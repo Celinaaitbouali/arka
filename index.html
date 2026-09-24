@@ -1,1043 +1,1166 @@
 <!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ARKA – Armoire de Ressources Connectée et Autonome</title>
-  <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIiB3aWR0aD0iMTIwIjoiaGVpZ2h0PSIxMjAiPgogIDxlbGxpcHNlIGN4PSI2MCIgY3k9IjY0IiByeD0iNTQiIHJ5PSIxOSIgdHJhbnNmb3JtPSJyb3RhdGUoLTE4IDYwIDY0KSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjRTg4M0FBIiBzdHJva2Utd2lkdGg9IjMiLz4KICA8cGF0aCBkPSJNMzAgOTYgTDYwIDIwIEw5MCA5NiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTQyMTNEIiBzdHJva2Utd2lkdGg9IjlB" type="image/svg+xml">
-  
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ARKA – Armoire de Ressources Connectée et Autonome</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' rx='26' fill='%2314213D'/%3E%3Cpath d='M30 96 L60 20 L90 96' fill='none' stroke='%23F5F3EE' stroke-width='11' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cline x1='44' y1='72' x2='76' y2='72' stroke='%23F5F3EE' stroke-width='9' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#14213D; --navy-deep:#0B1426; --navy-2:#1B2B4D; --navy-3:#24375F;
+  --orange:#E8833A; --orange-dark:#B35A17; --green:#2A9D8F; --green-l:#3FC1B0;
+  --red:#E05A4A; --amber:#E9B949; --ivory:#F5F3EE; --stone:#E9E6DF;
+  --ink-soft:#4A5468; --line:#D6D2C8; --muted-d:#9AA6BF;
+  --font-display:"Syne","Trebuchet MS",sans-serif; --font-body:"DM Sans",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font-body);font-size:15px;line-height:1.5}
+:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+button{font:inherit;cursor:pointer}
+.hidden{display:none!important}
 
-  <style>
-    :root {
-      --bg-main: #0B0F17;
-      --bg-card: rgba(22, 30, 46, 0.7);
-      --bg-card-hover: rgba(30, 41, 64, 0.8);
-      --border-color: rgba(255, 255, 255, 0.08);
-      --border-accent: rgba(56, 189, 248, 0.2);
-      
-      --text-main: #F1F5F9;
-      --text-muted: #94A3B8;
-      
-      --primary: #38BDF8;
-      --primary-glow: rgba(56, 189, 248, 0.15);
-      --orange: #F97316;
-      --green: #10B981;
-      --red: #EF4444;
-      --yellow: #F59E0B;
-      
-      --radius-sm: 8px;
-      --radius-md: 12px;
-      --radius-lg: 18px;
-      
-      --font-display: 'Syne', sans-serif;
-      --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    }
+/* ---------- Tableau de bord (salle de contrôle, sombre) ---------- */
+body.dash{background:var(--navy-deep);color:var(--ivory)}
+.dash header{display:flex;align-items:center;gap:20px;padding:16px 28px;background:var(--navy);border-bottom:1px solid var(--navy-3);position:sticky;top:0;z-index:5;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;color:inherit;text-decoration:none}
+.brand svg{width:40px;height:40px}
+.brand b{font-family:var(--font-display);font-weight:800;font-size:24px;letter-spacing:.14em}
+.brand span{font-size:13px;color:var(--muted-d);display:block;letter-spacing:0}
+.clock{font-family:var(--font-display);font-weight:700;font-size:22px;margin-left:auto}
+.pill{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;font-weight:500;font-size:14px}
+.pill::before{content:"";width:9px;height:9px;border-radius:50%;background:currentColor}
+.pill.ok{background:rgba(63,193,176,.15);color:var(--green-l)}
+.pill.warn{background:rgba(233,185,73,.15);color:var(--amber)}
+.pill.danger{background:rgba(224,90,74,.18);color:#FF8A7A}
+.pill.off{background:rgba(154,166,191,.15);color:var(--muted-d)}
+.tabs{display:flex;gap:4px;padding:12px 28px 0;background:var(--navy);border-bottom:1px solid var(--navy-3);overflow-x:auto}
+.tabs button{background:none;border:0;color:var(--muted-d);padding:10px 16px;border-bottom:3px solid transparent;white-space:nowrap}
+.tabs button:hover{color:var(--ivory)}
+.tabs button[aria-selected="true"]{color:var(--ivory);border-bottom-color:var(--orange);font-weight:500}
+.dash main{padding:24px 28px 48px;max-width:1400px;margin:0 auto}
+.grid{display:grid;gap:18px}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.card{background:var(--navy);border:1px solid var(--navy-3);border-radius:16px;padding:20px}
+.card h2{font-family:var(--font-display);font-weight:700;font-size:17px;margin:0 0 14px}
+.kpi .v{font-family:var(--font-display);font-weight:800;font-size:44px;line-height:1}
+.kpi .v small{font-size:17px;font-weight:600;margin-left:4px}
+.kpi .l{color:var(--muted-d);margin-top:8px;font-size:14px}
+.kpi .s{margin-top:10px;font-size:13px}
+.c-ok{color:var(--green-l)} .c-warn{color:var(--amber)} .c-danger{color:#FF8A7A} .c-mut{color:var(--muted-d)}
+.chart svg{width:100%;height:110px;display:block}
+.chart .cap{display:flex;justify-content:space-between;color:var(--muted-d);font-size:12px;margin-top:6px}
+.dash table{width:100%;border-collapse:collapse;font-size:14px}
+.dash th,.dash td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--navy-3)}
+.dash th{color:var(--muted-d);font-weight:500;font-size:13px}
+.dash tr:last-child td{border-bottom:0}
+.scroll{overflow-x:auto}
+.tag{display:inline-block;font-size:12px;font-weight:500;padding:2px 9px;border-radius:999px;margin:1px 3px 1px 0}
+.dash .tag{background:var(--navy-3);color:var(--ivory)}
+.dash .tag.ok{background:rgba(63,193,176,.18);color:var(--green-l)}
+.dash .tag.warn{background:rgba(233,185,73,.18);color:var(--amber)}
+.dash .tag.danger{background:rgba(224,90,74,.2);color:#FF8A7A}
+.crew{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}
+.pers{border-radius:12px;padding:12px 14px;background:var(--navy-2);border:1px solid var(--navy-3);border-left-width:4px}
+.pers.vert{border-left-color:var(--green-l)} .pers.orange{border-left-color:var(--amber)} .pers.rouge{border-left-color:var(--red);background:#2A2238}
+.pers .n{font-weight:500} .pers .p{font-size:12px;color:var(--muted-d)}
+.pers .vit{display:flex;gap:10px;font-size:13px;margin-top:8px;font-variant-numeric:tabular-nums}
+.pers .cond{font-size:12px;margin-top:6px}
+.bar{height:8px;border-radius:999px;background:var(--navy-3);overflow:hidden;min-width:60px}
+.bar span{display:block;height:100%;border-radius:999px;background:var(--green-l)}
+.bar span.warn{background:var(--amber)} .bar span.danger{background:var(--red)}
+.cascade{border-bottom:1px solid var(--navy-3);padding:12px 0}
+.cascade:last-child{border-bottom:0}
+.cascade .root{font-weight:500;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.cascade .step{font-size:13px;color:#C9CEDA;padding:3px 0;display:flex;gap:8px}
+.cascade .step::before{content:"↳";color:var(--orange)}
+.when{font-size:12px;color:var(--muted-d);white-space:nowrap;font-variant-numeric:tabular-nums}
+.banner{margin:0 0 18px;padding:12px 16px;border-radius:12px;background:rgba(233,185,73,.15);color:var(--amber)}
+.empty{color:var(--muted-d);padding:8px 0}
+.foot{color:var(--muted-d);font-size:13px;margin-top:28px}
+.foot a{color:var(--muted-d)}
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: var(--font-body);
-      background-color: var(--bg-main);
-      color: var(--text-main);
-      line-height: 1.5;
-      display: grid;
-      grid-template-columns: 280px 1fr;
-      min-height: 100vh;
-      background-image: 
-        radial-gradient(circle at 10% 20%, rgba(56, 189, 248, 0.05) 0%, transparent 40%),
-        radial-gradient(circle at 90% 80%, rgba(249, 115, 22, 0.04) 0%, transparent 40%);
-    }
-
-    /* --- Sidebar --- */
-    aside.sidebar {
-      background: rgba(15, 23, 42, 0.9);
-      border-right: 1px solid var(--border-color);
-      padding: 28px 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 28px;
-      position: sticky;
-      top: 0;
-      height: 100vh;
-      backdrop-filter: blur(12px);
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      text-decoration: none;
-      color: var(--text-main);
-    }
-    .brand-logo { width: 42px; height: 42px; filter: drop-shadow(0 0 8px rgba(56,189,248,0.4)); }
-    .brand-name {
-      font-family: var(--font-display);
-      font-size: 26px;
-      font-weight: 800;
-      letter-spacing: 0.1em;
-      background: linear-gradient(135deg, #FFF 30%, var(--primary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .nav { display: flex; flex-direction: column; gap: 6px; }
-    .nav a {
-      color: var(--text-muted);
-      text-decoration: none;
-      padding: 12px 14px;
-      border-radius: var(--radius-sm);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 14px;
-      font-weight: 500;
-      transition: all 0.2s ease;
-      border: 1px solid transparent;
-    }
-    .nav a:hover {
-      background: rgba(255, 255, 255, 0.04);
-      color: var(--text-main);
-      border-color: rgba(255, 255, 255, 0.05);
-    }
-    .nav a.active {
-      background: var(--primary-glow);
-      color: var(--primary);
-      border-color: var(--border-accent);
-      font-weight: 600;
-    }
-
-    .badge-count {
-      background: var(--orange);
-      color: #000;
-      font-size: 11px;
-      font-weight: 700;
-      padding: 2px 7px;
-      border-radius: 99px;
-    }
-
-    .role-box {
-      margin-top: auto;
-      background: rgba(255, 255, 255, 0.02);
-      padding: 14px;
-      border-radius: var(--radius-md);
-      border: 1px solid var(--border-color);
-    }
-    .role-box label { font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 6px; }
-    .role-box select {
-      width: 100%;
-      background: var(--bg-main);
-      color: var(--text-main);
-      border: 1px solid var(--border-color);
-      padding: 8px 10px;
-      border-radius: var(--radius-sm);
-      font-size: 13px;
-      outline: none;
-    }
-
-    /* --- Main Content --- */
-    main {
-      padding: 36px 48px;
-      max-width: 1300px;
-      width: 100%;
-      overflow-y: auto;
-    }
-
-    header.top-header {
-      margin-bottom: 28px;
-    }
-    h1 {
-      font-family: var(--font-display);
-      font-size: 32px;
-      font-weight: 700;
-      margin-bottom: 6px;
-    }
-    .intro { color: var(--text-muted); font-size: 15px; }
-
-    /* --- Layout Elements --- */
-    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 28px; }
-    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 28px; }
-
-    .card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-md);
-      padding: 24px;
-      backdrop-filter: blur(10px);
-      transition: border-color 0.2s ease;
-    }
-    .card:hover { border-color: rgba(255, 255, 255, 0.15); }
-
-    .card-title {
-      font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    /* KPI Autonomie */
-    .kpi-card {
-      position: relative;
-      overflow: hidden;
-    }
-    .kpi-val {
-      font-family: var(--font-display);
-      font-size: 44px;
-      font-weight: 800;
-      line-height: 1;
-      margin: 10px 0 6px;
-      color: #FFF;
-    }
-    .kpi-val small { font-size: 16px; color: var(--text-muted); font-weight: 400; margin-left: 4px; }
-    .kpi-lbl { font-size: 13px; color: var(--text-muted); }
-    .progress-bar {
-      height: 6px;
-      background: rgba(255, 255, 255, 0.08);
-      border-radius: 99px;
-      margin-top: 14px;
-      overflow: hidden;
-    }
-    .progress-bar span {
-      display: block;
-      height: 100%;
-      background: var(--primary);
-      border-radius: 99px;
-    }
-
-    /* Tableaux */
-    .table-container { overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
-    th {
-      color: var(--text-muted);
-      font-weight: 500;
-      padding: 12px 14px;
-      border-bottom: 1px solid var(--border-color);
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-    td {
-      padding: 14px;
-      border-bottom: 1px solid var(--border-color);
-      color: var(--text-main);
-    }
-    tr:last-child td { border-bottom: none; }
-
-    /* Tags & Badges */
-    .tag {
-      display: inline-flex;
-      align-items: center;
-      padding: 3px 10px;
-      border-radius: 99px;
-      font-size: 12px;
-      font-weight: 500;
-      gap: 4px;
-    }
-    .tag.ok { background: rgba(16, 185, 129, 0.15); color: var(--green); border: 1px solid rgba(16, 185, 129, 0.3); }
-    .tag.warn { background: rgba(245, 158, 11, 0.15); color: var(--yellow); border: 1px solid rgba(245, 158, 11, 0.3); }
-    .tag.danger { background: rgba(239, 68, 68, 0.15); color: var(--red); border: 1px solid rgba(239, 68, 68, 0.3); }
-    .tag.neutral { background: rgba(255, 255, 255, 0.06); color: var(--text-muted); }
-
-    /* Boutons & Formulaires */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--primary);
-      color: #000;
-      font-weight: 600;
-      padding: 10px 18px;
-      border-radius: var(--radius-sm);
-      border: none;
-      cursor: pointer;
-      font-size: 14px;
-      transition: all 0.2s ease;
-      gap: 8px;
-    }
-    .btn:hover { opacity: 0.9; transform: translateY(-1px); }
-    .btn.secondary {
-      background: transparent;
-      color: var(--text-main);
-      border: 1px solid var(--border-color);
-    }
-    .btn.secondary:hover { background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.2); }
-    .btn.sm { padding: 6px 12px; font-size: 12px; }
-
-    .form-group { margin-bottom: 16px; }
-    .form-group label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 6px; }
-    input[type="text"], input[type="number"], select, textarea {
-      width: 100%;
-      background: rgba(0, 0, 0, 0.2);
-      border: 1px solid var(--border-color);
-      color: var(--text-main);
-      padding: 10px 12px;
-      border-radius: var(--radius-sm);
-      font-family: inherit;
-      font-size: 14px;
-      outline: none;
-    }
-    input:focus, select:focus, textarea:focus { border-color: var(--primary); }
-    
-    .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-top: 6px; }
-    .checkbox-label { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-main); cursor: pointer; }
-
-    /* Cartes Serres / CropGuard */
-    .zone-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
-    .zone-card {
-      background: rgba(0, 0, 0, 0.3);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-sm);
-      padding: 16px;
-      text-align: center;
-    }
-    .zone-card.sick { border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.05); }
-
-    /* Alertes & Toast */
-    .alert-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      padding: 12px 0;
-      border-bottom: 1px solid var(--border-color);
-    }
-    .alert-item:last-child { border-bottom: none; }
-    
-    .toast {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      background: #1E293B;
-      color: #FFF;
-      border: 1px solid var(--border-accent);
-      padding: 14px 20px;
-      border-radius: var(--radius-md);
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-      transform: translateY(100px);
-      opacity: 0;
-      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      z-index: 100;
-    }
-    .toast.show { transform: translateY(0); opacity: 1; }
-
-    @media (max-width: 1024px) {
-      body { grid-template-columns: 1fr; }
-      aside.sidebar { height: auto; position: relative; }
-      main { padding: 24px; }
-      .grid-3, .grid-2 { grid-template-columns: 1fr; }
-    }
-  </style>
+/* ---------- Console admin (claire, séparée) ---------- */
+body.admin{background:var(--stone);color:var(--navy)}
+.admin header{display:flex;align-items:center;gap:16px;padding:16px 28px;background:var(--ivory);border-bottom:1px solid var(--line);flex-wrap:wrap}
+.admin header .brand span{color:var(--ink-soft)}
+.admin main{padding:24px 28px 56px;max-width:1300px;margin:0 auto}
+.admin .card{background:var(--ivory);border:1px solid var(--line)}
+.admin .muted{color:var(--ink-soft);font-size:14px}
+.admin table{width:100%;border-collapse:collapse;font-size:14px}
+.admin th,.admin td{text-align:left;padding:8px;border-bottom:1px solid var(--line)}
+.admin th{color:var(--ink-soft);font-weight:500;font-size:13px}
+.admin .tag{background:var(--stone);color:var(--navy)}
+.admin .tag.ok{background:#D4EFEA;color:#1D6F65}
+.admin .tag.warn{background:#FBE3D0;color:#8A4410}
+.admin .tag.danger{background:#F6D5D1;color:#8E2A1F}
+.admin .cascade{border-color:var(--line)}
+.admin .cascade .step{color:var(--ink-soft)}
+.admin .when{color:var(--ink-soft)}
+.admin .pill.ok{background:#D4EFEA;color:#1D6F65}
+.admin .pill.warn{background:#FBE3D0;color:#8A4410}
+.admin .pill.danger{background:#F6D5D1;color:#8E2A1F}
+.admin .pill.off{background:var(--line);color:var(--ink-soft)}
+.btn{border:0;border-radius:10px;padding:10px 16px;min-height:44px;background:var(--navy);color:var(--ivory);font-weight:500}
+.btn:hover{background:var(--navy-deep)}
+.btn.sec{background:transparent;color:var(--navy);border:1.5px solid var(--navy)}
+.btn.sec:hover{background:var(--stone)}
+.btn.warn{background:var(--orange-dark)}
+.btn.sm{padding:6px 12px;min-height:36px;font-size:14px}
+.btn[aria-pressed="true"]{background:var(--orange-dark);color:#fff;border-color:var(--orange-dark)}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.crise{border:1.5px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px;background:#fff}
+.crise.active{border-color:var(--orange-dark);background:#FFF6EE}
+.crise h3{margin:0;font-size:15px}
+.crise p{margin:0;font-size:13px;color:var(--ink-soft)}
+.admin label{font-weight:500;font-size:14px}
+.admin select,.admin input[type=number],.admin input[type=password],.admin input[type=text]{font:inherit;padding:9px 10px;border:1.5px solid var(--line);border-radius:10px;background:#fff;color:var(--navy)}
+.field{display:flex;flex-direction:column;gap:6px}
+.checks{display:flex;flex-wrap:wrap;gap:6px 16px;margin:6px 0 12px}
+.checks label{font-weight:400;display:flex;gap:6px;align-items:center}
+fieldset{border:1.5px solid var(--line);border-radius:10px;padding:10px 14px;margin:0 0 12px}
+legend{font-weight:500;font-size:14px;padding:0 6px}
+.login{max-width:420px;margin:12vh auto;background:var(--ivory);border:1px solid var(--line);border-radius:20px;padding:32px}
+.login h1{font-family:var(--font-display);margin:0 0 6px;font-size:26px}
+.err{color:#A32D2D;font-size:14px}
+.toast{position:fixed;right:20px;bottom:20px;background:var(--navy);color:var(--ivory);padding:12px 18px;border-radius:10px;opacity:0;transform:translateY(8px);transition:.2s;pointer-events:none;max-width:360px}
+.toast.show{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.toast{transition:none}}
+@media (max-width:1000px){.g4{grid-template-columns:repeat(2,minmax(0,1fr))}.g3,.g2{grid-template-columns:1fr}}
+@media (max-width:560px){.g4{grid-template-columns:1fr}.dash main,.admin main{padding:18px 14px}.dash header,.admin header{padding:12px 14px}.tabs{padding:8px 14px 0}}
+</style>
 </head>
 <body>
+<div id="root"></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <!-- Sidebar -->
-  <aside class="sidebar">
-    <a class="brand" href="#dashboard">
-      <svg class="brand-logo" viewBox="0 0 120 120">
-        <ellipse cx="60" cy="64" rx="54" ry="19" transform="rotate(-18 60 64)" fill="none" stroke="#F97316" stroke-width="4"/>
-        <path d="M30 96 L60 20 L90 96" fill="none" stroke="#F1F5F9" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
-        <line x1="44" y1="72" x2="76" y2="72" stroke="#F1F5F9" stroke-width="8" stroke-linecap="round"/>
-        <path d="M60 63 C52 56 53 46 60 41 C67 46 68 56 60 63 Z" fill="#10B981"/>
-        <circle cx="107" cy="43" r="5" fill="#F97316"/>
-      </svg>
-      <span class="brand-name">ARKA</span>
-    </a>
+<script>
+/* =====================================================================
+   ARKA – simulation du vaisseau (secteurs alimentation et infirmerie)
+   Principe repris du projet « Vaisseau OS » :
+   - un état global, une partie par module (armoire, cuisine, infirmerie)
+   - chaque module n'écrit que dans sa propre partie
+   - les modules communiquent uniquement par un bus d'événements
+   - chaque événement connaît sa cause : le journal affiche la cascade
+     « crise → effet → effet »
+   - une boucle fait avancer le vaisseau (1 seconde = 10 minutes à bord)
+   ===================================================================== */
 
-    <nav class="nav">
-      <a href="#dashboard" data-route="dashboard">Vue Générale</a>
-      <a href="#medicaments" data-route="medicaments">Infirmerie & Santé</a>
-      <a href="#alimentation" data-route="alimentation">Alimentation & Stocks</a>
-      <a href="#graines" data-route="graines">Ferme & CropGuard</a>
-      <a href="#equipage" data-route="equipage">Équipage</a>
-      <a href="#alertes" data-route="alertes">Alertes <span id="alert-count" class="badge-count">0</span></a>
-    </nav>
+/*ENGINE-START*/
+const MIN_PAR_TICK = 10;
+const REPAS = [{ h: 420, nom: "Petit-déjeuner" }, { h: 750, nom: "Déjeuner" }, { h: 1140, nom: "Dîner" }];
 
-    <div class="role-box">
-      <label for="role-select">Poste de contrôle :</label>
-      <select id="role-select">
-        <option value="admin">Commandement (Admin)</option>
-        <option value="medecine">Officier Médical</option>
-        <option value="cuisine">Gestionnaire Repas</option>
-        <option value="agriculture">Responsable Serres</option>
-      </select>
-      <button class="btn secondary sm" style="width: 100%; margin-top: 8px;" data-action="reset-data">Réinitialiser les données</button>
-    </div>
-  </aside>
+function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+let rand = mulberry32(42);
+const clone = (o) => JSON.parse(JSON.stringify(o));
 
-  <!-- Principal -->
-  <main id="app">
-    <!-- Le contenu dynamique sera généré ici -->
-  </main>
+const PRODUITS = {
+  poulet:   { nom: "Poulet riz halal",        zone: "froid", kcal: 540, allergenes: [],                   tags: ["halal"],                       leger: false, dureeJ: 7 },
+  bolo:     { nom: "Pâtes bolognaise",        zone: "froid", kcal: 580, allergenes: ["gluten"],           tags: [],                              leger: false, dureeJ: 6 },
+  poisson:  { nom: "Poisson et purée",        zone: "froid", kcal: 480, allergenes: ["poisson", "lactose"], tags: [],                            leger: false, dureeJ: 5 },
+  tofu:     { nom: "Tofu sauté aux légumes",  zone: "froid", kcal: 430, allergenes: ["soja"],             tags: ["végétarien", "vegan", "halal"], leger: false, dureeJ: 8 },
+  omelette: { nom: "Omelette pommes de terre", zone: "froid", kcal: 460, allergenes: ["œuf"],             tags: ["végétarien", "halal"],         leger: false, dureeJ: 6 },
+  curry:    { nom: "Curry de lentilles",      zone: "sec",   kcal: 420, allergenes: [],                   tags: ["végétarien", "vegan", "halal"], leger: false, dureeJ: 90 },
+  riz:      { nom: "Riz aux légumes",         zone: "sec",   kcal: 380, allergenes: [],                   tags: ["végétarien", "vegan", "halal"], leger: true,  dureeJ: 120 },
+  soupe:    { nom: "Soupe de légumes",        zone: "sec",   kcal: 200, allergenes: [],                   tags: ["végétarien", "vegan", "halal"], leger: true,  dureeJ: 120 }
+};
 
-  <div id="toast" class="toast"></div>
+const MEDS = {
+  paracetamol:      { nom: "Paracétamol 1 g",            allergene: null,          reserve: 300, medbox: 30, seuil: 12 },
+  amoxicilline:     { nom: "Amoxicilline 1 g",           allergene: "pénicilline", reserve: 80,  medbox: 12, seuil: 5 },
+  azithromycine:    { nom: "Azithromycine 500 mg",       allergene: null,          reserve: 40,  medbox: 6,  seuil: 3 },
+  sro:              { nom: "Sels de réhydratation",      allergene: null,          reserve: 150, medbox: 20, seuil: 8 },
+  ondansetron:      { nom: "Antiémétique",               allergene: null,          reserve: 60,  medbox: 10, seuil: 4 },
+  adrenaline:       { nom: "Adrénaline auto-injecteur",  allergene: null,          reserve: 10,  medbox: 2,  seuil: 1 },
+  antihistaminique: { nom: "Antihistaminique",           allergene: null,          reserve: 80,  medbox: 10, seuil: 4 },
+  insuline:         { nom: "Insuline (dose)",            allergene: null,          reserve: 40,  medbox: 4,  seuil: 2 }
+};
 
-  <script>
-    // --- DONNÉES PAR DÉFAUT ---
-    const ALLERGENES = ["arachide", "gluten", "lactose", "fruits à coque", "œuf", "poisson", "soja", "pénicilline", "aspirine"];
-    const REGIMES = ["végétarien", "vegan", "halal"];
-    const MALADIES = ["diabète", "maladie cœliaque", "hypertension"];
-    const PILIERS = ["Commandement", "Médecine", "Repas", "Agriculture", "Technique"];
+const ALLERGENES = ["arachide", "gluten", "lactose", "fruits à coque", "œuf", "poisson", "soja", "pénicilline", "aspirine"];
+const REGIMES = ["végétarien", "vegan", "halal"];
+const MALADIES = ["diabète", "maladie cœliaque", "hypertension"];
 
-    const DEFAULT_DATA = {
-      graines: [
-        { id: "g1", espece: "Tomate", quantite: 42, seuil: 20 },
-        { id: "g2", espece: "Laitue", quantite: 18, seuil: 20 },
-        { id: "g3", espece: "Blé", quantite: 120, seuil: 50 },
-        { id: "g4", espece: "Pomme de terre", quantite: 35, seuil: 25 },
-        { id: "g5", espece: "Soja", quantite: 60, seuil: 30 }
-      ],
+const EQUIPAGE_INIT = [
+  ["e1", "Lina Moreau", "Médecine", ["pénicilline"], [], []],
+  ["e2", "Yanis Benali", "Agriculture", ["arachide"], ["halal"], []],
+  ["e3", "Sofia Almeida", "Repas", ["gluten"], ["végétarien"], ["maladie cœliaque"]],
+  ["e4", "Marc Delaunay", "Robotique", [], [], ["diabète"]],
+  ["e5", "Inès Haddad", "Repas", ["lactose"], ["halal"], []],
+  ["e6", "Tom Lefèvre", "Pilier central", [], [], []],
+  ["e7", "Amina Diallo", "Médecine", [], ["halal"], []],
+  ["e8", "Hugo Martin", "Agriculture", ["poisson"], [], []],
+  ["e9", "Chloé Bernard", "Repas", [], ["vegan"], []],
+  ["e10", "Karim Saïdi", "Robotique", ["arachide", "fruits à coque"], [], []],
+  ["e11", "Léa Rousseau", "Agriculture", [], ["végétarien"], []],
+  ["e12", "Nathan Petit", "Pilier central", ["aspirine"], [], ["hypertension"]],
+  ["e13", "Sarah Cohen", "Médecine", [], [], []],
+  ["e14", "Mehdi Amrani", "Repas", [], ["halal"], []],
+  ["e15", "Emma Girard", "Robotique", ["lactose"], [], []],
+  ["e16", "Lucas Fontaine", "Agriculture", [], [], []],
+  ["e17", "Jade Nguyen", "Pilier central", ["pénicilline"], ["végétarien"], []],
+  ["e18", "Rayan Belkacem", "Robotique", [], ["halal"], []],
+  ["e19", "Manon Dubois", "Repas", ["œuf"], [], []],
+  ["e20", "Adam Mercier", "Médecine", [], [], []]
+].map(([id, nom, pilier, allergies, regimes, maladies]) => ({ id, nom, pilier, allergies, regimes, maladies }));
 
-      zones: [
-        { id: "z1", zone: "Serre A1", espece: "Tomate", etat: "saine", confiance: 97 },
-        { id: "z2", zone: "Serre A2", espece: "Laitue", etat: "saine", confiance: 94 },
-        { id: "z3", zone: "Serre B1", espece: "Blé", etat: "saine", confiance: 99 },
-        { id: "z4", zone: "Serre B2", espece: "Pomme de terre", etat: "malade", confiance: 88 },
-        { id: "z5", zone: "Serre C1", espece: "Soja", etat: "saine", confiance: 95 }
-      ],
+const CRISES = {
+  "panne-frigo": { titre: "Panne du compartiment réfrigéré", desc: "Le compresseur s'arrête : la température monte, les lots frais sont perdus, l'autonomie en repas baisse et la cuisine peut passer en rationnement." },
+  "intoxication": { titre: "Lot alimentaire contaminé", desc: "Un lot frais est contaminé sans que personne ne le sache. Après le prochain repas, des cas arrivent à l'infirmerie, qui remonte jusqu'au lot grâce à la traçabilité." },
+  "etiquetage": { titre: "Erreur d'étiquetage allergène", desc: "Un lot contient de l'arachide non déclarée. Un membre allergique fait une réaction : adrénaline de la MedBox, puis retrait du lot." },
+  "epidemie": { titre: "Épidémie de grippe", desc: "Cinq membres tombent malades et la contagion se propage. Plus de médicaments consommés, MedBox réapprovisionnée, repas retardés si l'équipe cuisine est touchée." },
+  "rupture": { titre: "Rupture de paracétamol en réserve", desc: "La réserve de l'armoire tombe presque à zéro : la prévision d'autonomie chute et la MedBox ne peut plus être réapprovisionnée." }
+};
 
-      medicaments: [
-        { id: "m1", nom: "Paracétamol 500 mg", allergene: null, reserve: 400, medbox: 30, seuilMedbox: 20, conso: [6, 5, 7, 4, 6, 8, 5, 6, 7, 5, 6, 4, 7, 6], dlc: "2027-12-31" },
-        { id: "m2", nom: "Amoxicilline 1 g", allergene: "pénicilline", reserve: 90, medbox: 10, seuilMedbox: 8, conso: [1, 0, 2, 1, 1, 0, 2, 1, 1, 2, 1, 0, 1, 2], dlc: "2026-11-15" },
-        { id: "m3", nom: "Aspirine 500 mg", allergene: "aspirine", reserve: 150, medbox: 15, seuilMedbox: 10, conso: [2, 1, 2, 3, 1, 2, 2, 1, 3, 2, 1, 2, 2, 1], dlc: "2028-05-20" },
-        { id: "m4", nom: "Antihistaminique", allergene: null, reserve: 60, medbox: 8, seuilMedbox: 6, conso: [1, 2, 1, 1, 2, 1, 3, 2, 1, 2, 2, 1, 2, 3], dlc: "2027-08-10" },
-        { id: "m5", nom: "Insuline (flacon)", allergene: null, reserve: 24, medbox: 4, seuilMedbox: 3, conso: [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5], dlc: "2026-10-30" }
-      ],
+function etatInitial() {
+  const t0 = 6 * 60;
+  const lots = [];
+  let n = 1;
+  const ajout = (pid, portions, decalageJ = 0) => {
+    const p = PRODUITS[pid];
+    lots.push({ id: "L" + String(n++).padStart(3, "0"), pid, portions, peremption: t0 + (p.dureeJ + decalageJ) * 1440, expo: 0, statut: "ok", allergenesReels: [...p.allergenes], contamine: false });
+  };
+  ajout("poulet", 40, -3); ajout("poulet", 40, 1); ajout("bolo", 70); ajout("poisson", 50);
+  ajout("tofu", 60); ajout("omelette", 60); ajout("curry", 120); ajout("riz", 140); ajout("soupe", 100);
+  const reserve = {}, medbox = {}, seuils = {};
+  for (const [k, m] of Object.entries(MEDS)) { reserve[k] = m.reserve; medbox[k] = m.medbox; seuils[k] = m.seuil; }
+  const patients = {};
+  EQUIPAGE_INIT.forEach((e) => { patients[e.id] = { cond: null, vitals: { temp: 36.8, spo2: 98, fc: 72 }, triage: "vert", doses: {} }; });
+  return {
+    t: t0, tick: 0, running: true, vitesse: 1, seq: 0, journal: [], crises: [],
+    equipage: clone(EQUIPAGE_INIT),
+    armoire: { froid: { temp: 4, panne: false, alerte: false }, pharma: { temp: 19 }, lots, reserve, pertes: [], nextLot: n, stockBas: {} },
+    cuisine: { mode: "nominal", attente: null, dernier: null },
+    infirmerie: { patients, medbox, seuils, demandes: {}, vide: {}, consoLog: [], isolement: false, incubations: [], casParLot: {} },
+    hist: { froid: [], malades: [], autoRepas: [], medbox: [] }
+  };
+}
 
-      aliments: [
-        { id: "a1", nom: "Ration pâtes bolognaise", categorie: "Plat", quantite: 80, allergenes: ["gluten"], tags: [], sucre: false },
-        { id: "a2", nom: "Curry de lentilles", categorie: "Plat", quantite: 65, allergenes: [], tags: ["végétarien", "vegan", "halal"], sucre: false },
-        { id: "a3", nom: "Poulet riz halal", categorie: "Plat", quantite: 50, allergenes: [], tags: ["halal"], sucre: false },
-        { id: "a4", nom: "Poisson et purée", categorie: "Plat", quantite: 30, allergenes: ["poisson", "lactose"], tags: [], sucre: false },
-        { id: "a5", nom: "Tofu sauté aux légumes", categorie: "Plat", quantite: 40, allergenes: ["soja"], tags: ["végétarien", "vegan", "halal"], sucre: false },
-        { id: "a6", nom: "Barre aux cacahuètes", categorie: "Collation", quantite: 120, allergenes: ["arachide"], tags: ["végétarien", "halal"], sucre: true },
-        { id: "a7", nom: "Compote de pommes", categorie: "Collation", quantite: 90, allergenes: [], tags: ["végétarien", "vegan", "halal"], sucre: true },
-        { id: "a8", nom: "Crackers sans gluten", categorie: "Collation", quantite: 70, allergenes: [], tags: ["végétarien", "vegan", "halal"], sucre: false },
-        { id: "a9", nom: "Yaourt nature", categorie: "Dessert", quantite: 60, allergenes: ["lactose"], tags: ["végétarien", "halal"], sucre: false }
-      ],
+let S = etatInitial();
+const evRefs = new Map();  // événements récents gardés en mémoire pour relier les causes
+const causes = {};         // dernières causes connues (panne, épidémie...)
 
-      equipage: [
-        { id: "e1", nom: "Lina Moreau", pilier: "Médecine", allergies: ["pénicilline"], regimes: [], maladies: [], notes: "Chef de bord médical" },
-        { id: "e2", nom: "Yanis Benali", pilier: "Agriculture", allergies: ["arachide"], regimes: ["halal"], maladies: [], notes: "Responsable hydroponie" },
-        { id: "e3", nom: "Sofia Almeida", pilier: "Repas", allergies: ["gluten"], regimes: ["végétarien"], maladies: ["maladie cœliaque"], notes: "" },
-        { id: "e4", nom: "Marc Delaunay", pilier: "Technique", allergies: [], regimes: [], maladies: ["diabète"], notes: "Suivi glycémique requis" }
-      ],
-
-      alertes: [
-        { id: "al1", date: new Date().toISOString(), niveau: "danger", pilier: "Agriculture", message: "CropGuard : Anomalie foliaire détectée en Serre B2." },
-        { id: "al2", date: new Date().toISOString(), niveau: "warn", pilier: "Agriculture", message: "Stock de graines de laitue sous le seuil critique." }
-      ]
-    };
-
-    // --- CHARGEMENT SÉCURISÉ ---
-    const STORAGE_KEY = "arka-app-state-v3";
-    let data = loadData();
-    let currentRole = "admin";
-    let stateUI = { memberFilter: "", deliveryStatus: null };
-
-    function loadData() {
-      try {
-        const local = localStorage.getItem(STORAGE_KEY);
-        if (local) {
-          const parsed = JSON.parse(local);
-          if (parsed && parsed.medicaments && parsed.medicaments.length > 0) {
-            return parsed;
+/* ---------- Bus d'événements avec traçage de causalité ---------- */
+function creerBus() {
+  const abonnes = [];
+  const file = [];
+  let enCours = false;
+  const correspond = (motif, type) => motif === "*" || motif === type || (motif.endsWith(".*") && type.startsWith(motif.slice(0, -1)));
+  return {
+    on(motif, fn) { abonnes.push({ motif, fn }); },
+    publish(type, data = {}, o = {}) {
+      const cause = o.cause || null;
+      const depth = cause ? cause.depth + 1 : 0;
+      if (depth > 12) return null;
+      const label = o.label || o.message || type;
+      const ev = {
+        id: ++S.seq, t: S.t, type, source: o.source || type.split(".")[0], level: o.level || "info",
+        message: o.message || type, data, silent: !!o.silent,
+        causeId: cause ? cause.id : null, rootId: cause ? cause.rootId : null, depth,
+        chemin: cause ? [...cause.chemin, label] : [label]
+      };
+      if (!ev.rootId) ev.rootId = ev.id;
+      evRefs.set(ev.id, ev);
+      if (evRefs.size > 600) evRefs.delete(evRefs.keys().next().value);
+      file.push(ev);
+      if (!enCours) {
+        enCours = true;
+        let traites = 0;
+        while (file.length && traites++ < 1000) {
+          const e = file.shift();
+          if (!e.silent) {
+            S.journal.push({ id: e.id, t: e.t, type: e.type, source: e.source, level: e.level, message: e.message, rootId: e.rootId, depth: e.depth, chemin: e.chemin });
+            if (S.journal.length > 600) S.journal.splice(0, S.journal.length - 600);
           }
+          for (const a of abonnes) if (correspond(a.motif, e.type)) { try { a.fn(e); } catch (err) { console.error(err); } }
         }
-      } catch (e) {
-        console.warn("Accès au stockage local bloqué, utilisation du stockage mémoire.");
+        file.length = 0;
+        enCours = false;
       }
-      return JSON.parse(JSON.stringify(DEFAULT_DATA));
+      return ev;
+    }
+  };
+}
+const bus = creerBus();
+
+/* ---------- Règles partagées ---------- */
+const membre = (id) => S.equipage.find((m) => m.id === id);
+const lotParId = (id) => S.armoire.lots.find((l) => l.id === id);
+const lotsDispo = () => S.armoire.lots.filter((l) => l.statut === "ok" && l.portions >= 1);
+const totalPortions = () => lotsDispo().reduce((s, l) => s + l.portions, 0);
+const autonomieRepas = () => totalPortions() / Math.max(1, S.equipage.length * 3);
+
+// Règles strictes : on se base sur l'étiquette du produit (ce que la cuisine connaît)
+function motifsIncompatibilite(p, m) {
+  const motifs = [];
+  const allergies = new Set(m.allergies);
+  if (m.maladies.includes("maladie cœliaque")) allergies.add("gluten");
+  p.allergenes.filter((a) => allergies.has(a)).forEach((a) => motifs.push("contient " + a));
+  m.regimes.forEach((r) => { if (!p.tags.includes(r)) motifs.push("non " + r); });
+  return motifs;
+}
+// Choix d'un lot : produits compatibles, puis « premier périmé, premier sorti »
+function choisirLot(m, lots, leger) {
+  let cand = lots.filter((l) => motifsIncompatibilite(PRODUITS[l.pid], m).length === 0);
+  if (leger) { const l2 = cand.filter((l) => PRODUITS[l.pid].leger); if (l2.length) cand = l2; }
+  cand.sort((a, b) => a.peremption - b.peremption || b.portions - a.portions);
+  return cand[0] || null;
+}
+function consoJour(med) {
+  return S.infirmerie.consoLog.filter((c) => c.med === med && c.t > S.t - 1440).reduce((s, c) => s + c.qty, 0);
+}
+function autonomieMed(med) {
+  const c = consoJour(med);
+  const stock = S.armoire.reserve[med] + S.infirmerie.medbox[med];
+  return c > 0 ? stock / c : Infinity;
+}
+
+/* ---------- Module ARMOIRE (stocks, froid, réserve de médicaments) ---------- */
+function initArmoire() {
+  const A = () => S.armoire;
+  const perte = (l, motif) => { A().pertes.unshift({ t: S.t, lot: l.id, nom: PRODUITS[l.pid].nom, portions: Math.round(l.portions), motif }); A().pertes = A().pertes.slice(0, 30); };
+
+  bus.on("crise.panne-frigo", (e) => {
+    A().froid.panne = true; causes.panne = e;
+    bus.publish("armoire.froid.panne", {}, { cause: e, level: "danger", message: "Compresseur du compartiment réfrigéré à l'arrêt", label: "Compresseur à l'arrêt" });
+  });
+  bus.on("admin.reparer", (e) => {
+    if (!A().froid.panne) return;
+    A().froid.panne = false;
+    bus.publish("armoire.froid.repare", {}, { cause: e, level: "ok", message: "Compresseur réparé : retour progressif vers 4 °C", label: "Compresseur réparé" });
+  });
+  bus.on("crise.intoxication", (e) => {
+    const cible = lotsDispo().filter((l) => PRODUITS[l.pid].zone === "froid").sort((a, b) => a.peremption - b.peremption)[0];
+    if (!cible) return;
+    cible.contamine = true;
+    cible.causeRef = bus.publish("armoire.lot.contamine", { lotId: cible.id }, { cause: e, level: "warn", message: `Contamination invisible du lot ${cible.id} (${PRODUITS[cible.pid].nom})`, label: `Lot ${cible.id} contaminé` }).id;
+  });
+  bus.on("crise.etiquetage", (e) => {
+    const allergique = S.equipage.find((m) => m.allergies.includes("arachide"));
+    const cible = allergique && choisirLot(allergique, lotsDispo(), false);
+    if (!cible) { bus.publish("armoire.etiquetage", {}, { cause: e, message: "Aucun membre allergique à l'arachide : erreur sans conséquence" }); return; }
+    if (!cible.allergenesReels.includes("arachide")) cible.allergenesReels.push("arachide");
+    cible.causeRef = bus.publish("armoire.etiquetage", { lotId: cible.id }, { cause: e, level: "warn", message: `Arachide présente mais non déclarée dans le lot ${cible.id} (${PRODUITS[cible.pid].nom})`, label: `Arachide non déclarée (lot ${cible.id})` }).id;
+  });
+  bus.on("crise.rupture", (e) => {
+    A().reserve.paracetamol = Math.min(A().reserve.paracetamol, 3);
+    bus.publish("armoire.reserve.maj", { med: "paracetamol" }, { cause: e, level: "danger", message: "Réserve de paracétamol : 3 unités restantes", label: "Réserve paracétamol : 3" });
+  });
+  bus.on("cuisine.retrait", (e) => {
+    for (const r of e.data.retraits) { const l = lotParId(r.lotId); if (l) l.portions = Math.max(0, l.portions - r.qty); }
+    for (const pid of Object.keys(PRODUITS)) {
+      const tot = lotsDispo().filter((l) => l.pid === pid).reduce((s, l) => s + l.portions, 0);
+      if (tot < 15 && !A().stockBas[pid]) { A().stockBas[pid] = true; bus.publish("armoire.stock.bas", { pid }, { cause: e, level: "warn", message: `Stock bas : ${PRODUITS[pid].nom} (${Math.round(tot)} portions)`, label: `Stock bas ${PRODUITS[pid].nom}` }); }
+      if (tot >= 15) A().stockBas[pid] = false;
+    }
+  });
+  bus.on("infirmerie.demande.reappro", (e) => {
+    const { med, qty } = e.data;
+    const dispo = Math.min(qty, A().reserve[med]);
+    if (dispo > 0) {
+      A().reserve[med] -= dispo;
+      bus.publish("armoire.reappro.medbox", { med, qty: dispo }, { cause: e, message: `${dispo} × ${MEDS[med].nom} envoyés de la réserve vers la MedBox`, label: `Armoire → MedBox : ${dispo} ${MEDS[med].nom}` });
+    }
+    if (dispo < qty) bus.publish("armoire.rupture.med", { med }, { cause: e, level: "danger", message: `Réserve insuffisante : ${MEDS[med].nom} (${A().reserve[med]} restants)`, label: `Rupture ${MEDS[med].nom}` });
+  });
+  bus.on("infirmerie.suspicion.alimentaire", (e) => {
+    const l = lotParId(e.data.lotId);
+    if (!l || l.statut !== "ok") return;
+    perte(l, e.data.motif === "allergene" ? "Allergène non déclaré" : "Contamination suspectée");
+    const p = Math.round(l.portions);
+    l.statut = "quarantaine"; l.portions = 0;
+    bus.publish("armoire.lot.quarantaine", { lotId: l.id }, { cause: e, level: "warn", message: `Lot ${l.id} (${PRODUITS[l.pid].nom}) retiré de l'armoire : ${p} portions en quarantaine`, label: `Lot ${l.id} en quarantaine` });
+  });
+  bus.on("admin.livraison", (e) => {
+    const { pid, qty } = e.data;
+    const p = PRODUITS[pid];
+    const id = "L" + String(A().nextLot++).padStart(3, "0");
+    A().lots.push({ id, pid, portions: qty, peremption: S.t + p.dureeJ * 1440, expo: 0, statut: "ok", allergenesReels: [...p.allergenes], contamine: false });
+    bus.publish("armoire.lot.ajoute", { lotId: id }, { cause: e, level: "ok", message: `Nouveau lot ${id} rangé : ${qty} portions de ${p.nom}`, label: `Lot ${id} rangé` });
+  });
+  bus.on("admin.reappro", (e) => {
+    const { med, qty } = e.data;
+    A().reserve[med] += qty;
+    bus.publish("armoire.reserve.maj", { med }, { cause: e, level: "ok", message: `Réserve de ${MEDS[med].nom} : +${qty} (total ${A().reserve[med]})`, label: `Réserve ${MEDS[med].nom} +${qty}` });
+  });
+}
+function tickArmoire() {
+  const A = S.armoire, f = A.froid;
+  const cible = f.panne ? 21 : 4;
+  f.temp += (cible - f.temp) * (f.panne ? 0.07 : 0.25) + (rand() - 0.5) * 0.12;
+  A.pharma.temp = 19 + (rand() - 0.5) * 0.6;
+  if (f.temp > 8 && !f.alerte) {
+    f.alerte = true;
+    causes.froid = bus.publish("armoire.froid.alerte", {}, { cause: causes.panne, level: "danger", message: `Compartiment réfrigéré à ${f.temp.toFixed(1).replace(".", ",")} °C : chaîne du froid rompue`, label: "Chaîne du froid rompue" });
+  }
+  if (f.temp <= 6 && f.alerte) {
+    f.alerte = false;
+    bus.publish("armoire.froid.normal", {}, { level: "ok", message: `Compartiment réfrigéré revenu à ${f.temp.toFixed(1).replace(".", ",")} °C`, label: "Froid rétabli" });
+  }
+  for (const l of A.lots) {
+    if (l.statut !== "ok" || l.portions < 1) continue;
+    const p = PRODUITS[l.pid];
+    if (p.zone === "froid" && f.temp > 8) {
+      l.expo++;
+      if (l.expo >= 6) {
+        A.pertes.unshift({ t: S.t, lot: l.id, nom: p.nom, portions: Math.round(l.portions), motif: "Chaîne du froid rompue" });
+        const qte = Math.round(l.portions);
+        l.statut = "perdu"; l.portions = 0;
+        causes.perte = bus.publish("armoire.lot.perdu", { lotId: l.id }, { cause: causes.froid, level: "danger", message: `Lot ${l.id} (${p.nom}) jeté : ${qte} portions exposées plus d'une heure au-dessus de 8 °C`, label: `Lot ${l.id} jeté (${qte} portions)` });
+      }
+    }
+    if (S.t > l.peremption) {
+      A.pertes.unshift({ t: S.t, lot: l.id, nom: p.nom, portions: Math.round(l.portions), motif: "Date de péremption dépassée" });
+      l.statut = "perime"; l.portions = 0;
+      causes.perte = bus.publish("armoire.lot.perime", { lotId: l.id }, { level: "warn", message: `Lot ${l.id} (${p.nom}) périmé et retiré`, label: `Lot ${l.id} périmé` });
+    }
+  }
+  A.pertes = A.pertes.slice(0, 30);
+}
+
+/* ---------- Module CUISINE (repas, rationnement, compatibilité) ---------- */
+function initCuisine() {
+  bus.on("armoire.lot.quarantaine", (e) => {
+    bus.publish("cuisine.menu.ajuste", {}, { cause: e, message: "Menus recalculés sans le lot retiré", label: "Menus recalculés" });
+  });
+}
+function servirRepas(nomRepas, cause) {
+  const C = S.cuisine;
+  const ration = C.mode === "rationnement" ? 0.75 : 1;
+  const reste = {};
+  const servings = [], sans = [];
+  let kcal = 0;
+  for (const m of S.equipage) {
+    const P = S.infirmerie.patients[m.id];
+    const dispo = lotsDispo().filter((l) => (reste[l.id] ?? l.portions) >= ration);
+    const l = choisirLot(m, dispo, !!(P && P.cond));
+    if (!l) { sans.push(m.nom); continue; }
+    reste[l.id] = (reste[l.id] ?? l.portions) - ration;
+    servings.push({ membre: m.id, lotId: l.id });
+    kcal += PRODUITS[l.pid].kcal * ration;
+  }
+  const parLot = {};
+  servings.forEach((s) => { parLot[s.lotId] = (parLot[s.lotId] || 0) + ration; });
+  C.dernier = { repas: nomRepas, t: S.t, servis: servings.length, sans, kcal: servings.length ? Math.round(kcal / servings.length) : 0 };
+  const ev = bus.publish("cuisine.repas.servi", { repas: nomRepas, servings }, {
+    cause, level: sans.length ? "warn" : "info",
+    message: `${nomRepas} servi à ${servings.length}/${S.equipage.length} membres${ration < 1 ? " (rations réduites de 25 %)" : ""}`,
+    label: `${nomRepas} servi`
+  });
+  bus.publish("cuisine.retrait", { retraits: Object.entries(parLot).map(([lotId, qty]) => ({ lotId, qty })) }, { cause: ev, silent: true });
+  if (sans.length) bus.publish("cuisine.aucun.compatible", { membres: sans }, { cause: ev, level: "danger", message: `Aucun plat compatible en stock pour : ${sans.join(", ")}`, label: "Aucun plat compatible" });
+}
+function tickCuisine() {
+  const C = S.cuisine;
+  const prev = (S.t - MIN_PAR_TICK) % 1440, cur = S.t % 1440;
+  for (const r of REPAS) {
+    if (!(prev < r.h && cur >= r.h)) continue;
+    const staffMalade = S.equipage.filter((m) => m.pilier === "Repas" && S.infirmerie.patients[m.id].cond && S.infirmerie.patients[m.id].cond.sev > 0.35).length;
+    if (staffMalade >= 2 && !C.attente) {
+      C.attente = { repas: r.nom, t: S.t + 60 };
+      bus.publish("cuisine.service.retarde", {}, { cause: causes.epidemie, level: "warn", message: `${r.nom} retardé d'une heure : ${staffMalade} membres de l'équipe cuisine malades`, label: `${r.nom} retardé` });
+    } else {
+      servirRepas(r.nom, null);
+    }
+  }
+  if (C.attente && S.t >= C.attente.t) { const nom = C.attente.repas; C.attente = null; servirRepas(nom, null); }
+  const auto = autonomieRepas();
+  if (auto < 7 && C.mode === "nominal") {
+    C.mode = "rationnement";
+    bus.publish("cuisine.mode", { mode: C.mode }, { cause: causes.perte, level: "warn", message: `Autonomie en repas : ${auto.toFixed(1).replace(".", ",")} jours. Passage en rationnement (portions −25 %)`, label: "Rationnement" });
+  } else if (auto >= 9 && C.mode === "rationnement") {
+    C.mode = "nominal";
+    bus.publish("cuisine.mode", { mode: C.mode }, { level: "ok", message: `Autonomie en repas : ${auto.toFixed(1).replace(".", ",")} jours. Retour aux portions normales`, label: "Fin du rationnement" });
+  }
+}
+
+/* ---------- Module INFIRMERIE (constantes, triage, soins, MedBox) ---------- */
+const causePatient = {};
+function demander(med, cause) {
+  const I = S.infirmerie;
+  if (I.demandes[med]) return;
+  const qty = Math.max(1, I.seuils[med] * 2 - Math.floor(I.medbox[med]));
+  I.demandes[med] = true;
+  bus.publish("infirmerie.demande.reappro", { med, qty }, { cause, message: `MedBox sous le seuil : demande de ${qty} × ${MEDS[med].nom} à l'armoire`, label: `Demande MedBox : ${MEDS[med].nom}` });
+}
+function donner(m, P, med, cause, silencieux = false) {
+  const I = S.infirmerie;
+  if (MEDS[med].allergene && m.allergies.includes(MEDS[med].allergene)) {
+    bus.publish("infirmerie.contre-indication", { med, membre: m.id }, { cause, level: "warn", message: `${MEDS[med].nom} bloqué pour ${m.nom} : allergie déclarée (${MEDS[med].allergene})`, label: `${MEDS[med].nom} bloqué (allergie)` });
+    return false;
+  }
+  if (I.medbox[med] < 1) {
+    if (!I.vide[med]) { I.vide[med] = true; bus.publish("infirmerie.medbox.vide", { med }, { cause, level: "danger", message: `MedBox vide : ${MEDS[med].nom} indisponible pour ${m.nom}`, label: `MedBox vide : ${MEDS[med].nom}` }); }
+    demander(med, cause);
+    return false;
+  }
+  I.medbox[med] -= 1;
+  P.doses[med] = S.t;
+  I.consoLog.push({ t: S.t, med, qty: 1 });
+  const ev = bus.publish("infirmerie.soin", { med, membre: m.id }, { cause, silent: silencieux, message: `${MEDS[med].nom} administré à ${m.nom}`, label: `${MEDS[med].nom} → ${m.nom}` });
+  if (I.medbox[med] < I.seuils[med]) demander(med, ev);
+  return true;
+}
+function tomberMalade(m, type, cause, extra = {}) {
+  const P = S.infirmerie.patients[m.id];
+  if (P.cond && type !== "anaphylaxie") return null;
+  if (type === "grippe" && P.immunise) return null;
+  P.cond = { type, sev: type === "anaphylaxie" ? 0.95 : type === "intox" ? 0.55 : 0.25, duree: 0, pic: 14 + Math.floor(rand() * 14), bacterien: false, antibio: false, adre: false, ...extra };
+  const apres = extra.repas ? ` après le ${extra.repas.toLowerCase()}` : "";
+  const msg = type === "grippe" ? `${m.nom} a la grippe` : type === "intox" ? `Intoxication alimentaire : ${m.nom}${apres} (lot ${extra.lotId})` : `Réaction allergique grave : ${m.nom}${apres} (allergène non déclaré : ${extra.allergene})`;
+  const ev = bus.publish("infirmerie.cas", { membre: m.id, type }, { cause, level: type === "grippe" ? "warn" : "danger", message: msg, label: msg });
+  causePatient[m.id] = ev;
+  return ev;
+}
+function initInfirmerie() {
+  const I = () => S.infirmerie;
+  bus.on("armoire.reappro.medbox", (e) => { I().medbox[e.data.med] += e.data.qty; I().demandes[e.data.med] = false; I().vide[e.data.med] = false; });
+  bus.on("armoire.rupture.med", (e) => { I().demandes[e.data.med] = "rupture"; });
+  bus.on("armoire.reserve.maj", (e) => {
+    const med = e.data.med;
+    if (I().demandes[med] === "rupture" && S.armoire.reserve[med] > 0) { I().demandes[med] = false; if (I().medbox[med] < I().seuils[med]) demander(med, e); }
+  });
+  bus.on("crise.epidemie", (e) => {
+    causes.epidemie = e;
+    const sains = S.equipage.filter((m) => !I().patients[m.id].cond);
+    for (let k = 0; k < 5 && sains.length; k++) tomberMalade(sains.splice(Math.floor(rand() * sains.length), 1)[0], "grippe", e);
+  });
+  bus.on("admin.isolement", (e) => { I().isolement = !!e.data.actif; });
+  bus.on("cuisine.repas.servi", (e) => {
+    for (const s of e.data.servings) {
+      const l = lotParId(s.lotId), m = membre(s.membre);
+      if (!l || !m) continue;
+      if (l.contamine && rand() < 0.75) I().incubations.push({ membre: m.id, type: "intox", t: S.t + 20 + Math.floor(rand() * 3) * 10, lotId: l.id, ref: l.causeRef ?? e.id, repas: e.data.repas });
+      const cache = l.allergenesReels.filter((a) => !PRODUITS[l.pid].allergenes.includes(a) && m.allergies.includes(a));
+      if (cache.length) I().incubations.push({ membre: m.id, type: "anaphylaxie", t: S.t + MIN_PAR_TICK, lotId: l.id, allergene: cache[0], ref: l.causeRef ?? e.id, repas: e.data.repas });
+    }
+  });
+}
+function tickInfirmerie() {
+  const I = S.infirmerie;
+  // Déclenchement des cas liés aux repas (incubation)
+  I.incubations = I.incubations.filter((inc) => {
+    if (S.t < inc.t) return true;
+    const m = membre(inc.membre);
+    if (!m) return false;
+    const ev = tomberMalade(m, inc.type, evRefs.get(inc.ref) || null, { lotId: inc.lotId, allergene: inc.allergene, repas: inc.repas });
+    if (!ev) return false;
+    if (inc.type === "anaphylaxie") {
+      bus.publish("infirmerie.suspicion.alimentaire", { lotId: inc.lotId, motif: "allergene" }, { cause: ev, level: "warn", message: `Traçabilité : allergène non déclaré (${inc.allergene}) suspecté dans le lot ${inc.lotId}`, label: `Traçabilité → lot ${inc.lotId}` });
+    } else {
+      I.casParLot[inc.lotId] = (I.casParLot[inc.lotId] || 0) + 1;
+      if (I.casParLot[inc.lotId] === 2) bus.publish("infirmerie.suspicion.alimentaire", { lotId: inc.lotId, motif: "contamination" }, { cause: ev, level: "warn", message: `Traçabilité : 2 cas ont mangé le lot ${inc.lotId}, contamination suspectée`, label: `Traçabilité → lot ${inc.lotId}` });
+    }
+    return false;
+  });
+  // Contagion de la grippe
+  const grippes = S.equipage.filter((m) => I.patients[m.id].cond && I.patients[m.id].cond.type === "grippe").length;
+  if (grippes) {
+    const p = 0.0012 * grippes * (I.isolement ? 0.15 : 1);
+    for (const m of S.equipage) if (!I.patients[m.id].cond && rand() < p) tomberMalade(m, "grippe", causes.epidemie || null);
+  }
+  // Évolution, constantes, triage, soins
+  const insuline = (S.t - MIN_PAR_TICK) % 1440 < 420 && S.t % 1440 >= 420;
+  for (const m of S.equipage) {
+    const P = I.patients[m.id];
+    const c = P.cond;
+    const cause = causePatient[m.id] || null;
+    if (c) {
+      c.duree++;
+      if (c.type === "grippe") {
+        if (c.bacterien && !c.antibio) c.sev = Math.min(1, c.sev + 0.01);
+        else if (c.duree < c.pic) c.sev = Math.min(0.9, c.sev + 0.035);
+        else c.sev -= c.antibio ? 0.03 : 0.02;
+        if (!c.bacterien && c.sev > 0.6 && rand() < 0.008) {
+          c.bacterien = true;
+          bus.publish("infirmerie.surinfection", { membre: m.id }, { cause, level: "warn", message: `Surinfection bactérienne chez ${m.nom} : antibiotique nécessaire`, label: `Surinfection ${m.nom}` });
+        }
+      } else if (c.type === "intox") {
+        c.sev -= (S.t - (P.doses.sro ?? -1e9) < 180) ? 0.03 : 0.012;
+      } else if (c.type === "anaphylaxie") {
+        c.sev = c.adre ? c.sev - 0.07 : Math.min(1, c.sev + 0.02);
+      }
+      if (c.sev <= 0.05) {
+        if (c.type === "grippe") P.immunise = true;
+        P.cond = null;
+        bus.publish("infirmerie.guerison", { membre: m.id }, { cause, level: "ok", message: `${m.nom} est guéri(e)`, label: `${m.nom} guéri(e)` });
+        delete causePatient[m.id];
+      }
+    }
+    const cc = P.cond;
+    const n = () => rand() - 0.5;
+    let temp = 36.7 + n() * 0.3, fc = 70 + n() * 6, spo2 = 98 + n() * 1.2;
+    if (cc) {
+      if (cc.type === "grippe") { temp += cc.sev * 3.2; fc += cc.sev * 35; spo2 -= cc.sev * (cc.bacterien ? 7 : 3); }
+      if (cc.type === "intox") { temp += cc.sev * 1.4; fc += cc.sev * 40; spo2 -= cc.sev * 2; }
+      if (cc.type === "anaphylaxie") { fc += cc.sev * 60; spo2 -= cc.sev * 16; }
+      if (temp > 37 && S.t - (P.doses.paracetamol ?? -1e9) < 360) temp = 37 + (temp - 37) * 0.45;
+    }
+    P.vitals = { temp: +temp.toFixed(1), fc: Math.round(fc), spo2: Math.round(Math.min(100, spo2)) };
+    const v = P.vitals;
+    const triage = (v.spo2 < 92 || v.temp >= 39.5 || v.fc >= 125) ? "rouge" : (v.spo2 < 95 || v.temp >= 38 || v.fc >= 100) ? "orange" : "vert";
+    if (triage !== P.triage) {
+      const avant = P.triage;
+      P.triage = triage;
+      if (triage === "rouge" || avant === "rouge") bus.publish("infirmerie.triage", { membre: m.id, triage }, { cause, level: triage === "rouge" ? "danger" : "info", message: `${m.nom} passe en triage ${triage}`, label: `${m.nom} : triage ${triage}` });
+    }
+    // Soins
+    if (cc) {
+      if (v.temp >= 38.5 && S.t - (P.doses.paracetamol ?? -1e9) >= 360) donner(m, P, "paracetamol", cause);
+      if (cc.type === "grippe" && cc.bacterien && !cc.antibio) {
+        let med = "amoxicilline";
+        if (m.allergies.includes("pénicilline")) {
+          bus.publish("infirmerie.contre-indication", { med, membre: m.id }, { cause, level: "warn", message: `Amoxicilline bloquée pour ${m.nom} (allergie à la pénicilline) : azithromycine prescrite à la place`, label: "Amoxicilline bloquée → azithromycine" });
+          med = "azithromycine";
+        }
+        if (donner(m, P, med, cause)) cc.antibio = true;
+      }
+      if (cc.type === "intox") {
+        if (S.t - (P.doses.sro ?? -1e9) >= 120) donner(m, P, "sro", cause);
+        if (cc.sev > 0.3 && S.t - (P.doses.ondansetron ?? -1e9) >= 480) donner(m, P, "ondansetron", cause);
+      }
+      if (cc.type === "anaphylaxie") {
+        if (!cc.adre) { if (donner(m, P, "adrenaline", cause)) cc.adre = true; }
+        else if (S.t - (P.doses.antihistaminique ?? -1e9) >= 480) donner(m, P, "antihistaminique", cause);
+      }
+    }
+    if (insuline && m.maladies.includes("diabète")) donner(m, P, "insuline", null, true);
+    if (!cc && rand() < 0.002) donner(m, P, "paracetamol", null, true);
+  }
+  I.consoLog = I.consoLog.filter((c) => c.t > S.t - 2880);
+}
+
+/* ---------- Boucle et commandes ---------- */
+function historiser() {
+  const h = S.hist, push = (k, v) => { h[k].push(v); if (h[k].length > 144) h[k].shift(); };
+  push("froid", +S.armoire.froid.temp.toFixed(1));
+  push("malades", S.equipage.filter((m) => S.infirmerie.patients[m.id].cond).length);
+  push("autoRepas", +autonomieRepas().toFixed(1));
+  push("medbox", Object.values(S.infirmerie.medbox).reduce((a, b) => a + b, 0));
+}
+function tick() {
+  S.t += MIN_PAR_TICK; S.tick++;
+  tickArmoire(); tickCuisine(); tickInfirmerie();
+  historiser();
+}
+function commande(c) {
+  const src = { source: "admin" };
+  switch (c.cmd) {
+    case "pause": S.running = !S.running; bus.publish("admin.simulation", {}, { ...src, message: S.running ? "Simulation relancée" : "Simulation en pause" }); break;
+    case "vitesse": S.vitesse = c.args.v; break;
+    case "crise":
+      if (!CRISES[c.args.nom]) return;
+      S.crises.push({ nom: c.args.nom, t: S.t });
+      bus.publish("crise." + c.args.nom, {}, { ...src, level: "danger", message: "Crise déclenchée : " + CRISES[c.args.nom].titre, label: "Crise : " + CRISES[c.args.nom].titre });
+      break;
+    case "reset": {
+      const v = S.vitesse, eq = S.equipage;
+      S = etatInitial(); S.vitesse = v; S.equipage = eq;
+      S.equipage.forEach((m) => { if (!S.infirmerie.patients[m.id]) S.infirmerie.patients[m.id] = { cond: null, vitals: { temp: 36.8, spo2: 98, fc: 72 }, triage: "vert", doses: {} }; });
+      evRefs.clear(); for (const k in causes) delete causes[k]; for (const k in causePatient) delete causePatient[k];
+      bus.publish("admin.reset", {}, { ...src, level: "ok", message: "Réinitialisation : stocks, infirmerie et cuisine reviennent au nominal" });
+      break;
+    }
+    case "reparer": bus.publish("admin.reparer", {}, { ...src, message: "Intervention : réparation du compresseur demandée", label: "Réparation demandée" }); break;
+    case "isolement": bus.publish("admin.isolement", { actif: c.args.actif }, { ...src, level: c.args.actif ? "warn" : "info", message: c.args.actif ? "Isolement des malades activé à l'infirmerie" : "Isolement des malades levé" }); break;
+    case "livraison": if (PRODUITS[c.args.pid] && c.args.qty > 0) bus.publish("admin.livraison", { pid: c.args.pid, qty: c.args.qty }, { ...src, message: `Livraison de la ferme : ${c.args.qty} portions de ${PRODUITS[c.args.pid].nom}`, label: "Livraison" }); break;
+    case "reappro": if (MEDS[c.args.med] && c.args.qty > 0) bus.publish("admin.reappro", { med: c.args.med, qty: c.args.qty }, { ...src, message: `Production / livraison : ${c.args.qty} × ${MEDS[c.args.med].nom} pour la réserve`, label: "Réserve réapprovisionnée" }); break;
+    case "profil": {
+      const m = membre(c.args.id);
+      if (!m) return;
+      m.allergies = c.args.allergies; m.regimes = c.args.regimes; m.maladies = c.args.maladies;
+      bus.publish("admin.profil", { membre: m.id }, { ...src, message: `Profil santé de ${m.nom} mis à jour` });
+      break;
+    }
+    case "membre": {
+      const nom = String(c.args.nom || "").trim().slice(0, 40);
+      if (!nom) return;
+      const id = "e" + Date.now().toString(36);
+      S.equipage.push({ id, nom, pilier: c.args.pilier || "Pilier central", allergies: c.args.allergies || [], regimes: c.args.regimes || [], maladies: c.args.maladies || [] });
+      S.infirmerie.patients[id] = { cond: null, vitals: { temp: 36.8, spo2: 98, fc: 72 }, triage: "vert", doses: {} };
+      bus.publish("admin.membre", { membre: id }, { ...src, level: "ok", message: `Nouveau membre enregistré : ${nom}` });
+      break;
+    }
+  }
+}
+let moteurPret = false;
+function initMoteur() {
+  if (moteurPret) return;
+  initArmoire(); initCuisine(); initInfirmerie();
+  moteurPret = true;
+}
+/*ENGINE-END*/
+
+/* =====================================================================
+   Communication entre les onglets (tableau de bord et console admin)
+   Le tableau de bord fait tourner la simulation et publie l'état ;
+   la console admin envoie des commandes. Tout passe par le navigateur.
+   ===================================================================== */
+const MODE = location.hash === "#admin" ? "admin" : "dash";
+const TAB_ID = Math.random().toString(36).slice(2);
+const K_SNAP = "arka-v2-snap", K_CMD = "arka-v2-cmd", K_LEAD = "arka-v2-leader";
+let V = null;           // dernier état reçu (vue)
+let leader = false;
+const vus = new Set();
+
+function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+function lsSet(k, v) { try { localStorage.setItem(k, v); return true; } catch (e) { return false; } }
+
+function devenirLeader() {
+  if (MODE !== "dash") return false;
+  try {
+    const l = JSON.parse(lsGet(K_LEAD) || "null");
+    if (!l || Date.now() - l.ts > 3000 || l.id === TAB_ID) { lsSet(K_LEAD, JSON.stringify({ id: TAB_ID, ts: Date.now() })); return true; }
+    return false;
+  } catch (e) { return true; }
+}
+function publierSnapshot() {
+  const snap = { ts: Date.now(), S };
+  V = snap;
+  lsSet(K_SNAP, JSON.stringify(snap));
+}
+function envoyer(cmd, args = {}) {
+  const c = { nonce: TAB_ID + Date.now() + Math.random(), cmd, args };
+  if (leader) { traiterCommande(c); return; }
+  lsSet(K_CMD, JSON.stringify(c));
+}
+function traiterCommande(c) {
+  if (!c || vus.has(c.nonce)) return;
+  vus.add(c.nonce);
+  commande(c);
+  publierSnapshot();
+  rendre();
+}
+window.addEventListener("storage", (e) => {
+  if (e.key === K_SNAP && e.newValue && !leader) { try { V = JSON.parse(e.newValue); rendre(); } catch (err) {} }
+  if (e.key === K_CMD && e.newValue && leader) { try { traiterCommande(JSON.parse(e.newValue)); } catch (err) {} }
+});
+window.addEventListener("hashchange", () => location.reload());
+
+function boucle() {
+  if (MODE === "dash" && devenirLeader()) {
+    if (!leader) {
+      leader = true;
+      const saved = lsGet(K_SNAP);
+      if (saved) { try { const snap = JSON.parse(saved); if (snap && snap.S && snap.S.armoire) S = snap.S; } catch (e) {} }
+      rand = mulberry32(Date.now() & 0xffffffff);
+      initMoteur();
+      if (!S.journal.length) bus.publish("systeme.demarrage", {}, { source: "systeme", level: "ok", message: "ARKA démarré : armoire, cuisine et infirmerie en ligne" });
+    }
+    if (S.running) tick();
+    publierSnapshot();
+    rendre();
+  } else {
+    leader = false;
+    rendre();
+  }
+  const delai = leader && S.running ? 1000 / (S.vitesse || 1) : 1000;
+  setTimeout(boucle, delai);
+}
+
+/* =====================================================================
+   Affichage
+   ===================================================================== */
+const root = document.getElementById("root");
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const heure = (t) => { const d = Math.floor(t / 1440) + 1, m = t % 1440; return `Jour ${d} · ${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`; };
+const hhmm = (t) => { const m = t % 1440; return `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`; };
+const jours = (x) => x === Infinity ? "> 90" : x > 90 ? "> 90" : x.toFixed(1).replace(".", ",");
+const niveauJours = (x, crit, warn) => x < crit ? "danger" : x < warn ? "warn" : "ok";
+const LOGO = `<svg viewBox="0 0 120 120" aria-hidden="true"><ellipse cx="60" cy="64" rx="54" ry="19" transform="rotate(-18 60 64)" fill="none" stroke="#E8833A" stroke-width="4"/><path d="M30 96 L60 20 L90 96" fill="none" stroke="COL" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/><line x1="44" y1="72" x2="76" y2="72" stroke="COL" stroke-width="8" stroke-linecap="round"/><path d="M60 63 C52 56 53 46 60 41 C67 46 68 56 60 63 Z" fill="#3FC1B0"/><circle cx="107" cy="43" r="5" fill="#E8833A"/></svg>`;
+const COND = { grippe: "Grippe", intox: "Intoxication alimentaire", anaphylaxie: "Réaction allergique grave" };
+
+function toast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(toast.h); toast.h = setTimeout(() => t.classList.remove("show"), 2800);
+}
+
+// Les fonctions de calcul utilisent S : pour l'affichage on travaille sur la vue V
+function avecVue(fn) { const sauv = S; S = V.S; try { return fn(); } finally { S = sauv; } }
+
+function sparkline(vals, { min, max, couleur = "#3FC1B0", seuil = null } = {}) {
+  if (!vals.length) return `<svg viewBox="0 0 300 100"></svg>`;
+  const lo = min ?? Math.min(...vals), hi = max ?? Math.max(...vals, lo + 1);
+  const x = (i) => (vals.length === 1 ? 300 : (i / (vals.length - 1)) * 300);
+  const y = (v) => 95 - ((v - lo) / (hi - lo || 1)) * 88;
+  const pts = vals.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
+  const ligneSeuil = seuil != null ? `<line x1="0" x2="300" y1="${y(seuil)}" y2="${y(seuil)}" stroke="#E05A4A" stroke-dasharray="4 4" stroke-width="1"/>` : "";
+  return `<svg viewBox="0 0 300 100" preserveAspectRatio="none" role="img" aria-label="Courbe sur 24 heures">${ligneSeuil}<polyline points="${pts}" fill="none" stroke="${couleur}" stroke-width="2.2" vector-effect="non-scaling-stroke" stroke-linejoin="round"/></svg>`;
+}
+
+function statutGlobal() {
+  const rouges = S.equipage.filter((m) => S.infirmerie.patients[m.id].triage === "rouge").length;
+  const malades = S.equipage.filter((m) => S.infirmerie.patients[m.id].cond).length;
+  const sans = S.cuisine.dernier && S.cuisine.dernier.sans.length;
+  if (rouges || S.armoire.froid.alerte || sans) return ["danger", "Critique"];
+  if (malades || S.armoire.froid.panne || S.cuisine.mode === "rationnement") return ["warn", "Alerte"];
+  return ["ok", "Nominal"];
+}
+function crisesActives() {
+  const a = new Set();
+  if (S.armoire.froid.panne) a.add("panne-frigo");
+  if (S.armoire.lots.some((l) => l.contamine && l.statut === "ok" && l.portions >= 1) || S.equipage.some((m) => S.infirmerie.patients[m.id].cond?.type === "intox")) a.add("intoxication");
+  if (S.armoire.lots.some((l) => l.statut === "ok" && l.portions >= 1 && l.allergenesReels.some((x) => !PRODUITS[l.pid].allergenes.includes(x))) || S.equipage.some((m) => S.infirmerie.patients[m.id].cond?.type === "anaphylaxie")) a.add("etiquetage");
+  if (S.equipage.some((m) => S.infirmerie.patients[m.id].cond?.type === "grippe")) a.add("epidemie");
+  if (S.armoire.reserve.paracetamol < 10) a.add("rupture");
+  return a;
+}
+function prochainRepas() {
+  if (S.cuisine.attente) return `${S.cuisine.attente.repas} à ${hhmm(S.cuisine.attente.t)} (retardé)`;
+  const cur = S.t % 1440;
+  const r = REPAS.find((x) => x.h > cur) || REPAS[0];
+  return `${r.nom} à ${hhmm(r.h)}`;
+}
+function medCritique() {
+  let best = null;
+  for (const k of Object.keys(MEDS)) { const a = autonomieMed(k); if (!best || a < best.a) best = { k, a }; }
+  return best;
+}
+function cascadesHTML(n, filtreNiveau) {
+  const parRacine = new Map();
+  for (const e of S.journal) { if (!parRacine.has(e.rootId)) parRacine.set(e.rootId, []); parRacine.get(e.rootId).push(e); }
+  let groupes = [...parRacine.values()].reverse();
+  if (filtreNiveau) groupes = groupes.filter((g) => g.some((e) => e.level === filtreNiveau));
+  groupes = groupes.slice(0, n);
+  if (!groupes.length) return `<p class="empty">Aucun événement pour le moment.</p>`;
+  const lab = { danger: "Urgent", warn: "Alerte", ok: "Résolu", info: "Info" };
+  return groupes.map((g) => {
+    const r = g[0];
+    const suite = g.slice(1, 14).map((e) => `<div class="step" style="padding-left:${Math.min(e.depth, 6) * 14}px"><span class="when">${hhmm(e.t)}</span><span>${esc(e.message)}</span></div>`).join("");
+    const plus = g.length > 14 ? `<div class="step"><span>… ${g.length - 14} autres effets</span></div>` : "";
+    const pire = g.some((e) => e.level === "danger") ? "danger" : g.some((e) => e.level === "warn") ? "warn" : r.level;
+    return `<div class="cascade"><div class="root"><span class="tag ${pire}">${lab[pire] || "Info"}</span><span>${esc(r.message)}</span><span class="when">${heure(r.t)}</span></div>${suite}${plus}</div>`;
+  }).join("");
+}
+
+/* ---------- Tableau de bord ---------- */
+let onglet = "vue";
+function rendreDash() {
+  if (!V) { root.innerHTML = `<main><p class="empty">Démarrage de la simulation…</p></main>`; return; }
+  avecVue(() => {
+    const [niv, lib] = statutGlobal();
+    const vieux = Date.now() - V.ts > 4000;
+    const I = S.infirmerie;
+    const cpt = { vert: 0, orange: 0, rouge: 0 };
+    S.equipage.forEach((m) => cpt[I.patients[m.id].triage]++);
+    const malades = S.equipage.filter((m) => I.patients[m.id].cond).length;
+    const autoR = autonomieRepas();
+    const mc = medCritique();
+    const froid = S.armoire.froid.temp;
+    let corps = "";
+
+    if (onglet === "vue") {
+      corps = `
+      <div class="grid g4">
+        <div class="card kpi"><div class="v c-${niveauJours(autoR, 5, 9)}">${jours(autoR)}<small>jours</small></div><div class="l">Autonomie en repas</div><div class="s c-mut">${Math.round(totalPortions())} portions · ${S.equipage.length} membres</div></div>
+        <div class="card kpi"><div class="v c-${niveauJours(mc.a, 10, 30)}">${jours(mc.a)}<small>jours</small></div><div class="l">Médicament le plus critique</div><div class="s c-mut">${esc(MEDS[mc.k].nom)}</div></div>
+        <div class="card kpi"><div class="v ${cpt.rouge ? "c-danger" : malades ? "c-warn" : "c-ok"}">${malades}<small>malades</small></div><div class="l">Infirmerie</div><div class="s"><span class="c-ok">${cpt.vert} vert</span> · <span class="c-warn">${cpt.orange} orange</span> · <span class="c-danger">${cpt.rouge} rouge</span></div></div>
+        <div class="card kpi"><div class="v ${froid > 8 ? "c-danger" : froid > 6 ? "c-warn" : "c-ok"}">${froid.toFixed(1).replace(".", ",")}<small>°C</small></div><div class="l">Compartiment réfrigéré</div><div class="s c-mut">${S.armoire.froid.panne ? "Compresseur en panne" : "Consigne 4 °C"}</div></div>
+      </div>
+      <div class="grid g3" style="margin-top:18px">
+        <div class="card chart"><h2>Température du froid</h2>${sparkline(S.hist.froid, { min: 0, max: 22, couleur: "#E8833A", seuil: 8 })}<div class="cap"><span>24 h</span><span>seuil 8 °C</span></div></div>
+        <div class="card chart"><h2>Membres malades</h2>${sparkline(S.hist.malades, { min: 0, max: Math.max(6, ...S.hist.malades), couleur: "#E9B949" })}<div class="cap"><span>24 h</span><span>maintenant : ${malades}</span></div></div>
+        <div class="card chart"><h2>Autonomie en repas</h2>${sparkline(S.hist.autoRepas, { min: 0, max: 14, couleur: "#3FC1B0", seuil: 7 })}<div class="cap"><span>24 h</span><span>seuil de rationnement 7 j</span></div></div>
+      </div>
+      <div class="grid g2" style="margin-top:18px">
+        <div class="card"><h2>Dernières cascades</h2>${cascadesHTML(4)}</div>
+        <div class="card"><h2>Cuisine</h2>
+          <p>Prochain repas : <b>${esc(prochainRepas())}</b></p>
+          <p>Mode : <span class="tag ${S.cuisine.mode === "nominal" ? "ok" : "warn"}">${S.cuisine.mode === "nominal" ? "Portions normales" : "Rationnement"}</span></p>
+          ${S.cuisine.dernier ? `<p>Dernier service : ${esc(S.cuisine.dernier.repas)} à ${hhmm(S.cuisine.dernier.t)}, ${S.cuisine.dernier.servis} repas servis, ${S.cuisine.dernier.kcal} kcal en moyenne${S.cuisine.dernier.sans.length ? `, <span class="c-danger">${S.cuisine.dernier.sans.length} sans plat compatible</span>` : ""}.</p>` : `<p class="empty">Aucun repas servi depuis le démarrage.</p>`}
+        </div>
+      </div>`;
     }
 
-    function saveData() {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-      } catch (e) {}
-    }
-
-    function resetData() {
-      data = JSON.parse(JSON.stringify(DEFAULT_DATA));
-      saveData();
-      toast("Données réinitialisées avec succès !");
-      router();
-    }
-
-    function esc(str) {
-      return String(str ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-    }
-
-    function toast(msg) {
-      const t = document.getElementById("toast");
-      if (!t) return;
-      t.textContent = msg;
-      t.classList.add("show");
-      clearTimeout(t.timer);
-      t.timer = setTimeout(() => t.classList.remove("show"), 3000);
-    }
-
-    function addAlert(niveau, pilier, message) {
-      data.alertes.unshift({ id: 'al' + Date.now(), date: new Date().toISOString(), niveau, pilier, message });
-    }
-
-    function avg(arr) { return arr && arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 1; }
-    function daysLeft(m) { const a = avg(m.conso); return a > 0 ? Math.floor((m.reserve + m.medbox) / a) : 999; }
-    function canSeeHealth() { return currentRole === "admin" || currentRole === "medecine"; }
-
-    function getIncompatibilities(aliment, member) {
-      const reasons = [];
-      const allergies = new Set(member.allergies || []);
-      if ((member.maladies || []).includes("maladie cœliaque")) allergies.add("gluten");
-      
-      (aliment.allergenes || []).forEach(a => {
-        if (allergies.has(a)) reasons.push(`Allergène: ${a}`);
+    if (onglet === "alim") {
+      const parProduit = Object.entries(PRODUITS).map(([pid, p]) => {
+        const lots = S.armoire.lots.filter((l) => l.pid === pid && l.statut === "ok" && l.portions >= 1);
+        const tot = lots.reduce((s, l) => s + l.portions, 0);
+        const per = lots.length ? Math.min(...lots.map((l) => l.peremption)) : null;
+        return { pid, p, tot, per, n: lots.length };
       });
-      (member.regimes || []).forEach(r => {
-        if (!(aliment.tags || []).includes(r)) reasons.push(`Non ${r}`);
-      });
-      if ((member.maladies || []).includes("diabète") && aliment.sucre) {
-        reasons.push("Teneur élevée en sucre");
-      }
-      return reasons;
+      corps = `
+      <div class="grid g3">
+        <div class="card kpi"><div class="v c-${niveauJours(autoR, 5, 9)}">${jours(autoR)}<small>jours</small></div><div class="l">Autonomie en repas</div></div>
+        <div class="card kpi"><div class="v">${esc(prochainRepas().split(" à ")[1] || "")}</div><div class="l">${esc(prochainRepas().split(" à ")[0])}</div><div class="s"><span class="tag ${S.cuisine.mode === "nominal" ? "ok" : "warn"}">${S.cuisine.mode === "nominal" ? "Portions normales" : "Rationnement −25 %"}</span></div></div>
+        <div class="card kpi"><div class="v">${S.cuisine.dernier ? S.cuisine.dernier.kcal : "–"}<small>kcal</small></div><div class="l">Moyenne par repas au dernier service</div><div class="s ${S.cuisine.dernier && S.cuisine.dernier.sans.length ? "c-danger" : "c-mut"}">${S.cuisine.dernier ? (S.cuisine.dernier.sans.length ? "Sans plat compatible : " + esc(S.cuisine.dernier.sans.join(", ")) : "Tout l'équipage a reçu un plat compatible") : ""}</div></div>
+      </div>
+      <div class="card" style="margin-top:18px"><h2>Stock alimentaire de l'armoire</h2><div class="scroll"><table>
+        <thead><tr><th>Produit</th><th>Zone</th><th>Portions</th><th>Péremption la plus proche</th><th>Allergènes (étiquette)</th><th>Régimes</th></tr></thead>
+        <tbody>${parProduit.map(({ p, tot, per }) => `<tr>
+          <td>${esc(p.nom)}</td><td>${p.zone === "froid" ? "Réfrigéré" : "Sec"}</td>
+          <td><span class="${tot < 15 ? "c-danger" : ""}">${Math.round(tot)}</span></td>
+          <td>${per ? heure(per) : "<span class='c-mut'>–</span>"}</td>
+          <td>${p.allergenes.map((a) => `<span class="tag warn">${esc(a)}</span>`).join("") || "<span class='c-mut'>Aucun</span>"}</td>
+          <td>${p.tags.map((t) => `<span class="tag">${esc(t)}</span>`).join("") || "<span class='c-mut'>–</span>"}</td></tr>`).join("")}</tbody></table></div></div>
+      <div class="grid g2" style="margin-top:18px">
+        <div class="card chart"><h2>Autonomie en repas (24 h)</h2>${sparkline(S.hist.autoRepas, { min: 0, max: 14, seuil: 7 })}<div class="cap"><span>il y a 24 h</span><span>maintenant</span></div></div>
+        <div class="card"><h2>Lots retirés</h2>${S.armoire.pertes.length ? `<div class="scroll"><table><thead><tr><th>Heure</th><th>Lot</th><th>Portions</th><th>Motif</th></tr></thead><tbody>${S.armoire.pertes.slice(0, 8).map((x) => `<tr><td class="when">${heure(x.t)}</td><td>${esc(x.lot)} · ${esc(x.nom)}</td><td>${x.portions}</td><td>${esc(x.motif)}</td></tr>`).join("")}</tbody></table></div>` : `<p class="empty">Aucun lot retiré.</p>`}</div>
+      </div>`;
     }
 
-    // --- VUES & RENDU ---
-    function renderDashboard() {
-      const minDaysMed = Math.min(...data.medicaments.map(daysLeft));
-      const totalFood = data.aliments.reduce((s, a) => s + a.quantite, 0);
-      const foodDays = Math.floor(totalFood / Math.max(data.equipage.length * 3, 1));
-      const healthyZones = Math.round((data.zones.filter(z => z.etat === "saine").length / data.zones.length) * 100);
-
-      return `
-        <header class="top-header">
-          <h1>Tableau de bord de survie</h1>
-          <p class="intro">Aperçu en temps réel des ressources vitales et de l'autonomie de la station.</p>
-        </header>
-
-        <div class="grid-3">
-          <div class="card kpi-card">
-            <div class="kpi-lbl">Autonomie Médicale Minimale</div>
-            <div class="kpi-val">${minDaysMed === 999 ? "∞" : minDaysMed}<small>jours</small></div>
-            <div class="progress-bar"><span style="width: ${Math.min(100, (minDaysMed/60)*100)}%"></span></div>
-          </div>
-          <div class="card kpi-card">
-            <div class="kpi-lbl">Réserve d'Alimentation</div>
-            <div class="kpi-val">${foodDays}<small>jours</small></div>
-            <div class="progress-bar"><span style="width: ${Math.min(100, (foodDays/90)*100)}%"></span></div>
-          </div>
-          <div class="card kpi-card">
-            <div class="kpi-lbl">Santé des Serres (CropGuard)</div>
-            <div class="kpi-val">${healthyZones}<small>%</small></div>
-            <div class="progress-bar"><span style="width: ${healthyZones}%"></span></div>
-          </div>
-        </div>
-
-        <div class="grid-2">
-          <div class="card">
-            <div class="card-title">Dernières Alertes Système</div>
-            <div>${data.alertes.slice(0, 4).map(a => `
-              <div class="alert-item">
-                <span class="tag ${a.niveau}">${a.niveau.toUpperCase()}</span>
-                <div>
-                  <div style="font-size: 14px;">${esc(a.message)}</div>
-                  <div style="font-size: 11px; color: var(--text-muted);">${a.pilier}</div>
-                </div>
-              </div>
-            `).join('') || '<p style="color:var(--text-muted)">Aucune alerte.</p>'}</div>
-          </div>
-
-          <div class="card">
-            <div class="card-title">Stocks sous le seuil critique</div>
-            <div class="table-container">
-              <table>
-                <thead><tr><th>Ressource</th><th>Actuel</th><th>Seuil</th></tr></thead>
-                <tbody>
-                  ${data.medicaments.filter(m => m.medbox < m.seuilMedbox).map(m => `
-                    <tr><td>MedBox: ${esc(m.nom)}</td><td><span class="tag danger">${m.medbox}</span></td><td>${m.seuilMedbox}</td></tr>
-                  `).join('')}
-                  ${data.graines.filter(g => g.quantite < g.seuil).map(g => `
-                    <tr><td>Graines: ${esc(g.espece)}</td><td><span class="tag warn">${g.quantite}</span></td><td>${g.seuil}</td></tr>
-                  `).join('')}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      `;
+    if (onglet === "inf") {
+      corps = `
+      <div class="grid g4">
+        <div class="card kpi"><div class="v c-ok">${cpt.vert}</div><div class="l">Triage vert</div></div>
+        <div class="card kpi"><div class="v c-warn">${cpt.orange}</div><div class="l">Triage orange</div></div>
+        <div class="card kpi"><div class="v c-danger">${cpt.rouge}</div><div class="l">Triage rouge</div></div>
+        <div class="card kpi"><div class="v">${I.isolement ? "Oui" : "Non"}</div><div class="l">Isolement des malades</div></div>
+      </div>
+      <div class="card" style="margin-top:18px"><h2>Équipage : constantes en direct</h2><div class="crew">
+        ${S.equipage.map((m) => { const P = I.patients[m.id]; const v = P.vitals; return `<div class="pers ${P.triage}">
+          <div class="n">${esc(m.nom)}</div><div class="p">${esc(m.pilier)}</div>
+          <div class="vit"><span class="${v.temp >= 38 ? "c-warn" : ""}">${v.temp.toFixed(1).replace(".", ",")} °C</span><span class="${v.spo2 < 95 ? "c-danger" : ""}">SpO₂ ${v.spo2} %</span><span class="${v.fc >= 100 ? "c-warn" : ""}">${v.fc} bpm</span></div>
+          <div class="cond ${P.cond ? "c-warn" : "c-mut"}">${P.cond ? esc(COND[P.cond.type]) + (P.cond.bacterien ? " + surinfection" : "") : "Aucun symptôme"}</div></div>`; }).join("")}
+      </div></div>
+      <div class="card" style="margin-top:18px"><h2>MedBox et prévision d'autonomie</h2><div class="scroll"><table>
+        <thead><tr><th>Médicament</th><th>MedBox</th><th>Seuil</th><th>Réserve armoire</th><th>Consommé (24 h)</th><th>Autonomie prévue</th></tr></thead>
+        <tbody>${Object.entries(MEDS).map(([k, md]) => { const a = autonomieMed(k); const nv = niveauJours(a, 10, 30); const mb = I.medbox[k]; return `<tr>
+          <td>${esc(md.nom)}</td>
+          <td><div class="row" style="gap:8px"><div class="bar" style="width:70px"><span class="${mb < I.seuils[k] ? "danger" : ""}" style="width:${Math.min(100, (mb / (I.seuils[k] * 2.5)) * 100)}%"></span></div>${mb}</div></td>
+          <td>${I.seuils[k]}</td><td>${S.armoire.reserve[k]}</td><td>${consoJour(k)}</td>
+          <td><span class="tag ${nv}">${jours(a)} j</span></td></tr>`; }).join("")}</tbody></table></div>
+        <p class="c-mut" style="font-size:13px;margin:10px 0 0">Prévision : stock total (réserve + MedBox) divisé par la consommation des dernières 24 heures à bord.</p></div>`;
     }
 
-    function renderMedicaments() {
-      const d = stateUI.deliveryStatus;
-
-      return `
-        <header class="top-header">
-          <h1>Infirmerie & Distribution Médicale</h1>
-          <p class="intro">Gestion des stocks MedBox, prévisions d'autonomie et sécurisation de la délivrance.</p>
-        </header>
-
-        <div class="card" style="margin-bottom: 24px;">
-          <div class="card-title">
-            <span>Inventaire & Réserve Active</span>
-            <button class="btn secondary sm" data-action="simular-day">Simuler 24h de consommation</button>
-          </div>
-          <div class="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>Médicament</th>
-                  <th>Réserve globale</th>
-                  <th>MedBox (Jour)</th>
-                  <th>Conso Mts</th>
-                  <th>Autonomie</th>
-                  <th>DLC</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${data.medicaments.map(m => {
-                  const days = daysLeft(m);
-                  return `
-                    <tr>
-                      <td><strong>${esc(m.nom)}</strong></td>
-                      <td>${m.reserve} d.</td>
-                      <td>
-                        ${m.medbox}${m.medbox < m.seuilMedbox ? '<span class="tag danger">Bas</span>' : ''}
-                      </td>
-                      <td>${avg(m.conso).toFixed(1)} /j</td>
-                      <td><span class="tag ${days < 30 ? 'danger' : 'ok'}">${days} j</span></td>
-                      <td><span style="font-size:12px; color:var(--text-muted)">${m.dlc}</span></td>
-                      <td>
-                        <button class="btn secondary sm" data-action="reappro-med" data-id="${m.id}">Recharger MedBox</button>
-                      </td>
-                    </tr>
-                  `;
-                }).join('')}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="grid-2">
-          <div class="card">
-            <div class="card-title">Délivrer une prescription</div>
-            <div class="form-group">
-              <label>Membre de l'équipage</label>
-              <select id="deliv-member">
-                <option value="">Sélectionner un membre...</option>
-                ${data.equipage.map(e => `<option value="${e.id}">${esc(e.nom)}</option>`).join('')}
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Médicament à délivrer</label>
-              <select id="deliv-med">
-                <option value="">Sélectionner le produit...</option>
-                ${data.medicaments.map(m => `<option value="${m.id}">${esc(m.nom)} (${m.medbox} dispo)</option>`).join('')}
-              </select>
-            </div>
-            <button class="btn" data-action="process-deliv">Vérifier & Transférer</button>
-
-            ${d ? `
-              <div style="margin-top: 16px; padding: 12px; border-radius: var(--radius-sm); background: ${d.ok ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)'}; border: 1px solid ${d.ok ? 'var(--green)' : 'var(--red)'}">
-                <div style="font-weight:600; color:${d.ok ? 'var(--green)' : 'var(--red)'}">${d.ok ? 'Délivrance autorisée' : 'Blocage de sécurité'}</div>
-                <div style="font-size:13px; margin-top:4px;">${esc(d.msg)}</div>
-              </div>
-            ` : ''}
-          </div>
-
-          <div class="card">
-            <div class="card-title">Protocole Médical de Sécurité</div>
-            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">
-              Le système vérifie automatiquement les allergies déclarées dans la fiche de l'équipage avant d'ouvrir le casier MedBox.
-            </p>
-            <div class="alert-item">
-              <span class="tag warn">Règle</span>
-              <div style="font-size:13px;">Toute contre-indication bloque la délivrance physique du médicament.</div>
-            </div>
-          </div>
-        </div>
-      `;
+    if (onglet === "journal") {
+      corps = `<div class="card"><h2>Journal de bord : chaque cascade de cause à effet</h2>${cascadesHTML(30)}</div>`;
     }
 
-    function renderAlimentation() {
-      const selectedMember = data.equipage.find(e => e.id === stateUI.memberFilter);
+    const tab = (id, l) => `<button role="tab" aria-selected="${onglet === id}" data-tab="${id}">${l}</button>`;
+    root.innerHTML = `
+      <header>
+        <a class="brand" href="#" aria-label="ARKA">${LOGO.replaceAll("COL", "#F5F3EE")}<div><b>ARKA</b><span>Tableau de bord du vaisseau</span></div></a>
+        <span class="pill ${niv}">${lib}</span>
+        ${!S.running ? `<span class="pill off">En pause</span>` : S.vitesse > 1 ? `<span class="pill off">Vitesse ×${S.vitesse}</span>` : ""}
+        <div class="clock" aria-live="off">${heure(S.t)}</div>
+      </header>
+      <nav class="tabs" role="tablist" aria-label="Secteurs">${tab("vue", "Vue d'ensemble")}${tab("alim", "Alimentation")}${tab("inf", "Infirmerie")}${tab("journal", "Journal des cascades")}</nav>
+      <main>
+        ${vieux ? `<div class="banner">Ce tableau de bord ne reçoit plus de données. Fermez les autres onglets du tableau de bord puis rechargez cette page.</div>` : ""}
+        ${corps}
+        <p class="foot">Simulation ARKA : 1 seconde = 10 minutes à bord. Le contrôle se fait depuis la <a href="#admin" target="_blank" rel="noopener">console d'administration</a>.</p>
+      </main>`;
+  });
+}
+root.addEventListener("click", (e) => {
+  const b = e.target.closest("[data-tab]");
+  if (b && MODE === "dash") { onglet = b.dataset.tab; rendre(); }
+});
 
-      return `
-        <header class="top-header">
-          <h1>Gestion de l'Alimentation</h1>
-          <p class="intro">Contrôle des réserves nutritionnelles et filtrage automatisé selon les profils de santé.</p>
-        </header>
+/* ---------- Console d'administration ---------- */
+const CODE_ADMIN = "ARKA-2026";   // code de démonstration (voir README)
+let adminMonte = false, filtreJournal = "";
+function adminConnecte() { try { return sessionStorage.getItem("arka-admin") === "1"; } catch (e) { return false; } }
 
-        <div class="card" style="margin-bottom:24px;">
-          <div class="form-group" style="max-width: 300px;">
-            <label>Filtrer pour un membre de l'équipage :</label>
-            <select id="alim-member-select">
-              <option value="">Toute la réserve (Sans filtre)</option>
-              ${data.equipage.map(e => `<option value="${e.id}" ${stateUI.memberFilter === e.id ? 'selected' : ''}>${esc(e.nom)}</option>`).join('')}
-            </select>
+function rendreLogin() {
+  root.innerHTML = `
+    <div class="login">
+      <div class="brand" style="margin-bottom:18px">${LOGO.replaceAll("COL", "#14213D")}<div><b>ARKA</b><span>Console d'administration</span></div></div>
+      <h1>Accès réservé</h1>
+      <p class="muted">Cette console pilote la simulation du vaisseau. Entrez le code administrateur.</p>
+      <form id="f-login" class="field" novalidate>
+        <label for="code">Code administrateur</label>
+        <input type="password" id="code" autocomplete="off">
+        <span id="login-err" class="err" aria-live="polite"></span>
+        <button class="btn" type="submit" style="margin-top:8px">Se connecter</button>
+      </form>
+    </div>`;
+  document.getElementById("f-login").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const v = document.getElementById("code").value.trim();
+    if (!v) { document.getElementById("login-err").textContent = "Entrez le code administrateur."; return; }
+    if (v !== CODE_ADMIN) { document.getElementById("login-err").textContent = "Code incorrect."; return; }
+    try { sessionStorage.setItem("arka-admin", "1"); } catch (err) {}
+    adminMonte = false; rendre();
+  });
+  document.getElementById("code").addEventListener("input", () => { document.getElementById("login-err").textContent = ""; });
+}
+
+function monterAdmin() {
+  const opt = (obj, lab) => Object.entries(obj).map(([k, v]) => `<option value="${k}">${esc(lab(v))}</option>`).join("");
+  const checks = (name, list) => list.map((x) => `<label><input type="checkbox" name="${name}" value="${esc(x)}"> ${esc(x)}</label>`).join("");
+  root.innerHTML = `
+    <header>
+      <div class="brand">${LOGO.replaceAll("COL", "#14213D")}<div><b>ARKA</b><span>Console d'administration</span></div></div>
+      <span id="a-statut" class="pill off">Connexion…</span>
+      <div class="clock" id="a-heure" style="font-size:20px"></div>
+      <a class="btn sec sm" href="./" target="_blank" rel="noopener" id="a-ouvrir">Ouvrir le tableau de bord</a>
+      <button class="btn sec sm" id="a-deco">Se déconnecter</button>
+    </header>
+    <main>
+      <div id="a-banner"></div>
+      <div class="grid g2">
+        <section class="card">
+          <h2>Simulation</h2>
+          <div class="row">
+            <button class="btn" id="a-pause">Mettre en pause</button>
+            <span class="muted">Vitesse :</span>
+            ${[1, 2, 5, 10].map((v) => `<button class="btn sec sm" data-vit="${v}" aria-pressed="false">×${v}</button>`).join("")}
           </div>
-
-          ${selectedMember ? `
-            <div style="padding:12px; background: rgba(56, 189, 248, 0.05); border: 1px solid var(--border-accent); border-radius: var(--radius-sm); margin-bottom:16px;">
-              <strong>Profil sélectionné : ${esc(selectedMember.nom)}</strong>
-              <div style="font-size:12px; color: var(--text-muted);">
-                Allergies : ${selectedMember.allergies.join(', ') \vert{}\vert{} 'Aucune'} \vert{} Régimes : ${selectedMember.regimes.join(', ') || 'Aucun'}
-              </div>
-            </div>
-          ` : ''}
-
-          <div class="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>Produit</th>
-                  <th>Catégorie</th>
-                  <th>Stock (Rations)</th>
-                  <th>Allergènes</th>
-                  <th>Compatibilité</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${data.aliments.map(a => {
-                  let status = `<span class="tag neutral">Standard</span>`;
-                  if (selectedMember) {
-                    const issues = getIncompatibilities(a, selectedMember);
-                    if (issues.length > 0) {
-                      status = `<span class="tag danger" title="${issues.join(', ')}">Incompatible</span>`;
-                    } else {
-                      status = `<span class="tag ok">Compatible</span>`;
-                    }
-                  }
-                  return `
-                    <tr>
-                      <td><strong>${esc(a.nom)}</strong></td>
-                      <td>${esc(a.categorie)}</td>
-                      <td>${a.quantite}</td>
-                      <td>${a.allergenes.map(x => `<span class="tag warn">${x}</span>`).join(' ') || '<span style="color:var(--text-muted)">Aucun</span>'}</td>
-                      <td>${status}</td>
-                    </tr>
-                  `;
-                }).join('')}
-              </tbody>
-            </table>
+          <div id="a-resume" class="muted" style="margin-top:14px"></div>
+        </section>
+        <section class="card">
+          <h2>Actions sur le vaisseau</h2>
+          <div class="row" style="margin-bottom:12px">
+            <button class="btn sec" id="a-reparer">Réparer le compresseur</button>
+            <button class="btn sec" id="a-isol" aria-pressed="false">Isoler les malades</button>
           </div>
+          <form id="f-livr" class="row" novalidate style="margin-bottom:10px">
+            <label for="l-pid" class="hidden">Produit</label>
+            <select id="l-pid">${opt(PRODUITS, (p) => p.nom)}</select>
+            <label for="l-qty" class="hidden">Portions</label>
+            <input type="number" id="l-qty" min="1" max="500" value="60" style="width:90px">
+            <button class="btn sm" type="submit">Livrer des repas</button>
+          </form>
+          <form id="f-med" class="row" novalidate>
+            <label for="m-med" class="hidden">Médicament</label>
+            <select id="m-med">${opt(MEDS, (m) => m.nom)}</select>
+            <label for="m-qty" class="hidden">Quantité</label>
+            <input type="number" id="m-qty" min="1" max="500" value="50" style="width:90px">
+            <button class="btn sm" type="submit">Réapprovisionner la réserve</button>
+          </form>
+          <p id="a-form-err" class="err" aria-live="polite"></p>
+        </section>
+      </div>
+
+      <section class="card" style="margin-top:18px">
+        <h2>Déclencher une crise</h2>
+        <div class="grid g3" id="a-crises">
+          ${Object.entries(CRISES).map(([k, c]) => `<div class="crise" data-crise-box="${k}"><h3>${esc(c.titre)}</h3><p>${esc(c.desc)}</p><div><button class="btn warn sm" data-crise="${k}">Déclencher</button></div></div>`).join("")}
+          <div class="crise"><h3>Retour à la normale</h3><p>Réinitialise les stocks, l'infirmerie et la cuisine. Les profils de l'équipage sont conservés.</p><div><button class="btn sm" id="a-reset">Réinitialiser</button></div></div>
         </div>
-      `;
-    }
+      </section>
 
-    function renderGraines() {
-      return `
-        <header class="top-header">
-          <h1>Ferme Intelligente & CropGuard</h1>
-          <p class="intro">Suivi des cultures hydroponiques assisté par vision artificielle.</p>
-        </header>
+      <div class="grid g2" style="margin-top:18px">
+        <section class="card">
+          <h2>Profils santé de l'équipage</h2>
+          <p class="muted">Ces informations servent au filtrage strict des repas et des médicaments. Elles ne sont visibles que dans cette console.</p>
+          <div class="field" style="margin-bottom:10px"><label for="p-membre">Membre</label><select id="p-membre"></select></div>
+          <form id="f-profil" novalidate>
+            <fieldset><legend>Allergies</legend><div class="checks">${checks("allergies", ALLERGENES)}</div></fieldset>
+            <fieldset><legend>Régime</legend><div class="checks">${checks("regimes", REGIMES)}</div></fieldset>
+            <fieldset><legend>Maladies</legend><div class="checks">${checks("maladies", MALADIES)}</div></fieldset>
+            <button class="btn" type="submit">Enregistrer le profil</button>
+          </form>
+        </section>
+        <section class="card">
+          <h2>Enregistrer un nouveau membre</h2>
+          <form id="f-membre" novalidate>
+            <div class="field" style="margin-bottom:10px"><label for="n-nom">Nom et prénom</label><input type="text" id="n-nom" maxlength="40"><span id="n-err" class="err" aria-live="polite"></span></div>
+            <div class="field" style="margin-bottom:10px"><label for="n-pilier">Pilier</label><select id="n-pilier">${["Agriculture", "Médecine", "Repas", "Robotique", "Pilier central"].map((p) => `<option>${p}</option>`).join("")}</select></div>
+            <fieldset><legend>Allergies</legend><div class="checks">${checks("allergies", ALLERGENES)}</div></fieldset>
+            <fieldset><legend>Régime</legend><div class="checks">${checks("regimes", REGIMES)}</div></fieldset>
+            <fieldset><legend>Maladies</legend><div class="checks">${checks("maladies", MALADIES)}</div></fieldset>
+            <button class="btn" type="submit">Enregistrer le membre</button>
+          </form>
+        </section>
+      </div>
 
-        <div class="card" style="margin-bottom:24px;">
-          <div class="card-title">
-            <span>Surveillance des Zones de Culture</span>
-            <button class="btn sm" data-action="scan-crop">Lancer un Scan IA CropGuard</button>
-          </div>
-
-          <div class="zone-grid">
-            ${data.zones.map(z => `
-              <div class="zone-card ${z.etat === 'malade' ? 'sick' : ''}">
-                <div style="font-size:16px; font-weight:700;">${esc(z.zone)}</div>
-                <div style="font-size:12px; color:var(--text-muted); margin-bottom:8px;">${esc(z.espece)}</div>
-                <div>
-                  <span class="tag ${z.etat === 'malade' ? 'danger' : 'ok'}">${z.etat.toUpperCase()}</span>
-                </div>
-                <div style="font-size:11px; margin-top:6px; color:var(--text-muted)">IA Confiance: ${z.confiance}\%</div>${z.etat === 'malade' ? `
-                  <button class="btn secondary sm" style="margin-top:10px; width:100%" data-action="treat-zone" data-id="${z.id}">Traiter la zone</button>
-                ` : ''}
-              </div>
-            `).join('')}
-          </div>
+      <section class="card" style="margin-top:18px">
+        <div class="row" style="justify-content:space-between;margin-bottom:6px">
+          <h2 style="margin:0">Journal complet des cascades</h2>
+          <div class="row"><label for="a-filtre" class="muted">Afficher</label>
+            <select id="a-filtre"><option value="">Toutes les cascades</option><option value="danger">Seulement les urgences</option><option value="warn">Seulement les alertes</option></select></div>
         </div>
+        <div id="a-journal"></div>
+      </section>
+    </main>`;
+  adminMonte = true;
 
-        <div class="card">
-          <div class="card-title">Banque de Semences (Graines)</div>
-          <div class="table-container">
-            <table>
-              <thead><tr><th>Espèce</th><th>Sachets en réserve</th><th>Seuil Alerte</th><th>Actions</th></tr></thead>
-              <tbody>
-                ${data.graines.map(g => `
-                  <tr>
-                    <td><strong>${esc(g.espece)}</strong></td>
-                    <td>${g.quantite}</td>
-                    <td>${g.seuil}</td>
-                    <td><button class="btn secondary sm" data-action="use-seed" data-id="${g.id}">Utiliser 5 sachets</button></td>
-                  </tr>
-                `).join('')}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      `;
+  const $ = (id) => document.getElementById(id);
+  $("a-deco").onclick = () => { try { sessionStorage.removeItem("arka-admin"); } catch (e) {} adminMonte = false; rendre(); };
+  $("a-ouvrir").href = location.href.split("#")[0];
+  $("a-pause").onclick = () => envoyer("pause");
+  document.querySelectorAll("[data-vit]").forEach((b) => b.onclick = () => { envoyer("vitesse", { v: +b.dataset.vit }); toast(`Vitesse ×${b.dataset.vit}`); });
+  $("a-reparer").onclick = () => { envoyer("reparer"); toast("Réparation demandée"); };
+  $("a-isol").onclick = () => { const actif = $("a-isol").getAttribute("aria-pressed") !== "true"; envoyer("isolement", { actif }); toast(actif ? "Isolement activé" : "Isolement levé"); };
+  $("a-reset").onclick = () => { envoyer("reset"); toast("Simulation réinitialisée"); };
+  document.querySelectorAll("[data-crise]").forEach((b) => b.onclick = () => { envoyer("crise", { nom: b.dataset.crise }); toast("Crise déclenchée : " + CRISES[b.dataset.crise].titre); });
+  $("f-livr").onsubmit = (e) => { e.preventDefault(); const q = parseInt($("l-qty").value, 10); if (!(q >= 1 && q <= 500)) { $("a-form-err").textContent = "Indiquez un nombre de portions entre 1 et 500."; return; } $("a-form-err").textContent = ""; envoyer("livraison", { pid: $("l-pid").value, qty: q }); toast(`${q} portions livrées`); };
+  $("f-med").onsubmit = (e) => { e.preventDefault(); const q = parseInt($("m-qty").value, 10); if (!(q >= 1 && q <= 500)) { $("a-form-err").textContent = "Indiquez une quantité entre 1 et 500."; return; } $("a-form-err").textContent = ""; envoyer("reappro", { med: $("m-med").value, qty: q }); toast("Réserve réapprovisionnée"); };
+  ["l-qty", "m-qty"].forEach((id) => $(id).addEventListener("input", () => { $("a-form-err").textContent = ""; }));
+  $("a-filtre").onchange = () => { filtreJournal = $("a-filtre").value; majAdmin(); };
+
+  const remplirProfil = () => {
+    if (!V) return;
+    const m = V.S.equipage.find((x) => x.id === $("p-membre").value);
+    if (!m) return;
+    $("f-profil").querySelectorAll("input[type=checkbox]").forEach((c) => { c.checked = m[c.name].includes(c.value); });
+  };
+  $("p-membre").onchange = remplirProfil;
+  $("f-profil").onsubmit = (e) => {
+    e.preventDefault();
+    const f = new FormData(e.target);
+    const id = $("p-membre").value;
+    if (!id) return;
+    envoyer("profil", { id, allergies: f.getAll("allergies"), regimes: f.getAll("regimes"), maladies: f.getAll("maladies") });
+    toast("Profil enregistré");
+  };
+  $("f-membre").onsubmit = (e) => {
+    e.preventDefault();
+    const nom = $("n-nom").value.trim();
+    if (!nom) { $("n-err").textContent = "Indiquez le nom et le prénom."; return; }
+    const f = new FormData(e.target);
+    envoyer("membre", { nom, pilier: $("n-pilier").value, allergies: f.getAll("allergies"), regimes: f.getAll("regimes"), maladies: f.getAll("maladies") });
+    e.target.reset(); $("n-err").textContent = "";
+    toast(`Fiche de ${nom} enregistrée`);
+  };
+  $("n-nom").addEventListener("input", () => { $("n-err").textContent = ""; });
+  remplirProfilFn = remplirProfil;
+  majAdmin();
+}
+
+let nbMembresAffiches = 0, remplirProfilFn = null;
+function majAdmin() {
+  const $ = (id) => document.getElementById(id);
+  if (!V) { $("a-statut").className = "pill off"; $("a-statut").textContent = "En attente"; $("a-banner").innerHTML = `<div class="card" style="margin-bottom:18px"><b>La simulation ne tourne pas encore.</b> Ouvrez le tableau de bord dans un autre onglet : c'est lui qui fait tourner le vaisseau. Cette console le pilote à distance.</div>`; return; }
+  const vieux = Date.now() - V.ts > 4000;
+  avecVue(() => {
+    const [niv, lib] = statutGlobal();
+    $("a-statut").className = "pill " + (vieux ? "off" : niv);
+    $("a-statut").textContent = vieux ? "Tableau de bord fermé" : lib;
+    $("a-heure").textContent = heure(S.t);
+    $("a-banner").innerHTML = vieux ? `<div class="card" style="margin-bottom:18px"><b>Le tableau de bord ne répond plus.</b> Ouvrez-le dans un autre onglet pour relancer la simulation (bouton « Ouvrir le tableau de bord »).</div>` : "";
+    $("a-pause").textContent = S.running ? "Mettre en pause" : "Relancer";
+    document.querySelectorAll("[data-vit]").forEach((b) => b.setAttribute("aria-pressed", String(+b.dataset.vit === S.vitesse)));
+    $("a-isol").setAttribute("aria-pressed", String(S.infirmerie.isolement));
+    $("a-isol").textContent = S.infirmerie.isolement ? "Lever l'isolement" : "Isoler les malades";
+    const act = crisesActives();
+    document.querySelectorAll("[data-crise-box]").forEach((b) => b.classList.toggle("active", act.has(b.dataset.criseBox)));
+    const malades = S.equipage.filter((m) => S.infirmerie.patients[m.id].cond).length;
+    const mc = medCritique();
+    $("a-resume").innerHTML = `Autonomie en repas : <b>${jours(autonomieRepas())} jours</b> · Malades : <b>${malades}</b> · Froid : <b>${S.armoire.froid.temp.toFixed(1).replace(".", ",")} °C</b> · Médicament le plus critique : <b>${esc(MEDS[mc.k].nom)} (${jours(mc.a)} j)</b>`;
+    $("a-journal").innerHTML = cascadesHTML(40, filtreJournal);
+    if (S.equipage.length !== nbMembresAffiches) {
+      const sel = $("p-membre"), avant = sel.value;
+      sel.innerHTML = S.equipage.map((m) => `<option value="${m.id}">${esc(m.nom)} · ${esc(m.pilier)}</option>`).join("");
+      if (avant && S.equipage.some((m) => m.id === avant)) sel.value = avant;
+      nbMembresAffiches = S.equipage.length;
+      remplirProfilFn && remplirProfilFn();
     }
+  });
+}
 
-    function renderEquipage() {
-      return `
-        <header class="top-header">
-          <h1>Équipage & Registre Médical</h1>
-          <p class="intro">Gestion des fiches de santé et des restrictions individuelles.</p>
-        </header>
+let loginMonte = false;
+function rendreAdmin() {
+  if (!adminConnecte()) { if (!loginMonte) { loginMonte = true; adminMonte = false; rendreLogin(); } return; }
+  loginMonte = false;
+  if (!adminMonte) { nbMembresAffiches = 0; monterAdmin(); return; }
+  majAdmin();
+}
 
-        <div class="grid-2">
-          <div class="card">
-            <div class="card-title">Membres Enregistrés</div>
-            <div class="table-container">
-              <table>
-                <thead><tr><th>Nom</th><th>Poste</th><th>Restrictions</th></tr></thead>
-                <tbody>
-                  ${data.equipage.map(e => `
-                    <tr>
-                      <td><strong>${esc(e.nom)}</strong></td>
-                      <td>${esc(e.pilier)}</td>
-                      <td>
-                        ${canSeeHealth() ? `
-                          ${e.allergies.map(a => `<span class="tag danger">${a}</span>`).join(' ')}
-                          ${e.regimes.map(r => `<span class="tag ok">${r}</span>`).join(' ')}
-                          ${e.maladies.map(m => `<span class="tag warn">${m}</span>`).join(' ')}
-                        ` : '<span style="color:var(--text-muted)">Confidentiel</span>'}
-                      </td>
-                    </tr>
-                  `).join('')}
-                </tbody>
-              </table>
-            </div>
-          </div>
+function rendre() { if (MODE === "admin") rendreAdmin(); else rendreDash(); }
 
-          <div class="card">
-            <div class="card-title">Ajouter un Membre</div>
-            <form id="add-member-form">
-              <div class="form-group">
-                <label>Nom complet</label>
-                <input type="text" name="nom" required>
-              </div>
-              <div class="form-group">
-                <label>Pôle / Affiliation</label>
-                <select name="pilier" required>
-                  ${PILIERS.map(p => `<option value="${p}">${p}</option>`).join('')}
-                </select>
-              </div>
-              
-              <div class="form-group">
-                <label>Allergies déclarées</label>
-                <div class="checkbox-grid">
-                  ${ALLERGENES.map(a => `
-                    <label class="checkbox-label"><input type="checkbox" name="allergies" value="${a}"> ${a}</label>
-                  `).join('')}
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label>Régime spécifique</label>
-                <div class="checkbox-grid">
-                  ${REGIMES.map(r => `
-                    <label class="checkbox-label"><input type="checkbox" name="regimes" value="${r}"> ${r}</label>
-                  `).join('')}
-                </div>
-              </div>
-
-              <button class="btn" type="submit">Enregistrer le membre</button>
-            </form>
-          </div>
-        </div>
-      `;
-    }
-
-    function renderAlertes() {
-      return `
-        <header class="top-header">
-          <h1>Journal des Alertes</h1>
-          <p class="intro">Historique de la télémétrie et des événements du système ARKA.</p>
-        </header>
-
-        <div class="card">
-          <div class="card-title">
-            <span>Historique (${data.alertes.length})</span>
-            <button class="btn secondary sm" data-action="clear-alerts">Effacer l'historique</button>
-          </div>
-          <div>
-            ${data.alertes.map(a => `
-              <div class="alert-item">
-                <span class="tag ${a.niveau}">${a.niveau.toUpperCase()}</span>
-                <div style="flex:1">
-                  <div>${esc(a.message)}</div>
-                  <div style="font-size:11px; color:var(--text-muted)">
-                    ${new Date(a.date).toLocaleString('fr-FR')} \vert{} Source :${a.pilier}
-                  </div>
-                </div>
-              </div>
-            `).join('') || '<p>Aucune alerte enregistrée.</p>'}
-          </div>
-        </div>
-      `;
-    }
-
-    // --- CONTROLEUR & ROUTAGE ---
-    const routes = {
-      dashboard: renderDashboard,
-      medicaments: renderMedicaments,
-      alimentation: renderAlimentation,
-      graines: renderGraines,
-      equipage: renderEquipage,
-      alertes: renderAlertes
-    };
-
-    function router() {
-      const hash = location.hash.replace('#', '') || 'dashboard';
-      const renderFn = routes[hash] || renderDashboard;
-      document.getElementById("app").innerHTML = renderFn();
-
-      // Navigation Active
-      document.querySelectorAll(".nav a").forEach(el => {
-        el.classList.toggle("active", el.dataset.route === hash);
-      });
-
-      // Mettre à jour le compteur d'alertes
-      const alertEl = document.getElementById("alert-count");
-      if (alertEl) alertEl.textContent = data.alertes.length;
-    }
-
-    // --- ACTIONS INTERACTIVES ---
-    document.addEventListener("click", e => {
-      const btn = e.target.closest("[data-action]");
-      if (!btn) return;
-
-      const action = btn.dataset.action;
-      const id = btn.dataset.id;
-
-      if (action === "reset-data") {
-        resetData();
-        return;
-      }
-
-      if (action === "reappro-med") {
-        const m = data.medicaments.find(x => x.id === id);
-        if (m && m.reserve > 0) {
-          const add = Math.min(10, m.reserve);
-          m.reserve -= add;
-          m.medbox += add;
-          toast(`Transfert de ${add} d. vers la MedBox (${m.nom})`);
-        } else {
-          toast("Réserve insuffisante !");
-        }
-      }
-
-      if (action === "process-deliv") {
-        const memberId = document.getElementById("deliv-member").value;
-        const medId = document.getElementById("deliv-med").value;
-
-        if (!memberId || !medId) {
-          toast("Veuillez sélectionner un membre et un produit.");
-          return;
-        }
-
-        const member = data.equipage.find(e => e.id === memberId);
-        const med = data.medicaments.find(m => m.id === medId);
-
-        if (med.allergene && member.allergies.includes(med.allergene)) {
-          stateUI.deliveryStatus = { ok: false, msg: `Contre-indication : ${member.nom} est allergique à (${med.allergene})` };
-          addAlert("danger", "Médecine", `TENTATIVE DE DÉLIVRANCE BLOQUÉE : ${med.nom} pour ${member.nom}`);
-        } else if (med.medbox < 1) {
-          stateUI.deliveryStatus = { ok: false, msg: "Stock MedBox épuisé. Veuillez recharger depuis la réserve." };
-        } else {
-          med.medbox -= 1;
-          stateUI.deliveryStatus = { ok: true, msg: `Délivrance validée. 1 dose de ${med.nom} transférée à ${member.nom}.` };
-        }
-      }
-
-      if (action === "simular-day") {
-        data.medicaments.forEach(m => {
-          const used = Math.min(m.medbox, Math.floor(Math.random() * 3) + 1);
-          m.medbox -= used;
-        });
-        toast("Consommation de 24h appliquée.");
-      }
-
-      if (action === "scan-crop") {
-        let detected = false;
-        data.zones.forEach(z => {
-          if (Math.random() < 0.3) {
-            z.etat = "malade";
-            z.confiance = Math.floor(Math.random() * 20) + 80;
-            detected = true;
-          }
-        });
-        if (detected) {
-          addAlert("danger", "Agriculture", "CropGuard : Nouvelle infection détectée sur les cultures.");
-          toast("Alerte CropGuard : Des anomalies ont été détectées !");
-        } else {
-          toast("Scan terminé : Aucune anomalie sur les serres.");
-        }
-      }
-
-      if (action === "treat-zone") {
-        const z = data.zones.find(x => x.id === id);
-        if (z) {
-          z.etat = "saine";
-          z.confiance = 99;
-          toast(`${z.zone} traitée et assainie.`);
-        }
-      }
-
-      if (action === "use-seed") {
-        const g = data.graines.find(x => x.id === id);
-        if (g && g.quantite >= 5) {
-          g.quantite -= 5;
-          toast(`5 sachets de ${g.espece} prélevés.`);
-        }
-      }
-
-      if (action === "clear-alerts") {
-        data.alertes = [];
-        toast("Historique des alertes effacé.");
-      }
-
-      saveData();
-      router();
-    });
-
-    document.addEventListener("change", e => {
-      if (e.target.id === "role-select") {
-        currentRole = e.target.value;
-        toast(`Rôle modifié : ${e.target.options[e.target.selectedIndex].text}`);
-        router();
-      }
-
-      if (e.target.id === "alim-member-select") {
-        stateUI.memberFilter = e.target.value;
-        router();
-      }
-    });
-
-    document.addEventListener("submit", e => {
-      if (e.target.id === "add-member-form") {
-        e.preventDefault();
-        const form = new FormData(e.target);
-        
-        const newMember = {
-          id: 'e' + Date.now(),
-          nom: form.get("nom"),
-          pilier: form.get("pilier"),
-          allergies: form.getAll("allergies"),
-          regimes: form.getAll("regimes"),
-          maladies: []
-        };
-
-        data.equipage.push(newMember);
-        saveData();
-        toast(`Membre ${newMember.nom} enregistré !`);
-        router();
-      }
-    });
-
-    // --- INITIALISATION ---
-    window.addEventListener("hashchange", router);
-    window.addEventListener("DOMContentLoaded", router);
-    window.addEventListener("load", router);
-  </script>
+/* ---------- Démarrage ---------- */
+document.body.className = MODE;
+document.title = MODE === "admin" ? "ARKA – Console d'administration" : "ARKA – Tableau de bord du vaisseau";
+try { const s = lsGet(K_SNAP); if (s) V = JSON.parse(s); } catch (e) {}
+rendre();
+boucle();
+</script>
 </body>
 </html>
