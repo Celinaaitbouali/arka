@@ -283,7 +283,7 @@ function etatInitial() {
     serre: { zones, scan: t0, recoltes: [] },
     activite: [], repasPerso: {},
     cuisine: { mode: "nominal", attente: null, dernier: null },
-    infirmerie: { patients, medbox, seuils, demandes: {}, vide: {}, consoLog: [], isolement: false, incubations: [], casParLot: {}, reponses: {} },
+    infirmerie: { patients, medbox, seuils, demandes: {}, vide: {}, consoLog: [], isolement: false, incubations: [], casParLot: {}, reponses: {}, demandesPerso: [] },
     hist: { froid: [], malades: [], autoRepas: [], medbox: [] }
   };
 }
@@ -820,24 +820,53 @@ function commande(c) {
     }
     case "graines": if (GRAINES[c.args.esp] && c.args.qty > 0) bus.publish("admin.graines", { esp: c.args.esp, qty: c.args.qty }, { ...src, message: `Livraison de graines : ${c.args.qty} graines de ${GRAINES[c.args.esp].nom.toLowerCase()}`, label: "Livraison de graines" }); break;
     case "prise": {
-      const m = membre(c.args.id), med = c.args.med, LS = LIBRE_SERVICE[med];
-      if (!m || !LS) return;
-      const P = S.infirmerie.patients[m.id];
-      const ev = bus.publish("equipage.prise", { membre: m.id, med }, { source: "equipage", message: `${m.nom} demande ${MEDS[med].nom} à la MedBox (${c.args.raison || "sans motif"})`, label: `Demande de ${m.nom}` });
+      // Une personne demande un médicament : la demande attend la validation de l'admin
+      const m = membre(c.args.id), med = c.args.med;
+      if (!m || !LIBRE_SERVICE[med]) return;
+      const I = S.infirmerie;
+      if (I.demandesPerso.some((d) => d.membre === m.id && d.statut === "attente")) {
+        I.reponses[m.id] = { ok: false, t: S.t, texte: "Vous avez déjà une demande en attente. Patientez, l'administrateur va y répondre." };
+        return;
+      }
+      const ev = bus.publish("equipage.demande", { membre: m.id, med }, { source: "equipage", message: `${m.nom} demande ${MEDS[med].nom} (${c.args.raison || "sans motif"}) : en attente de validation`, label: `Demande de ${m.nom}` });
+      I.demandesPerso.push({ id: "D" + ev.id, t: S.t, membre: m.id, nom: m.nom, med, raison: c.args.raison || "", statut: "attente", evId: ev.id });
+      if (I.demandesPerso.length > 40) I.demandesPerso.splice(0, I.demandesPerso.length - 40);
+      I.reponses[m.id] = { ok: null, t: S.t, texte: `Demande envoyée à ${hhmmM(S.t)}. L'administrateur doit débloquer la MedBox : vous verrez sa réponse ici.` };
+      break;
+    }
+    case "valider": {
+      // L'admin débloque (ou refuse) la MedBox pour une demande
+      const I = S.infirmerie;
+      const d = I.demandesPerso.find((x) => x.id === c.args.id);
+      if (!d || d.statut !== "attente") return;
+      const m = membre(d.membre);
+      if (!m) { d.statut = "refusee"; return; }
+      const P = I.patients[m.id], med = d.med, LS = LIBRE_SERVICE[med];
+      const cause = evRefs.get(d.evId) || null;
+      d.traitee = S.t;
+      if (!c.args.ok) {
+        d.statut = "refusee";
+        bus.publish("admin.demande.refusee", { id: d.id }, { cause, source: "admin", level: "warn", message: `Demande de ${m.nom} refusée par l'administrateur`, label: "Demande refusée" });
+        I.reponses[m.id] = { ok: false, t: S.t, texte: `Demande refusée par l'administrateur. Passez à l'infirmerie pour être examiné(e).` };
+        break;
+      }
+      const ev = bus.publish("admin.medbox.deverrouillee", { id: d.id }, { cause, source: "admin", level: "ok", message: `MedBox déverrouillée par l'administrateur pour ${m.nom}`, label: "MedBox déverrouillée" });
       const attente = LS.intervalle - (S.t - (P.doses[med] ?? -1e9));
-      let rep;
       if (MEDS[med].allergene && m.allergies.includes(MEDS[med].allergene)) {
         donner(m, P, med, ev, false, "libre-service");
-        rep = { ok: false, texte: `Refusé : vous êtes allergique (${MEDS[med].allergene}). Allez voir l'infirmerie, elle vous proposera un autre médicament.` };
+        d.statut = "bloquee";
+        I.reponses[m.id] = { ok: false, t: S.t, texte: `La MedBox a bloqué la délivrance : vous êtes allergique (${MEDS[med].allergene}). Allez voir l'infirmerie, elle vous proposera un autre médicament.` };
       } else if (attente > 0) {
-        bus.publish("equipage.prise.refusee", { membre: m.id, med }, { cause: ev, level: "warn", message: `Prise refusée pour ${m.nom} : dernière dose trop récente`, label: "Prise refusée (trop tôt)" });
-        rep = { ok: false, texte: `Pas encore : il faut attendre ${LS.intervalle / 60} heures entre deux prises. Prochaine prise possible à ${hhmmM(S.t + attente)}.` };
+        bus.publish("equipage.prise.refusee", { membre: m.id, med }, { cause: ev, level: "warn", message: `La MedBox a bloqué la délivrance pour ${m.nom} : dernière dose trop récente`, label: "Bloqué (trop tôt)" });
+        d.statut = "bloquee";
+        I.reponses[m.id] = { ok: false, t: S.t, texte: `La MedBox a bloqué la délivrance : il faut attendre ${LS.intervalle / 60} heures entre deux prises. Prochaine prise possible à ${hhmmM(S.t + attente)}.` };
       } else if (donner(m, P, med, ev, false, "libre-service")) {
-        rep = { ok: true, texte: `${MEDS[med].nom} délivré par la MedBox à ${hhmmM(S.t)}. Si ça ne va pas mieux dans quelques heures, passez à l'infirmerie.` };
+        d.statut = "approuvee";
+        I.reponses[m.id] = { ok: true, t: S.t, texte: `Demande acceptée. La MedBox vous a délivré ${MEDS[med].nom} à ${hhmmM(S.t)}. Si ça ne va pas mieux dans quelques heures, passez à l'infirmerie.` };
       } else {
-        rep = { ok: false, texte: "La MedBox est vide pour ce médicament. L'armoire a été prévenue et va la remplir : réessayez dans un moment ou allez à l'infirmerie." };
+        d.statut = "bloquee";
+        I.reponses[m.id] = { ok: false, t: S.t, texte: "Demande acceptée, mais la MedBox est vide pour ce médicament. L'armoire a été prévenue : réessayez dans un moment ou allez à l'infirmerie." };
       }
-      S.infirmerie.reponses[m.id] = { ...rep, t: S.t, med };
       break;
     }
     case "membre": {
@@ -1033,7 +1062,8 @@ const INFO = {
   tempC: "Température du corps. Normale : entre 36,5 et 37,5 °C. Fièvre à partir de 38 °C.",
   spo2: "Oxygène dans le sang. Normal : 95 % ou plus. En dessous de 92 %, c'est une urgence.",
   fc: "Battements du cœur par minute. Normal au repos : entre 60 et 100.",
-  libre: "Deux médicaments simples sont disponibles sans passer par l'infirmerie. La MedBox vérifie vos allergies et le délai depuis votre dernière prise avant de délivrer.",
+  libre: "Choisissez un médicament simple et envoyez votre demande. L'administrateur la reçoit et débloque la MedBox s'il est d'accord. Même débloquée, la MedBox vérifie encore vos allergies et le délai depuis votre dernière prise.",
+  demandesAdmin: "Les demandes envoyées depuis l'espace équipage. Les vérifications (allergie, dernière prise, stock) sont faites pour vous aider à décider. « Débloquer la MedBox » délivre le médicament, « Refuser » renvoie la personne vers l'infirmerie.",
   prochainPlat: "Le plat que la cuisine vous servira si le stock ne change pas d'ici là. Il respecte vos allergies, votre régime et votre état de santé.",
   restrictions: "Les informations de votre fiche d'identification. Elles servent à bloquer automatiquement les repas et médicaments dangereux pour vous.",
   historique: "Ce que vous avez reçu récemment, avec l'heure à bord."
@@ -1265,6 +1295,10 @@ function monterAdmin() {
     </header>
     <main>
       <div id="a-banner"></div>
+      <section class="card" style="margin-bottom:18px">
+        <h2>Demandes de médicaments <span id="a-nbdem" class="tag"></span> ${ib(INFO.demandesAdmin)}</h2>
+        <div id="a-demandes"></div>
+      </section>
       <div class="grid g2">
         <section class="card">
           <h2>Simulation ${ib("Mettre en pause ou accélérer le temps à bord. ×10 est pratique pendant une présentation pour voir les conséquences arriver vite.")}</h2>
@@ -1364,6 +1398,14 @@ function monterAdmin() {
   $("f-graines").onsubmit = (e) => { e.preventDefault(); const q = parseInt($("g-qty").value, 10); if (!(q >= 1 && q <= 500)) { $("a-form-err").textContent = "Indiquez un nombre de graines entre 1 et 500."; return; } $("a-form-err").textContent = ""; envoyer("graines", { esp: $("g-esp").value, qty: q }); toast(`${q} graines livrées`); };
   ["l-qty", "m-qty", "g-qty"].forEach((id) => $(id).addEventListener("input", () => { $("a-form-err").textContent = ""; }));
   $("a-filtre").onchange = () => { filtreJournal = $("a-filtre").value; majAdmin(); };
+  $("a-demandes").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-dem]");
+    if (!b) return;
+    const ok = b.dataset.ok === "1";
+    b.closest("li").style.opacity = ".5";
+    envoyer("valider", { id: b.dataset.dem, ok });
+    toast(ok ? "MedBox débloquée" : "Demande refusée");
+  });
 
   const remplirProfil = () => {
     if (!V) return;
@@ -1395,6 +1437,31 @@ function monterAdmin() {
 }
 
 let nbMembresAffiches = 0, remplirProfilFn = null;
+let cleDemandes = "";
+function demandesHTML() {
+  const I = S.infirmerie;
+  const att = I.demandesPerso.filter((d) => d.statut === "attente");
+  const faites = I.demandesPerso.filter((d) => d.statut !== "attente").slice(-5).reverse();
+  const STAT = { approuvee: ["ok", "Délivré"], refusee: ["warn", "Refusé"], bloquee: ["danger", "Bloqué par la MedBox"] };
+  const verif = (d) => {
+    const m = S.equipage.find((x) => x.id === d.membre);
+    if (!m) return "";
+    const P = I.patients[m.id], LS = LIBRE_SERVICE[d.med];
+    const allergie = MEDS[d.med].allergene && m.allergies.includes(MEDS[d.med].allergene);
+    const depuis = S.t - (P.doses[d.med] ?? -1e9);
+    const tot = depuis < LS.intervalle;
+    const stock = I.medbox[d.med];
+    return `<span class="tag ${allergie ? "danger" : "ok"}">${allergie ? "Allergie : " + esc(MEDS[d.med].allergene) : "Pas d'allergie"}</span>`
+      + `<span class="tag ${tot ? "danger" : "ok"}">${depuis > 1e8 ? "Aucune prise récente" : `Dernière prise il y a ${Math.floor(depuis / 60)} h ${String(depuis % 60).padStart(2, "0")}`}</span>`
+      + `<span class="tag ${stock < 1 ? "danger" : "ok"}">MedBox : ${stock}</span>`
+      + (P.cond ? `<span class="tag warn">Suivi(e) par l'infirmerie</span>` : "");
+  };
+  let h = att.length
+    ? `<ul class="feed">${att.map((d) => `<li style="flex-wrap:wrap"><span class="when">${hhmm(d.t)}</span><span style="flex:1;min-width:220px"><b>${esc(d.nom)}</b> demande <b>${esc(MEDS[d.med].nom)}</b>${d.raison ? ` (${esc(d.raison)})` : ""}<br>${verif(d)}</span><span class="row"><button class="btn sm" data-dem="${d.id}" data-ok="1">Débloquer la MedBox</button><button class="btn sec sm" data-dem="${d.id}" data-ok="0">Refuser</button></span></li>`).join("")}</ul>`
+    : `<p class="empty">Aucune demande en attente.</p>`;
+  if (faites.length) h += `<h3 style="font-size:14px;margin:16px 0 4px">Dernières réponses</h3><ul class="feed">${faites.map((d) => `<li><span class="when">${hhmm(d.traitee ?? d.t)}</span><span class="tag ${STAT[d.statut][0]}">${STAT[d.statut][1]}</span><span>${esc(d.nom)} : ${esc(MEDS[d.med].nom)}</span></li>`).join("")}</ul>`;
+  return { h, n: att.length };
+}
 function majAdmin() {
   const $ = (id) => document.getElementById(id);
   if (!V) { $("a-statut").className = "pill off"; $("a-statut").textContent = "En attente"; $("a-banner").innerHTML = `<div class="card" style="margin-bottom:18px"><b>La simulation ne tourne pas encore.</b> Ouvrez le tableau de bord dans un autre onglet : c'est lui qui fait tourner le vaisseau. Cette console le pilote à distance.</div>`; return; }
@@ -1415,6 +1482,12 @@ function majAdmin() {
     const mc = medCritique();
     $("a-resume").innerHTML = `Autonomie en repas : <b>${jours(autonomieRepas())} jours</b> · Malades : <b>${malades}</b> · Froid : <b>${S.armoire.froid.temp.toFixed(1).replace(".", ",")} °C</b> · Médicament le plus critique : <b>${esc(MEDS[mc.k].nom)} (${jours(mc.a)} j)</b>`;
     $("a-journal").innerHTML = cascadesHTML(40, filtreJournal);
+    const dem = demandesHTML();
+    const cle = JSON.stringify(S.infirmerie.demandesPerso.map((d) => d.id + d.statut)) + Math.floor(S.t / 60);
+    if (cle !== cleDemandes) { cleDemandes = cle; $("a-demandes").innerHTML = dem.h; }
+    $("a-nbdem").textContent = dem.n ? `${dem.n} en attente` : "";
+    $("a-nbdem").className = "tag " + (dem.n ? "warn" : "");
+    document.title = (dem.n ? `(${dem.n}) ` : "") + "ARKA – Console d'administration";
     if (S.equipage.length !== nbMembresAffiches) {
       const sel = $("p-membre"), avant = sel.value;
       sel.innerHTML = S.equipage.map((m) => `<option value="${m.id}">${esc(m.nom)} · ${esc(m.pilier)}</option>`).join("");
@@ -1452,12 +1525,12 @@ function monterEquip() {
         <div class="me">
           <section class="card" id="e-etat"></section>
           <section class="card">
-            <h2>Prendre un médicament à la MedBox ${ib(INFO.libre)}</h2>
+            <h2>Demander un médicament ${ib(INFO.libre)}</h2>
             <form id="f-prise" novalidate>
               <div class="row" style="align-items:flex-end">
                 <div class="field"><label for="e-med">Médicament</label><select id="e-med">${Object.keys(LIBRE_SERVICE).map((k) => `<option value="${k}">${esc(MEDS[k].nom)}</option>`).join("")}</select></div>
                 <div class="field"><label for="e-raison">Pourquoi ?</label><select id="e-raison"></select></div>
-                <button class="btn" type="submit">Prendre</button>
+                <button class="btn" type="submit">Envoyer la demande</button>
               </div>
             </form>
             <div id="e-rep" aria-live="polite"></div>
@@ -1481,7 +1554,7 @@ function monterEquip() {
     const id = moiId();
     if (!id) return;
     envoyer("prise", { id, med: $("e-med").value, raison: $("e-raison").value });
-    $("e-rep").innerHTML = `<div class="rep">Demande envoyée à la MedBox…</div>`;
+    $("e-rep").innerHTML = `<div class="rep" style="background:#FBE3D0;color:#8A4410">Envoi de la demande…</div>`;
   };
   majEquip();
 }
@@ -1528,7 +1601,10 @@ function majEquip() {
       ${hp.length ? `<ul class="feed">${hp.slice(0, 5).map((r) => `<li><span class="when">${heure(r.t)}</span><span>${esc(r.repas)} : ${esc(r.plat)}${r.ration < 1 ? " (portion réduite)" : ""}</span></li>`).join("")}</ul>` : `<p class="empty">Pas encore de repas depuis le démarrage.</p>`}`;
     $("e-hist").innerHTML = `<h2>Mes médicaments ${ib(INFO.historique)}</h2>${activiteHTML(10, m.id).replace('<p class="empty">Rien pour le moment.</p>', '<p class="empty">Vous n\'avez reçu aucun médicament.</p>')}`;
     const rep = S.infirmerie.reponses[m.id];
-    if (rep && S.t - rep.t <= 60) $("e-rep").innerHTML = `<div class="rep ${rep.ok ? "ok" : "no"}">${esc(rep.texte)}</div>`;
+    const enAttente = S.infirmerie.demandesPerso.find((d) => d.membre === m.id && d.statut === "attente");
+    if (enAttente) $("e-rep").innerHTML = `<div class="rep" style="background:#FBE3D0;color:#8A4410"><b>En attente de l'administrateur</b> : ${esc(MEDS[enAttente.med].nom)}, demandé à ${hhmm(enAttente.t)}.</div>`;
+    else if (rep && S.t - rep.t <= 120) $("e-rep").innerHTML = `<div class="rep ${rep.ok ? "ok" : "no"}">${esc(rep.texte)}</div>`;
+    else $("e-rep").innerHTML = "";
     $("e-feed").innerHTML = activiteHTML(8);
   });
 }
