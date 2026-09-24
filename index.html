@@ -126,6 +126,28 @@ legend{font-weight:500;font-size:14px;padding:0 6px}
 .login{max-width:420px;margin:12vh auto;background:var(--ivory);border:1px solid var(--line);border-radius:20px;padding:32px}
 .login h1{font-family:var(--font-display);margin:0 0 6px;font-size:26px}
 .err{color:#A32D2D;font-size:14px}
+.info{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;border:1.5px solid currentColor;background:transparent;color:inherit;opacity:.65;font:600 12px/1 var(--font-body);font-style:italic;padding:0;margin-left:6px;vertical-align:middle;cursor:pointer}
+.info:hover,.info[aria-expanded="true"]{opacity:1;color:var(--orange)}
+#pop{position:fixed;z-index:50;max-width:320px;background:#0B1426;color:#F5F3EE;border:1px solid #E8833A;border-radius:12px;padding:12px 14px;font-size:14px;line-height:1.5;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.intro{color:var(--muted-d);margin:0 0 18px;max-width:80ch}
+.admin .intro{color:var(--ink-soft)}
+.feed{list-style:none;margin:0;padding:0}
+.feed li{display:flex;gap:10px;align-items:baseline;padding:7px 0;border-bottom:1px solid var(--navy-3);font-size:14px}
+.admin .feed li{border-color:var(--line)}
+.feed li:last-child{border-bottom:0}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted-d);margin:0 0 14px}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px;background:var(--c)}
+.zones{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.zone{border-radius:12px;padding:14px;background:var(--navy-2);border:1px solid var(--navy-3)}
+.zone.vide{border-style:dashed;opacity:.8}
+.zone .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.zone .top b{white-space:nowrap}
+.admin .c-mut,.admin .empty{color:var(--ink-soft)}
+.me{display:grid;gap:18px;grid-template-columns:repeat(2,minmax(0,1fr))}
+.big{font-family:var(--font-display);font-weight:700;font-size:22px}
+.rep{margin-top:12px;padding:12px 14px;border-radius:10px}
+.rep.ok{background:#D4EFEA;color:#1D6F65}.rep.no{background:#F6D5D1;color:#8E2A1F}
+@media (max-width:1000px){.me{grid-template-columns:1fr}}
 .toast{position:fixed;right:20px;bottom:20px;background:var(--navy);color:var(--ivory);padding:12px 18px;border-radius:10px;opacity:0;transform:translateY(8px);transition:.2s;pointer-events:none;max-width:360px}
 .toast.show{opacity:1;transform:none}
 @media (prefers-reduced-motion:reduce){.toast{transition:none}}
@@ -136,6 +158,7 @@ legend{font-weight:500;font-size:14px;padding:0 6px}
 <body>
 <div id="root"></div>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
+<div id="pop" role="tooltip" hidden></div>
 
 <script>
 /* =====================================================================
@@ -155,6 +178,7 @@ const REPAS = [{ h: 420, nom: "Petit-déjeuner" }, { h: 750, nom: "Déjeuner" },
 
 function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 let rand = mulberry32(42);
+const hhmmM = (t) => { const m = t % 1440; return `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`; };
 const clone = (o) => JSON.parse(JSON.stringify(o));
 
 const PRODUITS = {
@@ -166,6 +190,26 @@ const PRODUITS = {
   curry:    { nom: "Curry de lentilles",      zone: "sec",   kcal: 420, allergenes: [],                   tags: ["végétarien", "vegan", "halal"], leger: false, dureeJ: 90 },
   riz:      { nom: "Riz aux légumes",         zone: "sec",   kcal: 380, allergenes: [],                   tags: ["végétarien", "vegan", "halal"], leger: true,  dureeJ: 120 },
   soupe:    { nom: "Soupe de légumes",        zone: "sec",   kcal: 200, allergenes: [],                   tags: ["végétarien", "vegan", "halal"], leger: true,  dureeJ: 120 }
+};
+
+PRODUITS.legumes = { nom: "Légumes frais de la serre", zone: "froid", kcal: 260, allergenes: [], tags: ["végétarien", "vegan", "halal"], leger: true, dureeJ: 5 };
+
+// Armoire à graines : stock de départ, seuil d'alerte, graines utilisées par semis, durée de culture
+const GRAINES = {
+  laitue:   { nom: "Laitue",         stock: 30, seuil: 10, parSemis: 6,  cycleJ: 1.2 },
+  tomate:   { nom: "Tomate",         stock: 24, seuil: 8,  parSemis: 5,  cycleJ: 1.8 },
+  pdt:      { nom: "Pomme de terre", stock: 40, seuil: 12, parSemis: 8,  cycleJ: 2.2 },
+  ble:      { nom: "Blé",            stock: 60, seuil: 20, parSemis: 12, cycleJ: 2.5 },
+  soja:     { nom: "Soja",           stock: 30, seuil: 10, parSemis: 6,  cycleJ: 2 },
+  lentille: { nom: "Lentille",       stock: 30, seuil: 10, parSemis: 6,  cycleJ: 2 }
+};
+const ZONES_INIT = [["A1", "laitue"], ["A2", "tomate"], ["B1", "pdt"], ["B2", "ble"], ["C1", "soja"], ["C2", "lentille"]];
+const RECOLTE_PORTIONS = 25;
+
+// Médicaments en libre-service à la MedBox (délai minimum entre deux prises)
+const LIBRE_SERVICE = {
+  paracetamol: { intervalle: 360, raisons: ["Mal de tête", "Fièvre", "Douleur"] },
+  antihistaminique: { intervalle: 480, raisons: ["Allergie saisonnière", "Démangeaisons", "Nez qui coule"] }
 };
 
 const MEDS = {
@@ -211,7 +255,8 @@ const CRISES = {
   "intoxication": { titre: "Lot alimentaire contaminé", desc: "Un lot frais est contaminé sans que personne ne le sache. Après le prochain repas, des cas arrivent à l'infirmerie, qui remonte jusqu'au lot grâce à la traçabilité." },
   "etiquetage": { titre: "Erreur d'étiquetage allergène", desc: "Un lot contient de l'arachide non déclarée. Un membre allergique fait une réaction : adrénaline de la MedBox, puis retrait du lot." },
   "epidemie": { titre: "Épidémie de grippe", desc: "Cinq membres tombent malades et la contagion se propage. Plus de médicaments consommés, MedBox réapprovisionnée, repas retardés si l'équipe cuisine est touchée." },
-  "rupture": { titre: "Rupture de paracétamol en réserve", desc: "La réserve de l'armoire tombe presque à zéro : la prévision d'autonomie chute et la MedBox ne peut plus être réapprovisionnée." }
+  "rupture": { titre: "Rupture de paracétamol en réserve", desc: "La réserve de l'armoire tombe presque à zéro : la prévision d'autonomie chute et la MedBox ne peut plus être réapprovisionnée." },
+  "maladie-cultures": { titre: "Maladie des cultures", desc: "Un champignon attaque deux zones de la serre. CropGuard le détecte à la prochaine analyse des photos : zones arrachées, graines sorties de l'armoire pour replanter, récolte perdue." }
 };
 
 function etatInitial() {
@@ -226,14 +271,19 @@ function etatInitial() {
   ajout("tofu", 60); ajout("omelette", 60); ajout("curry", 120); ajout("riz", 140); ajout("soupe", 100);
   const reserve = {}, medbox = {}, seuils = {};
   for (const [k, m] of Object.entries(MEDS)) { reserve[k] = m.reserve; medbox[k] = m.medbox; seuils[k] = m.seuil; }
+  const graines = {};
+  for (const [k, g] of Object.entries(GRAINES)) graines[k] = g.stock;
+  const zones = ZONES_INIT.map(([id, esp]) => ({ id, esp, etat: "pousse", croissance: +(0.1 + rand() * 0.8).toFixed(2), malade: false, demande: false }));
   const patients = {};
   EQUIPAGE_INIT.forEach((e) => { patients[e.id] = { cond: null, vitals: { temp: 36.8, spo2: 98, fc: 72 }, triage: "vert", doses: {} }; });
   return {
     t: t0, tick: 0, running: true, vitesse: 1, seq: 0, journal: [], crises: [],
     equipage: clone(EQUIPAGE_INIT),
-    armoire: { froid: { temp: 4, panne: false, alerte: false }, pharma: { temp: 19 }, lots, reserve, pertes: [], nextLot: n, stockBas: {} },
+    armoire: { froid: { temp: 4, panne: false, alerte: false }, pharma: { temp: 19 }, lots, reserve, graines, grainesBas: {}, pertes: [], nextLot: n, stockBas: {} },
+    serre: { zones, scan: t0, recoltes: [] },
+    activite: [], repasPerso: {},
     cuisine: { mode: "nominal", attente: null, dernier: null },
-    infirmerie: { patients, medbox, seuils, demandes: {}, vide: {}, consoLog: [], isolement: false, incubations: [], casParLot: {} },
+    infirmerie: { patients, medbox, seuils, demandes: {}, vide: {}, consoLog: [], isolement: false, incubations: [], casParLot: {}, reponses: {} },
     hist: { froid: [], malades: [], autoRepas: [], medbox: [] }
   };
 }
@@ -284,6 +334,13 @@ function creerBus() {
   };
 }
 const bus = creerBus();
+
+/* ---------- Activité à bord (ce que chaque personne reçoit) ---------- */
+function activite(membreId, type, texte, mode) {
+  const m = membreId ? S.equipage.find((x) => x.id === membreId) : null;
+  S.activite.push({ t: S.t, membre: membreId, nom: m ? m.nom : null, type, texte, mode });
+  if (S.activite.length > 150) S.activite.splice(0, S.activite.length - 150);
+}
 
 /* ---------- Règles partagées ---------- */
 const membre = (id) => S.equipage.find((m) => m.id === id);
@@ -380,6 +437,33 @@ function initArmoire() {
     A().lots.push({ id, pid, portions: qty, peremption: S.t + p.dureeJ * 1440, expo: 0, statut: "ok", allergenesReels: [...p.allergenes], contamine: false });
     bus.publish("armoire.lot.ajoute", { lotId: id }, { cause: e, level: "ok", message: `Nouveau lot ${id} rangé : ${qty} portions de ${p.nom}`, label: `Lot ${id} rangé` });
   });
+  bus.on("serre.demande.graines", (e) => {
+    const { zone, esp, qty } = e.data;
+    const G = GRAINES[esp];
+    if (A().graines[esp] >= qty) {
+      A().graines[esp] -= qty;
+      bus.publish("armoire.graines.sorties", { zone, esp, qty }, { cause: e, message: `${qty} graines de ${G.nom.toLowerCase()} sorties de l'armoire à graines pour la zone ${zone}`, label: `${qty} graines → zone ${zone}` });
+      if (A().graines[esp] < G.seuil && !A().grainesBas[esp]) {
+        A().grainesBas[esp] = true;
+        bus.publish("armoire.graines.bas", { esp }, { cause: e, level: "warn", message: `Armoire à graines : stock de ${G.nom.toLowerCase()} bas (${A().graines[esp]} restantes)`, label: `Graines de ${G.nom.toLowerCase()} bas` });
+      }
+    } else {
+      bus.publish("armoire.graines.rupture", { zone, esp }, { cause: e, level: "danger", message: `Plus assez de graines de ${G.nom.toLowerCase()} pour replanter la zone ${zone} (${A().graines[esp]} restantes)`, label: `Rupture graines ${G.nom.toLowerCase()}` });
+    }
+  });
+  bus.on("admin.graines", (e) => {
+    const { esp, qty } = e.data;
+    A().graines[esp] += qty;
+    if (A().graines[esp] >= GRAINES[esp].seuil) A().grainesBas[esp] = false;
+    bus.publish("armoire.graines.maj", { esp }, { cause: e, level: "ok", message: `Armoire à graines : +${qty} graines de ${GRAINES[esp].nom.toLowerCase()} (total ${A().graines[esp]})`, label: `Graines +${qty}` });
+  });
+  bus.on("serre.recolte", (e) => {
+    const { qty } = e.data;
+    if (qty < 1) return;
+    const id = "L" + String(A().nextLot++).padStart(3, "0");
+    A().lots.push({ id, pid: "legumes", portions: qty, peremption: S.t + PRODUITS.legumes.dureeJ * 1440, expo: 0, statut: "ok", allergenesReels: [], contamine: false });
+    bus.publish("armoire.lot.ajoute", { lotId: id }, { cause: e, level: "ok", message: `Lot ${id} rangé au froid : ${qty} portions de légumes frais`, label: `Lot ${id} rangé` });
+  });
   bus.on("admin.reappro", (e) => {
     const { med, qty } = e.data;
     A().reserve[med] += qty;
@@ -420,6 +504,62 @@ function tickArmoire() {
   A.pertes = A.pertes.slice(0, 30);
 }
 
+/* ---------- Module SERRE (cultures, CropGuard, besoins en graines) ---------- */
+function demanderGraines(z, cause) {
+  const G = GRAINES[z.esp];
+  z.demande = true;
+  bus.publish("serre.demande.graines", { zone: z.id, esp: z.esp, qty: G.parSemis }, { cause, message: `Zone ${z.id} : demande de ${G.parSemis} graines de ${G.nom.toLowerCase()} à l'armoire`, label: `Demande de graines (zone ${z.id})` });
+}
+function initSerre() {
+  const Z = () => S.serre.zones;
+  bus.on("armoire.graines.sorties", (e) => {
+    const z = Z().find((x) => x.id === e.data.zone);
+    if (!z) return;
+    z.etat = "pousse"; z.croissance = 0; z.malade = false; z.demande = false;
+    bus.publish("serre.semis", { zone: z.id }, { cause: e, level: "ok", message: `Zone ${z.id} replantée en ${GRAINES[z.esp].nom.toLowerCase()}`, label: `Zone ${z.id} replantée` });
+  });
+  bus.on("armoire.graines.rupture", (e) => { const z = Z().find((x) => x.id === e.data.zone); if (z) z.demande = "rupture"; });
+  bus.on("armoire.graines.maj", (e) => {
+    for (const z of Z()) if (z.esp === e.data.esp && z.demande === "rupture") { z.demande = false; demanderGraines(z, e); }
+  });
+  bus.on("crise.maladie-cultures", (e) => {
+    causes.cultures = e;
+    const cibles = Z().filter((z) => z.etat === "pousse" && !z.malade).sort(() => rand() - 0.5).slice(0, 2);
+    cibles.forEach((z) => { z.malade = true; });
+    if (cibles.length) bus.publish("serre.infection", { zones: cibles.map((z) => z.id) }, { cause: e, level: "warn", message: `Champignon sur les zones ${cibles.map((z) => z.id).join(" et ")} (pas encore visible)`, label: "Champignon invisible" });
+  });
+}
+function tickSerre() {
+  const SE = S.serre;
+  for (const z of SE.zones) {
+    if (z.etat === "vide") { if (!z.demande) demanderGraines(z, null); continue; }
+    const G = GRAINES[z.esp];
+    z.croissance = Math.min(1, z.croissance + (z.malade ? 0.3 : 1) / (G.cycleJ * 144));
+    if (!z.malade && rand() < 0.0003) z.malade = true;
+    if (z.croissance >= 1) {
+      const qty = z.malade ? Math.round(RECOLTE_PORTIONS * 0.4) : RECOLTE_PORTIONS;
+      const ev = bus.publish("serre.recolte", { zone: z.id, qty }, { level: "ok", message: `Récolte de la zone ${z.id} (${G.nom.toLowerCase()}) : ${qty} portions de légumes frais`, label: `Récolte zone ${z.id}` });
+      SE.recoltes.unshift({ t: S.t, zone: z.id, esp: z.esp, qty }); SE.recoltes = SE.recoltes.slice(0, 12);
+      z.etat = "vide"; z.croissance = 0; z.malade = false;
+      demanderGraines(z, ev);
+    }
+  }
+  // CropGuard : analyse des photos toutes les heures
+  if (S.t - SE.scan >= 60) {
+    SE.scan = S.t;
+    for (const z of SE.zones) {
+      if (z.etat !== "pousse" || !z.malade) continue;
+      const G = GRAINES[z.esp];
+      const conf = 84 + Math.floor(rand() * 14);
+      const ev = bus.publish("serre.cropguard.detection", { zone: z.id, conf }, { cause: causes.cultures, level: "danger", message: `CropGuard : feuilles malades détectées sur la zone ${z.id} (${G.nom.toLowerCase()}), confiance ${conf} %`, label: `CropGuard : zone ${z.id} malade` });
+      const perdu = Math.round(RECOLTE_PORTIONS * Math.max(0.2, z.croissance));
+      z.etat = "vide"; z.croissance = 0; z.malade = false;
+      const ev2 = bus.publish("serre.zone.arrachee", { zone: z.id }, { cause: ev, level: "warn", message: `Zone ${z.id} arrachée pour stopper la maladie : environ ${perdu} portions de récolte perdues`, label: `Zone ${z.id} arrachée` });
+      demanderGraines(z, ev2);
+    }
+  }
+}
+
 /* ---------- Module CUISINE (repas, rationnement, compatibilité) ---------- */
 function initCuisine() {
   bus.on("armoire.lot.quarantaine", (e) => {
@@ -439,10 +579,13 @@ function servirRepas(nomRepas, cause) {
     if (!l) { sans.push(m.nom); continue; }
     reste[l.id] = (reste[l.id] ?? l.portions) - ration;
     servings.push({ membre: m.id, lotId: l.id });
+    const hp = (S.repasPerso[m.id] = S.repasPerso[m.id] || []);
+    hp.unshift({ t: S.t, repas: nomRepas, plat: PRODUITS[l.pid].nom, ration }); if (hp.length > 8) hp.pop();
     kcal += PRODUITS[l.pid].kcal * ration;
   }
   const parLot = {};
   servings.forEach((s) => { parLot[s.lotId] = (parLot[s.lotId] || 0) + ration; });
+  activite(null, "repas", `${nomRepas} servi à ${servings.length} membres${sans.length ? `, ${sans.length} sans plat compatible` : ""}`, "cuisine");
   C.dernier = { repas: nomRepas, t: S.t, servis: servings.length, sans, kcal: servings.length ? Math.round(kcal / servings.length) : 0 };
   const ev = bus.publish("cuisine.repas.servi", { repas: nomRepas, servings }, {
     cause, level: sans.length ? "warn" : "info",
@@ -485,7 +628,7 @@ function demander(med, cause) {
   I.demandes[med] = true;
   bus.publish("infirmerie.demande.reappro", { med, qty }, { cause, message: `MedBox sous le seuil : demande de ${qty} × ${MEDS[med].nom} à l'armoire`, label: `Demande MedBox : ${MEDS[med].nom}` });
 }
-function donner(m, P, med, cause, silencieux = false) {
+function donner(m, P, med, cause, silencieux = false, mode = "infirmerie") {
   const I = S.infirmerie;
   if (MEDS[med].allergene && m.allergies.includes(MEDS[med].allergene)) {
     bus.publish("infirmerie.contre-indication", { med, membre: m.id }, { cause, level: "warn", message: `${MEDS[med].nom} bloqué pour ${m.nom} : allergie déclarée (${MEDS[med].allergene})`, label: `${MEDS[med].nom} bloqué (allergie)` });
@@ -499,6 +642,7 @@ function donner(m, P, med, cause, silencieux = false) {
   I.medbox[med] -= 1;
   P.doses[med] = S.t;
   I.consoLog.push({ t: S.t, med, qty: 1 });
+  activite(m.id, "med", MEDS[med].nom, mode);
   const ev = bus.publish("infirmerie.soin", { med, membre: m.id }, { cause, silent: silencieux, message: `${MEDS[med].nom} administré à ${m.nom}`, label: `${MEDS[med].nom} → ${m.nom}` });
   if (I.medbox[med] < I.seuils[med]) demander(med, ev);
   return true;
@@ -626,8 +770,8 @@ function tickInfirmerie() {
         else if (S.t - (P.doses.antihistaminique ?? -1e9) >= 480) donner(m, P, "antihistaminique", cause);
       }
     }
-    if (insuline && m.maladies.includes("diabète")) donner(m, P, "insuline", null, true);
-    if (!cc && rand() < 0.002) donner(m, P, "paracetamol", null, true);
+    if (insuline && m.maladies.includes("diabète")) donner(m, P, "insuline", null, true, "traitement quotidien");
+    if (!cc && rand() < 0.002 && S.t - (P.doses.paracetamol ?? -1e9) >= 360) donner(m, P, "paracetamol", null, true, "libre-service");
   }
   I.consoLog = I.consoLog.filter((c) => c.t > S.t - 2880);
 }
@@ -642,7 +786,7 @@ function historiser() {
 }
 function tick() {
   S.t += MIN_PAR_TICK; S.tick++;
-  tickArmoire(); tickCuisine(); tickInfirmerie();
+  tickArmoire(); tickSerre(); tickCuisine(); tickInfirmerie();
   historiser();
 }
 function commande(c) {
@@ -674,6 +818,28 @@ function commande(c) {
       bus.publish("admin.profil", { membre: m.id }, { ...src, message: `Profil santé de ${m.nom} mis à jour` });
       break;
     }
+    case "graines": if (GRAINES[c.args.esp] && c.args.qty > 0) bus.publish("admin.graines", { esp: c.args.esp, qty: c.args.qty }, { ...src, message: `Livraison de graines : ${c.args.qty} graines de ${GRAINES[c.args.esp].nom.toLowerCase()}`, label: "Livraison de graines" }); break;
+    case "prise": {
+      const m = membre(c.args.id), med = c.args.med, LS = LIBRE_SERVICE[med];
+      if (!m || !LS) return;
+      const P = S.infirmerie.patients[m.id];
+      const ev = bus.publish("equipage.prise", { membre: m.id, med }, { source: "equipage", message: `${m.nom} demande ${MEDS[med].nom} à la MedBox (${c.args.raison || "sans motif"})`, label: `Demande de ${m.nom}` });
+      const attente = LS.intervalle - (S.t - (P.doses[med] ?? -1e9));
+      let rep;
+      if (MEDS[med].allergene && m.allergies.includes(MEDS[med].allergene)) {
+        donner(m, P, med, ev, false, "libre-service");
+        rep = { ok: false, texte: `Refusé : vous êtes allergique (${MEDS[med].allergene}). Allez voir l'infirmerie, elle vous proposera un autre médicament.` };
+      } else if (attente > 0) {
+        bus.publish("equipage.prise.refusee", { membre: m.id, med }, { cause: ev, level: "warn", message: `Prise refusée pour ${m.nom} : dernière dose trop récente`, label: "Prise refusée (trop tôt)" });
+        rep = { ok: false, texte: `Pas encore : il faut attendre ${LS.intervalle / 60} heures entre deux prises. Prochaine prise possible à ${hhmmM(S.t + attente)}.` };
+      } else if (donner(m, P, med, ev, false, "libre-service")) {
+        rep = { ok: true, texte: `${MEDS[med].nom} délivré par la MedBox à ${hhmmM(S.t)}. Si ça ne va pas mieux dans quelques heures, passez à l'infirmerie.` };
+      } else {
+        rep = { ok: false, texte: "La MedBox est vide pour ce médicament. L'armoire a été prévenue et va la remplir : réessayez dans un moment ou allez à l'infirmerie." };
+      }
+      S.infirmerie.reponses[m.id] = { ...rep, t: S.t, med };
+      break;
+    }
     case "membre": {
       const nom = String(c.args.nom || "").trim().slice(0, 40);
       if (!nom) return;
@@ -688,7 +854,7 @@ function commande(c) {
 let moteurPret = false;
 function initMoteur() {
   if (moteurPret) return;
-  initArmoire(); initCuisine(); initInfirmerie();
+  initArmoire(); initSerre(); initCuisine(); initInfirmerie();
   moteurPret = true;
 }
 /*ENGINE-END*/
@@ -698,9 +864,9 @@ function initMoteur() {
    Le tableau de bord fait tourner la simulation et publie l'état ;
    la console admin envoie des commandes. Tout passe par le navigateur.
    ===================================================================== */
-const MODE = location.hash === "#admin" ? "admin" : "dash";
+const MODE = location.hash === "#admin" ? "admin" : location.hash === "#equipage" ? "equip" : "dash";
 const TAB_ID = Math.random().toString(36).slice(2);
-const K_SNAP = "arka-v2-snap", K_CMD = "arka-v2-cmd", K_LEAD = "arka-v2-leader";
+const K_SNAP = "arka-v3-snap", K_CMD = "arka-v3-cmd", K_LEAD = "arka-v3-leader";
 let V = null;           // dernier état reçu (vue)
 let leader = false;
 const vus = new Set();
@@ -806,6 +972,7 @@ function crisesActives() {
   if (S.armoire.lots.some((l) => l.statut === "ok" && l.portions >= 1 && l.allergenesReels.some((x) => !PRODUITS[l.pid].allergenes.includes(x))) || S.equipage.some((m) => S.infirmerie.patients[m.id].cond?.type === "anaphylaxie")) a.add("etiquetage");
   if (S.equipage.some((m) => S.infirmerie.patients[m.id].cond?.type === "grippe")) a.add("epidemie");
   if (S.armoire.reserve.paracetamol < 10) a.add("rupture");
+  if (S.serre.zones.some((z) => z.malade)) a.add("maladie-cultures");
   return a;
 }
 function prochainRepas() {
@@ -836,6 +1003,67 @@ function cascadesHTML(n, filtreNiveau) {
   }).join("");
 }
 
+/* ---------- Info-bulles : un petit « i » à côté de chaque élément ---------- */
+const ib = (t) => `<button type="button" class="info" data-info="${esc(t)}" aria-label="Explication">i</button>`;
+const INFO = {
+  statut: "État général du vaisseau. Nominal : tout va bien. Alerte : un problème est en cours (malades, panne, rationnement). Critique : il faut agir tout de suite (triage rouge, froid rompu, personne sans repas).",
+  horloge: "Heure à bord du vaisseau. La simulation va plus vite que la réalité : 1 seconde = 10 minutes à bord.",
+  autoRepas: "Nombre de jours pendant lesquels on peut nourrir tout l'équipage avec les repas rangés dans l'armoire (3 repas par jour et par personne).",
+  medCrit: "Le médicament qui sera épuisé le plus vite si on continue à le consommer comme ces dernières 24 heures (réserve de l'armoire + MedBox).",
+  malades: "Nombre de membres d'équipage suivis par l'infirmerie. Les couleurs indiquent la gravité (triage).",
+  froid: "Température du compartiment réfrigéré de l'armoire. Il doit rester autour de 4 °C. Au-dessus de 8 °C pendant plus d'une heure, les aliments frais doivent être jetés.",
+  courbeFroid: "Évolution de la température du froid sur les dernières 24 heures à bord. La ligne rouge en pointillés est la limite de 8 °C.",
+  courbeMalades: "Évolution du nombre de malades sur les dernières 24 heures à bord.",
+  courbeRepas: "Évolution de l'autonomie en repas. Sous la ligne des 7 jours, la cuisine réduit les portions de 25 % pour tenir plus longtemps.",
+  cascades: "Chaque problème déclenche une chaîne de conséquences. La première ligne est la cause, les lignes décalées en dessous sont les effets, dans l'ordre où ils se produisent.",
+  activite: "Tout ce que les personnes à bord reçoivent, en direct : médicaments pris à la MedBox ou donnés par l'infirmerie, et repas servis.",
+  cuisine: "Le service des repas : prochain repas, mode de portions et bilan du dernier service. Chaque personne reçoit un plat compatible avec ses allergies et son régime.",
+  stock: "Tous les plats rangés dans l'armoire. L'étiquette indique les allergènes connus. La cuisine sert en priorité les lots qui périment le plus tôt.",
+  pertes: "Lots retirés de l'armoire et pourquoi : froid rompu, date dépassée, contamination ou allergène non déclaré.",
+  triage: "Code couleur de l'infirmerie. Vert : constantes normales. Orange : à surveiller. Rouge : urgence, soins immédiats.",
+  equipage: "Les constantes de chaque personne, mises à jour en direct : température, oxygène dans le sang (SpO₂) et battements du cœur par minute.",
+  medbox: "La MedBox est la petite armoire à pharmacie utilisée au quotidien. Quand un médicament passe sous le seuil, elle demande automatiquement un réapprovisionnement à la réserve de l'armoire.",
+  prevision: "Autonomie prévue = stock total (réserve + MedBox) ÷ consommation des dernières 24 heures à bord.",
+  isolement: "Quand l'isolement est activé, les malades de la grippe restent séparés : la contagion est fortement réduite.",
+  serre: "Les six zones de culture de la ferme. Chaque zone pousse, puis est récoltée : les légumes frais vont dans l'armoire et la zone est replantée avec des graines de l'armoire à graines.",
+  cropguard: "CropGuard analyse les photos des caméras toutes les heures. S'il détecte des feuilles malades, la zone est arrachée pour protéger les autres et replantée.",
+  graines: "L'armoire à graines garde les semences de chaque espèce. À chaque replantation, la ferme en prend une quantité fixe. Sous le seuil, une alerte est envoyée.",
+  croissance: "Avancement de la culture jusqu'à la récolte. Une zone malade pousse beaucoup plus lentement.",
+  journal: "Le journal de bord complet. Chaque bloc part d'une cause (crise, repas, récolte…) et montre tous ses effets.",
+  tempC: "Température du corps. Normale : entre 36,5 et 37,5 °C. Fièvre à partir de 38 °C.",
+  spo2: "Oxygène dans le sang. Normal : 95 % ou plus. En dessous de 92 %, c'est une urgence.",
+  fc: "Battements du cœur par minute. Normal au repos : entre 60 et 100.",
+  libre: "Deux médicaments simples sont disponibles sans passer par l'infirmerie. La MedBox vérifie vos allergies et le délai depuis votre dernière prise avant de délivrer.",
+  prochainPlat: "Le plat que la cuisine vous servira si le stock ne change pas d'ici là. Il respecte vos allergies, votre régime et votre état de santé.",
+  restrictions: "Les informations de votre fiche d'identification. Elles servent à bloquer automatiquement les repas et médicaments dangereux pour vous.",
+  historique: "Ce que vous avez reçu récemment, avec l'heure à bord."
+};
+document.addEventListener("click", (e) => {
+  const pop = document.getElementById("pop");
+  const b = e.target.closest(".info");
+  document.querySelectorAll('.info[aria-expanded="true"]').forEach((x) => x.setAttribute("aria-expanded", "false"));
+  if (!b) { if (!e.target.closest("#pop")) pop.hidden = true; return; }
+  e.preventDefault();
+  if (!pop.hidden && pop.dataset.for === b.dataset.info) { pop.hidden = true; return; }
+  pop.textContent = b.dataset.info;
+  pop.dataset.for = b.dataset.info;
+  pop.hidden = false;
+  b.setAttribute("aria-expanded", "true");
+  const r = b.getBoundingClientRect(), w = Math.min(320, window.innerWidth - 24);
+  pop.style.left = Math.max(12, Math.min(r.left - 10, window.innerWidth - w - 12)) + "px";
+  const h = pop.offsetHeight;
+  pop.style.top = (r.bottom + 8 + h > window.innerHeight ? Math.max(12, r.top - h - 8) : r.bottom + 8) + "px";
+});
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") document.getElementById("pop").hidden = true; });
+window.addEventListener("scroll", () => { document.getElementById("pop").hidden = true; }, { passive: true });
+
+function activiteHTML(n, idMembre) {
+  const liste = S.activite.filter((a) => !idMembre || a.membre === idMembre).slice(-n).reverse();
+  if (!liste.length) return `<p class="empty">Rien pour le moment.</p>`;
+  const MODES = { "libre-service": "pris à la MedBox", infirmerie: "donné par l'infirmerie", "traitement quotidien": "traitement quotidien", cuisine: "" };
+  return `<ul class="feed">${liste.map((a) => `<li><span class="when">${hhmm(a.t)}</span><span class="tag ${a.type === "med" ? "warn" : "ok"}">${a.type === "med" ? "Médicament" : "Repas"}</span><span>${a.nom && !idMembre ? `<b>${esc(a.nom)}</b> : ` : ""}${esc(a.texte)}${MODES[a.mode] ? ` <span class="c-mut">(${MODES[a.mode]})</span>` : ""}</span></li>`).join("")}</ul>`;
+}
+
 /* ---------- Tableau de bord ---------- */
 let onglet = "vue";
 function rendreDash() {
@@ -850,27 +1078,32 @@ function rendreDash() {
     const autoR = autonomieRepas();
     const mc = medCritique();
     const froid = S.armoire.froid.temp;
+    const legende = `<div class="legend"><span style="--c:var(--green-l)">Vert : tout va bien</span><span style="--c:var(--amber)">Orange : à surveiller</span><span style="--c:var(--red)">Rouge : urgence</span></div>`;
     let corps = "";
 
     if (onglet === "vue") {
       corps = `
+      <p class="intro">Un coup d'œil sur tout le vaisseau. Les chiffres bougent en direct. Cliquez sur les petits « i » pour savoir ce que chaque élément veut dire.</p>
+      ${legende}
       <div class="grid g4">
-        <div class="card kpi"><div class="v c-${niveauJours(autoR, 5, 9)}">${jours(autoR)}<small>jours</small></div><div class="l">Autonomie en repas</div><div class="s c-mut">${Math.round(totalPortions())} portions · ${S.equipage.length} membres</div></div>
-        <div class="card kpi"><div class="v c-${niveauJours(mc.a, 10, 30)}">${jours(mc.a)}<small>jours</small></div><div class="l">Médicament le plus critique</div><div class="s c-mut">${esc(MEDS[mc.k].nom)}</div></div>
-        <div class="card kpi"><div class="v ${cpt.rouge ? "c-danger" : malades ? "c-warn" : "c-ok"}">${malades}<small>malades</small></div><div class="l">Infirmerie</div><div class="s"><span class="c-ok">${cpt.vert} vert</span> · <span class="c-warn">${cpt.orange} orange</span> · <span class="c-danger">${cpt.rouge} rouge</span></div></div>
-        <div class="card kpi"><div class="v ${froid > 8 ? "c-danger" : froid > 6 ? "c-warn" : "c-ok"}">${froid.toFixed(1).replace(".", ",")}<small>°C</small></div><div class="l">Compartiment réfrigéré</div><div class="s c-mut">${S.armoire.froid.panne ? "Compresseur en panne" : "Consigne 4 °C"}</div></div>
+        <div class="card kpi"><div class="v c-${niveauJours(autoR, 5, 9)}">${jours(autoR)}<small>jours</small></div><div class="l">Autonomie en repas ${ib(INFO.autoRepas)}</div><div class="s c-mut">${Math.round(totalPortions())} portions · ${S.equipage.length} membres</div></div>
+        <div class="card kpi"><div class="v c-${niveauJours(mc.a, 10, 30)}">${jours(mc.a)}<small>jours</small></div><div class="l">Médicament le plus critique ${ib(INFO.medCrit)}</div><div class="s c-mut">${esc(MEDS[mc.k].nom)}</div></div>
+        <div class="card kpi"><div class="v ${cpt.rouge ? "c-danger" : malades ? "c-warn" : "c-ok"}">${malades}<small>malades</small></div><div class="l">Infirmerie ${ib(INFO.malades)}</div><div class="s"><span class="c-ok">${cpt.vert} vert</span> · <span class="c-warn">${cpt.orange} orange</span> · <span class="c-danger">${cpt.rouge} rouge</span></div></div>
+        <div class="card kpi"><div class="v ${froid > 8 ? "c-danger" : froid > 6 ? "c-warn" : "c-ok"}">${froid.toFixed(1).replace(".", ",")}<small>°C</small></div><div class="l">Compartiment réfrigéré ${ib(INFO.froid)}</div><div class="s c-mut">${S.armoire.froid.panne ? "Compresseur en panne" : "Consigne 4 °C"}</div></div>
       </div>
       <div class="grid g3" style="margin-top:18px">
-        <div class="card chart"><h2>Température du froid</h2>${sparkline(S.hist.froid, { min: 0, max: 22, couleur: "#E8833A", seuil: 8 })}<div class="cap"><span>24 h</span><span>seuil 8 °C</span></div></div>
-        <div class="card chart"><h2>Membres malades</h2>${sparkline(S.hist.malades, { min: 0, max: Math.max(6, ...S.hist.malades), couleur: "#E9B949" })}<div class="cap"><span>24 h</span><span>maintenant : ${malades}</span></div></div>
-        <div class="card chart"><h2>Autonomie en repas</h2>${sparkline(S.hist.autoRepas, { min: 0, max: 14, couleur: "#3FC1B0", seuil: 7 })}<div class="cap"><span>24 h</span><span>seuil de rationnement 7 j</span></div></div>
+        <div class="card chart"><h2>Température du froid ${ib(INFO.courbeFroid)}</h2>${sparkline(S.hist.froid, { min: 0, max: 22, couleur: "#E8833A", seuil: 8 })}<div class="cap"><span>24 h</span><span>limite 8 °C</span></div></div>
+        <div class="card chart"><h2>Membres malades ${ib(INFO.courbeMalades)}</h2>${sparkline(S.hist.malades, { min: 0, max: Math.max(6, ...S.hist.malades), couleur: "#E9B949" })}<div class="cap"><span>24 h</span><span>maintenant : ${malades}</span></div></div>
+        <div class="card chart"><h2>Autonomie en repas ${ib(INFO.courbeRepas)}</h2>${sparkline(S.hist.autoRepas, { min: 0, max: 14, couleur: "#3FC1B0", seuil: 7 })}<div class="cap"><span>24 h</span><span>rationnement sous 7 j</span></div></div>
       </div>
-      <div class="grid g2" style="margin-top:18px">
-        <div class="card"><h2>Dernières cascades</h2>${cascadesHTML(4)}</div>
-        <div class="card"><h2>Cuisine</h2>
+      <div class="grid g3" style="margin-top:18px">
+        <div class="card"><h2>Activité à bord ${ib(INFO.activite)}</h2>${activiteHTML(10)}</div>
+        <div class="card"><h2>Dernières cascades ${ib(INFO.cascades)}</h2>${cascadesHTML(3)}</div>
+        <div class="card"><h2>Cuisine ${ib(INFO.cuisine)}</h2>
           <p>Prochain repas : <b>${esc(prochainRepas())}</b></p>
-          <p>Mode : <span class="tag ${S.cuisine.mode === "nominal" ? "ok" : "warn"}">${S.cuisine.mode === "nominal" ? "Portions normales" : "Rationnement"}</span></p>
+          <p>Portions : <span class="tag ${S.cuisine.mode === "nominal" ? "ok" : "warn"}">${S.cuisine.mode === "nominal" ? "Normales" : "Réduites de 25 %"}</span></p>
           ${S.cuisine.dernier ? `<p>Dernier service : ${esc(S.cuisine.dernier.repas)} à ${hhmm(S.cuisine.dernier.t)}, ${S.cuisine.dernier.servis} repas servis, ${S.cuisine.dernier.kcal} kcal en moyenne${S.cuisine.dernier.sans.length ? `, <span class="c-danger">${S.cuisine.dernier.sans.length} sans plat compatible</span>` : ""}.</p>` : `<p class="empty">Aucun repas servi depuis le démarrage.</p>`}
+          <p>Serre : <b>${S.serre.zones.filter((z) => z.etat === "pousse").length}/${S.serre.zones.length}</b> zones en culture</p>
         </div>
       </div>`;
     }
@@ -880,70 +1113,108 @@ function rendreDash() {
         const lots = S.armoire.lots.filter((l) => l.pid === pid && l.statut === "ok" && l.portions >= 1);
         const tot = lots.reduce((s, l) => s + l.portions, 0);
         const per = lots.length ? Math.min(...lots.map((l) => l.peremption)) : null;
-        return { pid, p, tot, per, n: lots.length };
+        return { pid, p, tot, per };
       });
+      const pr = prochainRepas();
       corps = `
+      <p class="intro">Tout ce qui concerne les repas : ce qu'il reste dans l'armoire, le prochain service et les lots retirés.</p>
       <div class="grid g3">
-        <div class="card kpi"><div class="v c-${niveauJours(autoR, 5, 9)}">${jours(autoR)}<small>jours</small></div><div class="l">Autonomie en repas</div></div>
-        <div class="card kpi"><div class="v">${esc(prochainRepas().split(" à ")[1] || "")}</div><div class="l">${esc(prochainRepas().split(" à ")[0])}</div><div class="s"><span class="tag ${S.cuisine.mode === "nominal" ? "ok" : "warn"}">${S.cuisine.mode === "nominal" ? "Portions normales" : "Rationnement −25 %"}</span></div></div>
-        <div class="card kpi"><div class="v">${S.cuisine.dernier ? S.cuisine.dernier.kcal : "–"}<small>kcal</small></div><div class="l">Moyenne par repas au dernier service</div><div class="s ${S.cuisine.dernier && S.cuisine.dernier.sans.length ? "c-danger" : "c-mut"}">${S.cuisine.dernier ? (S.cuisine.dernier.sans.length ? "Sans plat compatible : " + esc(S.cuisine.dernier.sans.join(", ")) : "Tout l'équipage a reçu un plat compatible") : ""}</div></div>
+        <div class="card kpi"><div class="v c-${niveauJours(autoR, 5, 9)}">${jours(autoR)}<small>jours</small></div><div class="l">Autonomie en repas ${ib(INFO.autoRepas)}</div></div>
+        <div class="card kpi"><div class="v">${esc(pr.split(" à ")[1] || "")}</div><div class="l">${esc(pr.split(" à ")[0])} ${ib(INFO.cuisine)}</div><div class="s"><span class="tag ${S.cuisine.mode === "nominal" ? "ok" : "warn"}">${S.cuisine.mode === "nominal" ? "Portions normales" : "Portions réduites de 25 %"}</span></div></div>
+        <div class="card kpi"><div class="v">${S.cuisine.dernier ? S.cuisine.dernier.kcal : "–"}<small>kcal</small></div><div class="l">Moyenne par personne au dernier repas ${ib("Énergie apportée en moyenne par le plat de chaque personne au dernier service.")}</div><div class="s ${S.cuisine.dernier && S.cuisine.dernier.sans.length ? "c-danger" : "c-mut"}">${S.cuisine.dernier ? (S.cuisine.dernier.sans.length ? "Sans plat compatible : " + esc(S.cuisine.dernier.sans.join(", ")) : "Tout l'équipage a reçu un plat compatible") : ""}</div></div>
       </div>
-      <div class="card" style="margin-top:18px"><h2>Stock alimentaire de l'armoire</h2><div class="scroll"><table>
-        <thead><tr><th>Produit</th><th>Zone</th><th>Portions</th><th>Péremption la plus proche</th><th>Allergènes (étiquette)</th><th>Régimes</th></tr></thead>
+      <div class="card" style="margin-top:18px"><h2>Stock alimentaire de l'armoire ${ib(INFO.stock)}</h2><div class="scroll"><table>
+        <thead><tr><th>Plat</th><th>Rangement</th><th>Portions</th><th>Périme le plus tôt</th><th>Allergènes</th><th>Convient aux régimes</th></tr></thead>
         <tbody>${parProduit.map(({ p, tot, per }) => `<tr>
           <td>${esc(p.nom)}</td><td>${p.zone === "froid" ? "Réfrigéré" : "Sec"}</td>
           <td><span class="${tot < 15 ? "c-danger" : ""}">${Math.round(tot)}</span></td>
           <td>${per ? heure(per) : "<span class='c-mut'>–</span>"}</td>
-          <td>${p.allergenes.map((a) => `<span class="tag warn">${esc(a)}</span>`).join("") || "<span class='c-mut'>Aucun</span>"}</td>
+          <td>${p.allergenes.map((x) => `<span class="tag warn">${esc(x)}</span>`).join("") || "<span class='c-mut'>Aucun</span>"}</td>
           <td>${p.tags.map((t) => `<span class="tag">${esc(t)}</span>`).join("") || "<span class='c-mut'>–</span>"}</td></tr>`).join("")}</tbody></table></div></div>
       <div class="grid g2" style="margin-top:18px">
-        <div class="card chart"><h2>Autonomie en repas (24 h)</h2>${sparkline(S.hist.autoRepas, { min: 0, max: 14, seuil: 7 })}<div class="cap"><span>il y a 24 h</span><span>maintenant</span></div></div>
-        <div class="card"><h2>Lots retirés</h2>${S.armoire.pertes.length ? `<div class="scroll"><table><thead><tr><th>Heure</th><th>Lot</th><th>Portions</th><th>Motif</th></tr></thead><tbody>${S.armoire.pertes.slice(0, 8).map((x) => `<tr><td class="when">${heure(x.t)}</td><td>${esc(x.lot)} · ${esc(x.nom)}</td><td>${x.portions}</td><td>${esc(x.motif)}</td></tr>`).join("")}</tbody></table></div>` : `<p class="empty">Aucun lot retiré.</p>`}</div>
+        <div class="card chart"><h2>Autonomie en repas (24 h) ${ib(INFO.courbeRepas)}</h2>${sparkline(S.hist.autoRepas, { min: 0, max: 14, seuil: 7 })}<div class="cap"><span>il y a 24 h</span><span>maintenant</span></div></div>
+        <div class="card"><h2>Lots retirés ${ib(INFO.pertes)}</h2>${S.armoire.pertes.length ? `<div class="scroll"><table><thead><tr><th>Heure</th><th>Lot</th><th>Portions</th><th>Motif</th></tr></thead><tbody>${S.armoire.pertes.slice(0, 8).map((x) => `<tr><td class="when">${heure(x.t)}</td><td>${esc(x.lot)} · ${esc(x.nom)}</td><td>${x.portions}</td><td>${esc(x.motif)}</td></tr>`).join("")}</tbody></table></div>` : `<p class="empty">Aucun lot retiré.</p>`}</div>
+      </div>`;
+    }
+
+    if (onglet === "serre") {
+      const Z = S.serre.zones;
+      const enCulture = Z.filter((z) => z.etat === "pousse");
+      const prochaine = enCulture.map((z) => S.t + Math.round((1 - z.croissance) * GRAINES[z.esp].cycleJ * 1440)).sort((x, y) => x - y)[0];
+      const bas = Object.keys(GRAINES).filter((k) => S.armoire.graines[k] < GRAINES[k].seuil).length;
+      corps = `
+      <p class="intro">La ferme et l'armoire à graines. Les récoltes remplissent l'armoire en légumes frais, et chaque zone récoltée ou arrachée est replantée avec des graines de l'armoire.</p>
+      <div class="grid g4">
+        <div class="card kpi"><div class="v">${enCulture.length}<small>/ ${Z.length}</small></div><div class="l">Zones en culture ${ib(INFO.serre)}</div></div>
+        <div class="card kpi"><div class="v">${prochaine ? hhmm(prochaine) : "–"}</div><div class="l">Prochaine récolte ${ib("Heure à bord à laquelle la zone la plus avancée sera récoltée.")}</div><div class="s c-mut">${prochaine ? heure(prochaine).split(" · ")[0] : ""}</div></div>
+        <div class="card kpi"><div class="v ${bas ? "c-warn" : "c-ok"}">${bas}</div><div class="l">Espèces de graines sous le seuil ${ib(INFO.graines)}</div></div>
+        <div class="card kpi"><div class="v">${hhmm(S.serre.scan)}</div><div class="l">Dernière analyse CropGuard ${ib(INFO.cropguard)}</div></div>
+      </div>
+      <div class="card" style="margin-top:18px"><h2>Zones de culture ${ib(INFO.serre)}</h2><div class="zones">
+        ${Z.map((z) => { const G = GRAINES[z.esp]; const fin = S.t + Math.round((1 - z.croissance) * G.cycleJ * 1440); return `<div class="zone ${z.etat}">
+          <div class="top"><b>Zone ${z.id}</b><span class="c-mut">${esc(G.nom)}</span></div>
+          ${z.etat === "pousse" ? `<div class="row" style="gap:8px;margin-top:10px"><div class="bar" style="flex:1"><span style="width:${Math.round(z.croissance * 100)}%"></span></div><span>${Math.round(z.croissance * 100)} %</span> ${ib(INFO.croissance)}</div><div class="c-mut" style="font-size:13px;margin-top:6px">Récolte vers ${heure(fin)}</div>`
+            : `<div style="margin-top:10px"><span class="tag ${z.demande === "rupture" ? "danger" : "warn"}">${z.demande === "rupture" ? "En attente de graines" : "Replantation en cours"}</span></div>`}
+        </div>`; }).join("")}
+      </div></div>
+      <div class="grid g2" style="margin-top:18px">
+        <div class="card"><h2>Armoire à graines ${ib(INFO.graines)}</h2><div class="scroll"><table>
+          <thead><tr><th>Espèce</th><th>Graines</th><th>Seuil</th><th>Par semis</th><th>État</th></tr></thead>
+          <tbody>${Object.entries(GRAINES).map(([k, g]) => { const q = S.armoire.graines[k]; const nv = q < g.parSemis ? "danger" : q < g.seuil ? "warn" : "ok"; return `<tr><td>${esc(g.nom)}</td><td>${q}</td><td>${g.seuil}</td><td>${g.parSemis}</td><td><span class="tag ${nv}">${nv === "danger" ? "Insuffisant" : nv === "warn" ? "Bas" : "Suffisant"}</span></td></tr>`; }).join("")}</tbody></table></div></div>
+        <div class="card"><h2>Dernières récoltes ${ib("Les récoltes récentes et le nombre de portions de légumes frais rangées dans l'armoire.")}</h2>${S.serre.recoltes.length ? `<ul class="feed">${S.serre.recoltes.slice(0, 8).map((r) => `<li><span class="when">${heure(r.t)}</span><span>Zone ${esc(r.zone)} (${esc(GRAINES[r.esp].nom.toLowerCase())}) : ${r.qty} portions</span></li>`).join("")}</ul>` : `<p class="empty">Pas encore de récolte depuis le démarrage.</p>`}</div>
       </div>`;
     }
 
     if (onglet === "inf") {
       corps = `
+      <p class="intro">L'état de santé de l'équipage en direct, les médicaments de la MedBox et combien de jours ils vont durer.</p>
+      ${legende}
       <div class="grid g4">
-        <div class="card kpi"><div class="v c-ok">${cpt.vert}</div><div class="l">Triage vert</div></div>
-        <div class="card kpi"><div class="v c-warn">${cpt.orange}</div><div class="l">Triage orange</div></div>
-        <div class="card kpi"><div class="v c-danger">${cpt.rouge}</div><div class="l">Triage rouge</div></div>
-        <div class="card kpi"><div class="v">${I.isolement ? "Oui" : "Non"}</div><div class="l">Isolement des malades</div></div>
+        <div class="card kpi"><div class="v c-ok">${cpt.vert}</div><div class="l">Triage vert ${ib(INFO.triage)}</div></div>
+        <div class="card kpi"><div class="v c-warn">${cpt.orange}</div><div class="l">Triage orange ${ib(INFO.triage)}</div></div>
+        <div class="card kpi"><div class="v c-danger">${cpt.rouge}</div><div class="l">Triage rouge ${ib(INFO.triage)}</div></div>
+        <div class="card kpi"><div class="v">${I.isolement ? "Oui" : "Non"}</div><div class="l">Isolement des malades ${ib(INFO.isolement)}</div></div>
       </div>
-      <div class="card" style="margin-top:18px"><h2>Équipage : constantes en direct</h2><div class="crew">
+      <div class="card" style="margin-top:18px"><h2>Équipage : constantes en direct ${ib(INFO.equipage)}</h2>
+        <p class="c-mut" style="font-size:13px;margin:-6px 0 12px">Température ${ib(INFO.tempC)} · SpO₂ ${ib(INFO.spo2)} · Cœur (bpm) ${ib(INFO.fc)}</p>
+        <div class="crew">
         ${S.equipage.map((m) => { const P = I.patients[m.id]; const v = P.vitals; return `<div class="pers ${P.triage}">
           <div class="n">${esc(m.nom)}</div><div class="p">${esc(m.pilier)}</div>
           <div class="vit"><span class="${v.temp >= 38 ? "c-warn" : ""}">${v.temp.toFixed(1).replace(".", ",")} °C</span><span class="${v.spo2 < 95 ? "c-danger" : ""}">SpO₂ ${v.spo2} %</span><span class="${v.fc >= 100 ? "c-warn" : ""}">${v.fc} bpm</span></div>
           <div class="cond ${P.cond ? "c-warn" : "c-mut"}">${P.cond ? esc(COND[P.cond.type]) + (P.cond.bacterien ? " + surinfection" : "") : "Aucun symptôme"}</div></div>`; }).join("")}
       </div></div>
-      <div class="card" style="margin-top:18px"><h2>MedBox et prévision d'autonomie</h2><div class="scroll"><table>
-        <thead><tr><th>Médicament</th><th>MedBox</th><th>Seuil</th><th>Réserve armoire</th><th>Consommé (24 h)</th><th>Autonomie prévue</th></tr></thead>
-        <tbody>${Object.entries(MEDS).map(([k, md]) => { const a = autonomieMed(k); const nv = niveauJours(a, 10, 30); const mb = I.medbox[k]; return `<tr>
-          <td>${esc(md.nom)}</td>
-          <td><div class="row" style="gap:8px"><div class="bar" style="width:70px"><span class="${mb < I.seuils[k] ? "danger" : ""}" style="width:${Math.min(100, (mb / (I.seuils[k] * 2.5)) * 100)}%"></span></div>${mb}</div></td>
-          <td>${I.seuils[k]}</td><td>${S.armoire.reserve[k]}</td><td>${consoJour(k)}</td>
-          <td><span class="tag ${nv}">${jours(a)} j</span></td></tr>`; }).join("")}</tbody></table></div>
-        <p class="c-mut" style="font-size:13px;margin:10px 0 0">Prévision : stock total (réserve + MedBox) divisé par la consommation des dernières 24 heures à bord.</p></div>`;
+      <div class="grid g2" style="margin-top:18px">
+        <div class="card"><h2>Médicaments pris récemment ${ib(INFO.activite)}</h2>${`<ul class="feed">${S.activite.filter((a) => a.type === "med").slice(-12).reverse().map((a) => `<li><span class="when">${hhmm(a.t)}</span><span><b>${esc(a.nom)}</b> : ${esc(a.texte)} <span class="c-mut">(${a.mode === "libre-service" ? "pris à la MedBox" : a.mode === "infirmerie" ? "donné par l'infirmerie" : esc(a.mode)})</span></span></li>`).join("") || `<li class="empty">Aucun médicament pris pour le moment.</li>`}</ul>`}</div>
+        <div class="card"><h2>MedBox et prévision ${ib(INFO.medbox)}</h2><div class="scroll"><table>
+          <thead><tr><th>Médicament</th><th>MedBox</th><th>Réserve</th><th>Pris (24 h)</th><th>Autonomie ${ib(INFO.prevision)}</th></tr></thead>
+          <tbody>${Object.entries(MEDS).map(([k, md]) => { const a = autonomieMed(k); const nv = niveauJours(a, 10, 30); const mb = I.medbox[k]; return `<tr>
+            <td>${esc(md.nom)}</td>
+            <td><div class="row" style="gap:8px"><div class="bar" style="width:60px"><span class="${mb < I.seuils[k] ? "danger" : ""}" style="width:${Math.min(100, (mb / (I.seuils[k] * 2.5)) * 100)}%"></span></div>${mb}</div></td>
+            <td>${S.armoire.reserve[k]}</td><td>${consoJour(k)}</td>
+            <td><span class="tag ${nv}">${jours(a)} j</span></td></tr>`; }).join("")}</tbody></table></div></div>
+      </div>`;
     }
 
     if (onglet === "journal") {
-      corps = `<div class="card"><h2>Journal de bord : chaque cascade de cause à effet</h2>${cascadesHTML(30)}</div>`;
+      corps = `<p class="intro">Tout ce qui s'est passé à bord, regroupé par cause. La première ligne de chaque bloc est la cause, les lignes décalées sont ses conséquences.</p><div class="card"><h2>Journal de bord ${ib(INFO.journal)}</h2>${cascadesHTML(30)}</div>`;
     }
 
     const tab = (id, l) => `<button role="tab" aria-selected="${onglet === id}" data-tab="${id}">${l}</button>`;
+    const popOuvert = !document.getElementById("pop").hidden;
     root.innerHTML = `
       <header>
         <a class="brand" href="#" aria-label="ARKA">${LOGO.replaceAll("COL", "#F5F3EE")}<div><b>ARKA</b><span>Tableau de bord du vaisseau</span></div></a>
-        <span class="pill ${niv}">${lib}</span>
+        <span class="pill ${niv}">${lib}</span>${ib(INFO.statut)}
         ${!S.running ? `<span class="pill off">En pause</span>` : S.vitesse > 1 ? `<span class="pill off">Vitesse ×${S.vitesse}</span>` : ""}
-        <div class="clock" aria-live="off">${heure(S.t)}</div>
+        <div class="clock" aria-live="off">${heure(S.t)} ${ib(INFO.horloge)}</div>
       </header>
-      <nav class="tabs" role="tablist" aria-label="Secteurs">${tab("vue", "Vue d'ensemble")}${tab("alim", "Alimentation")}${tab("inf", "Infirmerie")}${tab("journal", "Journal des cascades")}</nav>
+      <nav class="tabs" role="tablist" aria-label="Secteurs">${tab("vue", "Vue d'ensemble")}${tab("alim", "Alimentation")}${tab("serre", "Serre et graines")}${tab("inf", "Infirmerie")}${tab("journal", "Journal")}</nav>
       <main>
         ${vieux ? `<div class="banner">Ce tableau de bord ne reçoit plus de données. Fermez les autres onglets du tableau de bord puis rechargez cette page.</div>` : ""}
         ${corps}
-        <p class="foot">Simulation ARKA : 1 seconde = 10 minutes à bord. Le contrôle se fait depuis la <a href="#admin" target="_blank" rel="noopener">console d'administration</a>.</p>
+        <p class="foot">Simulation ARKA : 1 seconde = 10 minutes à bord. <a href="#equipage" target="_blank" rel="noopener">Espace équipage</a> · <a href="#admin" target="_blank" rel="noopener">Console d'administration</a></p>
       </main>`;
+    if (popOuvert) { const f = document.getElementById("pop").dataset.for; document.querySelectorAll(".info").forEach((x) => { if (x.dataset.info === f) x.setAttribute("aria-expanded", "true"); }); }
   });
 }
 root.addEventListener("click", (e) => {
@@ -989,13 +1260,14 @@ function monterAdmin() {
       <span id="a-statut" class="pill off">Connexion…</span>
       <div class="clock" id="a-heure" style="font-size:20px"></div>
       <a class="btn sec sm" href="./" target="_blank" rel="noopener" id="a-ouvrir">Ouvrir le tableau de bord</a>
+      <a class="btn sec sm" href="#equipage" target="_blank" rel="noopener">Espace équipage</a>
       <button class="btn sec sm" id="a-deco">Se déconnecter</button>
     </header>
     <main>
       <div id="a-banner"></div>
       <div class="grid g2">
         <section class="card">
-          <h2>Simulation</h2>
+          <h2>Simulation ${ib("Mettre en pause ou accélérer le temps à bord. ×10 est pratique pendant une présentation pour voir les conséquences arriver vite.")}</h2>
           <div class="row">
             <button class="btn" id="a-pause">Mettre en pause</button>
             <span class="muted">Vitesse :</span>
@@ -1004,7 +1276,7 @@ function monterAdmin() {
           <div id="a-resume" class="muted" style="margin-top:14px"></div>
         </section>
         <section class="card">
-          <h2>Actions sur le vaisseau</h2>
+          <h2>Actions sur le vaisseau ${ib("Interventions de l'équipe : réparer le froid, isoler les malades, livrer des repas, des médicaments ou des graines. Chaque action apparaît dans le journal.")}</h2>
           <div class="row" style="margin-bottom:12px">
             <button class="btn sec" id="a-reparer">Réparer le compresseur</button>
             <button class="btn sec" id="a-isol" aria-pressed="false">Isoler les malades</button>
@@ -1023,12 +1295,19 @@ function monterAdmin() {
             <input type="number" id="m-qty" min="1" max="500" value="50" style="width:90px">
             <button class="btn sm" type="submit">Réapprovisionner la réserve</button>
           </form>
+          <form id="f-graines" class="row" novalidate style="margin-top:10px">
+            <label for="g-esp" class="hidden">Espèce</label>
+            <select id="g-esp">${opt(GRAINES, (g) => g.nom)}</select>
+            <label for="g-qty" class="hidden">Graines</label>
+            <input type="number" id="g-qty" min="1" max="500" value="30" style="width:90px">
+            <button class="btn sm" type="submit">Livrer des graines</button>
+          </form>
           <p id="a-form-err" class="err" aria-live="polite"></p>
         </section>
       </div>
 
       <section class="card" style="margin-top:18px">
-        <h2>Déclencher une crise</h2>
+        <h2>Déclencher une crise ${ib("Chaque crise démarre une cascade de conséquences que vous pouvez suivre en direct sur le tableau de bord. Une carte encadrée en orange indique une crise encore en cours.")}</h2>
         <div class="grid g3" id="a-crises">
           ${Object.entries(CRISES).map(([k, c]) => `<div class="crise" data-crise-box="${k}"><h3>${esc(c.titre)}</h3><p>${esc(c.desc)}</p><div><button class="btn warn sm" data-crise="${k}">Déclencher</button></div></div>`).join("")}
           <div class="crise"><h3>Retour à la normale</h3><p>Réinitialise les stocks, l'infirmerie et la cuisine. Les profils de l'équipage sont conservés.</p><div><button class="btn sm" id="a-reset">Réinitialiser</button></div></div>
@@ -1037,7 +1316,7 @@ function monterAdmin() {
 
       <div class="grid g2" style="margin-top:18px">
         <section class="card">
-          <h2>Profils santé de l'équipage</h2>
+          <h2>Profils santé de l'équipage ${ib(INFO.restrictions)}</h2>
           <p class="muted">Ces informations servent au filtrage strict des repas et des médicaments. Elles ne sont visibles que dans cette console.</p>
           <div class="field" style="margin-bottom:10px"><label for="p-membre">Membre</label><select id="p-membre"></select></div>
           <form id="f-profil" novalidate>
@@ -1048,7 +1327,7 @@ function monterAdmin() {
           </form>
         </section>
         <section class="card">
-          <h2>Enregistrer un nouveau membre</h2>
+          <h2>Enregistrer un nouveau membre ${ib("La fiche d'identification remplie à l'arrivée à bord. Les allergies, le régime et les maladies protègent la personne lors des repas et des soins.")}</h2>
           <form id="f-membre" novalidate>
             <div class="field" style="margin-bottom:10px"><label for="n-nom">Nom et prénom</label><input type="text" id="n-nom" maxlength="40"><span id="n-err" class="err" aria-live="polite"></span></div>
             <div class="field" style="margin-bottom:10px"><label for="n-pilier">Pilier</label><select id="n-pilier">${["Agriculture", "Médecine", "Repas", "Robotique", "Pilier central"].map((p) => `<option>${p}</option>`).join("")}</select></div>
@@ -1062,7 +1341,7 @@ function monterAdmin() {
 
       <section class="card" style="margin-top:18px">
         <div class="row" style="justify-content:space-between;margin-bottom:6px">
-          <h2 style="margin:0">Journal complet des cascades</h2>
+          <h2 style="margin:0">Journal complet des cascades ${ib(INFO.cascades)}</h2>
           <div class="row"><label for="a-filtre" class="muted">Afficher</label>
             <select id="a-filtre"><option value="">Toutes les cascades</option><option value="danger">Seulement les urgences</option><option value="warn">Seulement les alertes</option></select></div>
         </div>
@@ -1082,7 +1361,8 @@ function monterAdmin() {
   document.querySelectorAll("[data-crise]").forEach((b) => b.onclick = () => { envoyer("crise", { nom: b.dataset.crise }); toast("Crise déclenchée : " + CRISES[b.dataset.crise].titre); });
   $("f-livr").onsubmit = (e) => { e.preventDefault(); const q = parseInt($("l-qty").value, 10); if (!(q >= 1 && q <= 500)) { $("a-form-err").textContent = "Indiquez un nombre de portions entre 1 et 500."; return; } $("a-form-err").textContent = ""; envoyer("livraison", { pid: $("l-pid").value, qty: q }); toast(`${q} portions livrées`); };
   $("f-med").onsubmit = (e) => { e.preventDefault(); const q = parseInt($("m-qty").value, 10); if (!(q >= 1 && q <= 500)) { $("a-form-err").textContent = "Indiquez une quantité entre 1 et 500."; return; } $("a-form-err").textContent = ""; envoyer("reappro", { med: $("m-med").value, qty: q }); toast("Réserve réapprovisionnée"); };
-  ["l-qty", "m-qty"].forEach((id) => $(id).addEventListener("input", () => { $("a-form-err").textContent = ""; }));
+  $("f-graines").onsubmit = (e) => { e.preventDefault(); const q = parseInt($("g-qty").value, 10); if (!(q >= 1 && q <= 500)) { $("a-form-err").textContent = "Indiquez un nombre de graines entre 1 et 500."; return; } $("a-form-err").textContent = ""; envoyer("graines", { esp: $("g-esp").value, qty: q }); toast(`${q} graines livrées`); };
+  ["l-qty", "m-qty", "g-qty"].forEach((id) => $(id).addEventListener("input", () => { $("a-form-err").textContent = ""; }));
   $("a-filtre").onchange = () => { filtreJournal = $("a-filtre").value; majAdmin(); };
 
   const remplirProfil = () => {
@@ -1153,11 +1433,112 @@ function rendreAdmin() {
   majAdmin();
 }
 
-function rendre() { if (MODE === "admin") rendreAdmin(); else rendreDash(); }
+/* ---------- Espace équipage : chaque personne voit ce qui la concerne ---------- */
+let equipMonte = false;
+const moiId = () => { try { return sessionStorage.getItem("arka-moi") || ""; } catch (e) { return ""; } };
+function monterEquip() {
+  root.innerHTML = `
+    <header>
+      <div class="brand">${LOGO.replaceAll("COL", "#14213D")}<div><b>ARKA</b><span>Espace équipage</span></div></div>
+      <div class="clock" id="e-heure" style="font-size:20px"></div>
+    </header>
+    <main>
+      <p class="intro">Bienvenue à bord. Ici, vous voyez vos repas, vos médicaments et votre état de santé, en direct. Cliquez sur les « i » pour avoir une explication.</p>
+      <div id="e-banner"></div>
+      <section class="card" style="margin-bottom:18px">
+        <div class="field" style="max-width:420px"><label for="e-moi">Qui êtes-vous ?</label><select id="e-moi"><option value="">Choisissez votre nom…</option></select></div>
+      </section>
+      <div id="e-perso" class="hidden">
+        <div class="me">
+          <section class="card" id="e-etat"></section>
+          <section class="card">
+            <h2>Prendre un médicament à la MedBox ${ib(INFO.libre)}</h2>
+            <form id="f-prise" novalidate>
+              <div class="row" style="align-items:flex-end">
+                <div class="field"><label for="e-med">Médicament</label><select id="e-med">${Object.keys(LIBRE_SERVICE).map((k) => `<option value="${k}">${esc(MEDS[k].nom)}</option>`).join("")}</select></div>
+                <div class="field"><label for="e-raison">Pourquoi ?</label><select id="e-raison"></select></div>
+                <button class="btn" type="submit">Prendre</button>
+              </div>
+            </form>
+            <div id="e-rep" aria-live="polite"></div>
+            <p class="muted" style="margin-top:14px">Pour tout autre médicament, l'infirmerie s'occupe de vous : ce qu'elle vous donne s'affiche automatiquement dans votre historique.</p>
+          </section>
+          <section class="card" id="e-repas"></section>
+          <section class="card" id="e-hist"></section>
+        </div>
+        <section class="card" style="margin-top:18px"><h2>Activité à bord ${ib(INFO.activite)}</h2><div id="e-feed"></div></section>
+      </div>
+      <p class="foot"><a href="./" target="_blank" rel="noopener" id="e-dash">Tableau de bord du vaisseau</a></p>
+    </main>`;
+  equipMonte = true;
+  const $ = (id) => document.getElementById(id);
+  $("e-dash").href = location.href.split("#")[0];
+  const raisons = () => { $("e-raison").innerHTML = LIBRE_SERVICE[$("e-med").value].raisons.map((r) => `<option>${esc(r)}</option>`).join(""); };
+  $("e-med").onchange = raisons; raisons();
+  $("e-moi").onchange = () => { try { sessionStorage.setItem("arka-moi", $("e-moi").value); } catch (e) {} majEquip(); };
+  $("f-prise").onsubmit = (e) => {
+    e.preventDefault();
+    const id = moiId();
+    if (!id) return;
+    envoyer("prise", { id, med: $("e-med").value, raison: $("e-raison").value });
+    $("e-rep").innerHTML = `<div class="rep">Demande envoyée à la MedBox…</div>`;
+  };
+  majEquip();
+}
+let nbEquipAffiches = 0;
+function majEquip() {
+  const $ = (id) => document.getElementById(id);
+  if (!V) { $("e-banner").innerHTML = `<div class="card" style="margin-bottom:18px"><b>Le vaisseau n'est pas encore démarré.</b> Ouvrez le tableau de bord dans un autre onglet pour lancer la simulation.</div>`; return; }
+  const vieux = Date.now() - V.ts > 4000;
+  avecVue(() => {
+    $("e-heure").innerHTML = `${heure(S.t)} ${ib(INFO.horloge)}`;
+    $("e-banner").innerHTML = vieux ? `<div class="card" style="margin-bottom:18px"><b>Le tableau de bord ne répond plus.</b> Ouvrez-le dans un autre onglet pour relancer la simulation.</div>` : "";
+    const sel = $("e-moi");
+    if (S.equipage.length !== nbEquipAffiches) {
+      sel.innerHTML = `<option value="">Choisissez votre nom…</option>` + S.equipage.map((m) => `<option value="${m.id}">${esc(m.nom)}</option>`).join("");
+      nbEquipAffiches = S.equipage.length;
+    }
+    const id = moiId();
+    if (sel.value !== id) sel.value = id;
+    const m = S.equipage.find((x) => x.id === id);
+    $("e-perso").classList.toggle("hidden", !m);
+    if (!m) return;
+    const P = S.infirmerie.patients[m.id], v = P.vitals;
+    const etat = P.cond
+      ? `<p class="big c-${P.triage === "rouge" ? "danger" : "warn"}" style="color:${P.triage === "rouge" ? "#A32D2D" : "#8A4410"}">Vous êtes suivi(e) par l'infirmerie</p><p>Motif : <b>${esc(COND[P.cond.type])}</b>${P.cond.bacterien ? " avec surinfection" : ""}. L'équipe médicale adapte vos repas (plats légers) et vos soins.</p>`
+      : `<p class="big" style="color:#1D6F65">Vous allez bien</p><p class="muted">Vos constantes sont normales.</p>`;
+    $("e-etat").innerHTML = `
+      <h2>Bonjour ${esc(m.nom.split(" ")[0])} ${ib(INFO.triage)}</h2>
+      ${etat}
+      <div class="row" style="gap:18px;margin-top:10px">
+        <div><div class="big">${v.temp.toFixed(1).replace(".", ",")} °C</div><div class="muted">Température ${ib(INFO.tempC)}</div></div>
+        <div><div class="big">${v.spo2} %</div><div class="muted">Oxygène ${ib(INFO.spo2)}</div></div>
+        <div><div class="big">${v.fc}</div><div class="muted">Battements / min ${ib(INFO.fc)}</div></div>
+      </div>
+      <h3 style="font-size:15px;margin:18px 0 6px">Mes restrictions ${ib(INFO.restrictions)}</h3>
+      <div>${[...m.allergies.map((a) => `<span class="tag danger">Allergie : ${esc(a)}</span>`), ...m.regimes.map((r) => `<span class="tag">${esc(r)}</span>`), ...m.maladies.map((x) => `<span class="tag warn">${esc(x)}</span>`)].join("") || `<span class="muted">Aucune restriction déclarée.</span>`}</div>`;
+    const plat = choisirLot(m, lotsDispo(), !!P.cond);
+    const hp = S.repasPerso[m.id] || [];
+    $("e-repas").innerHTML = `
+      <h2>Mes repas ${ib(INFO.prochainPlat)}</h2>
+      <p>Prochain repas : <b>${esc(prochainRepas())}</b></p>
+      <p>${plat ? `Vous devriez recevoir : <b>${esc(PRODUITS[plat.pid].nom)}</b>, compatible avec vos restrictions.` : `<span style="color:#A32D2D">Aucun plat compatible avec votre profil n'est en stock. La cuisine a été prévenue.</span>`}</p>
+      ${S.cuisine.mode === "rationnement" ? `<p class="muted">Les portions sont réduites de 25 % pour que les réserves durent plus longtemps.</p>` : ""}
+      <h3 style="font-size:15px;margin:14px 0 6px">Derniers repas reçus</h3>
+      ${hp.length ? `<ul class="feed">${hp.slice(0, 5).map((r) => `<li><span class="when">${heure(r.t)}</span><span>${esc(r.repas)} : ${esc(r.plat)}${r.ration < 1 ? " (portion réduite)" : ""}</span></li>`).join("")}</ul>` : `<p class="empty">Pas encore de repas depuis le démarrage.</p>`}`;
+    $("e-hist").innerHTML = `<h2>Mes médicaments ${ib(INFO.historique)}</h2>${activiteHTML(10, m.id).replace('<p class="empty">Rien pour le moment.</p>', '<p class="empty">Vous n\'avez reçu aucun médicament.</p>')}`;
+    const rep = S.infirmerie.reponses[m.id];
+    if (rep && S.t - rep.t <= 60) $("e-rep").innerHTML = `<div class="rep ${rep.ok ? "ok" : "no"}">${esc(rep.texte)}</div>`;
+    $("e-feed").innerHTML = activiteHTML(8);
+  });
+}
+function rendreEquip() { if (!equipMonte) { monterEquip(); return; } majEquip(); }
+
+function rendre() { if (MODE === "admin") rendreAdmin(); else if (MODE === "equip") rendreEquip(); else rendreDash(); }
 
 /* ---------- Démarrage ---------- */
-document.body.className = MODE;
-document.title = MODE === "admin" ? "ARKA – Console d'administration" : "ARKA – Tableau de bord du vaisseau";
+document.body.className = MODE === "equip" ? "admin equip" : MODE;
+document.title = MODE === "admin" ? "ARKA – Console d'administration" : MODE === "equip" ? "ARKA – Espace équipage" : "ARKA – Tableau de bord du vaisseau";
 try { const s = lsGet(K_SNAP); if (s) V = JSON.parse(s); } catch (e) {}
 rendre();
 boucle();
