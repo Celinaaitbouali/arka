@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>ARKA – Armoire de Ressources Connectée et Autonome</title>
-  <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIiB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCI+CiAgPGVsbGlwc2UgY3g9IjYwIiBjeT0iNjQiIHJ4PSI1NCIgcnk9IjE5IiB0cmFuc2Zvcm09InJvdGF0ZSgtMTggNjAgNjQpIiBmaWxsPSJub25lIiBzdHJva2U9IiNFODgzM0EiIHN0cm9rZS13aWR0aD0iMyIvPgogIDxwYXRoIGQ9Ik0zMCA5NiBMNjAgMjAgTDkwIDk2IiBmaWxsPSJub25lIiBzdHJva2U9IiMxNDIxM0QiIHN0cm9rZS13aWR0aD0iOSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CiAgPGxpbmUgeDE9IjQ0IiB5MT0iNzIiIHgyPSI3NiIgeTI9IjcyIiBzdHJva2U9IiMxNDIxM0QiIHN0cm9rZS13aWR0aD0iNyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPHBhdGggZD0iTTYwIDYzIEM1MiA1NiA1MyA0NiA2MCA0MSBDNjcgNDYgNjggNTYgNjAgNjMgZiIgZmlsbD0iIzJBOUQ4RiIvPgogIDxjaXJjbGUgY3g9IjEwNyIgY3k9IjQzIiByPSI0LjUiIGZpbGw9IiNFODgzM0EiLz4KPC9zdmc+Cg==" type="image/svg+xml">
+  <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIiB3aWR0aD0iMTIwIjoiaGVpZ2h0PSIxMjAiPgogIDxlbGxpcHNlIGN4PSI2MCIgY3k9IjY0IiByeD0iNTQiIHJ5PSIxOSIgdHJhbnNmb3JtPSJyb3RhdGUoLTE4IDYwIDY0KSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjRTg4M0FBIiBzdHJva2Utd2lkdGg9IjMiLz4KICA8cGF0aCBkPSJNMzAgOTYgTDYwIDIwIEw5MCA5NiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTQyMTNEIiBzdHJva2Utd2lkdGg9IjlB" type="image/svg+xml">
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -363,6 +363,7 @@
         <option value="cuisine">Gestionnaire Repas</option>
         <option value="agriculture">Responsable Serres</option>
       </select>
+      <button class="btn secondary sm" style="width: 100%; margin-top: 8px;" data-action="reset-data">Réinitialiser les données</button>
     </div>
   </aside>
 
@@ -374,7 +375,7 @@
   <div id="toast" class="toast"></div>
 
   <script>
-    // --- DONNÉES DE DÉMONSTRATION FUSIONNÉES ET ENRICHIES ---
+    // --- DONNÉES PAR DÉFAUT ---
     const ALLERGENES = ["arachide", "gluten", "lactose", "fruits à coque", "œuf", "poisson", "soja", "pénicilline", "aspirine"];
     const REGIMES = ["végétarien", "vegan", "halal"];
     const MALADIES = ["diabète", "maladie cœliaque", "hypertension"];
@@ -430,22 +431,38 @@
       ]
     };
 
-    // --- LOGIQUE APPLICATION ---
-    const STORAGE_KEY = "arka-app-state-v2";
+    // --- CHARGEMENT SÉCURISÉ ---
+    const STORAGE_KEY = "arka-app-state-v3";
     let data = loadData();
     let currentRole = "admin";
-    let stateUI = { memberFilter: "", deliveryStatus: null, errors: {} };
+    let stateUI = { memberFilter: "", deliveryStatus: null };
 
     function loadData() {
       try {
         const local = localStorage.getItem(STORAGE_KEY);
-        if (local) return JSON.parse(local);
-      } catch (e) {}
+        if (local) {
+          const parsed = JSON.parse(local);
+          if (parsed && parsed.medicaments && parsed.medicaments.length > 0) {
+            return parsed;
+          }
+        }
+      } catch (e) {
+        console.warn("Accès au stockage local bloqué, utilisation du stockage mémoire.");
+      }
       return JSON.parse(JSON.stringify(DEFAULT_DATA));
     }
 
     function saveData() {
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) {}
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      } catch (e) {}
+    }
+
+    function resetData() {
+      data = JSON.parse(JSON.stringify(DEFAULT_DATA));
+      saveData();
+      toast("Données réinitialisées avec succès !");
+      router();
     }
 
     function esc(str) {
@@ -454,6 +471,7 @@
 
     function toast(msg) {
       const t = document.getElementById("toast");
+      if (!t) return;
       t.textContent = msg;
       t.classList.add("show");
       clearTimeout(t.timer);
@@ -464,9 +482,8 @@
       data.alertes.unshift({ id: 'al' + Date.now(), date: new Date().toISOString(), niveau, pilier, message });
     }
 
-    function avg(arr) { return arr.reduce((a, b) => a + b, 0) / arr.length; }
+    function avg(arr) { return arr && arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 1; }
     function daysLeft(m) { const a = avg(m.conso); return a > 0 ? Math.floor((m.reserve + m.medbox) / a) : 999; }
-
     function canSeeHealth() { return currentRole === "admin" || currentRole === "medecine"; }
 
     function getIncompatibilities(aliment, member) {
@@ -880,7 +897,8 @@
       });
 
       // Mettre à jour le compteur d'alertes
-      document.getElementById("alert-count").textContent = data.alertes.length;
+      const alertEl = document.getElementById("alert-count");
+      if (alertEl) alertEl.textContent = data.alertes.length;
     }
 
     // --- ACTIONS INTERACTIVES ---
@@ -890,6 +908,11 @@
 
       const action = btn.dataset.action;
       const id = btn.dataset.id;
+
+      if (action === "reset-data") {
+        resetData();
+        return;
+      }
 
       if (action === "reappro-med") {
         const m = data.medicaments.find(x => x.id === id);
@@ -1013,6 +1036,7 @@
 
     // --- INITIALISATION ---
     window.addEventListener("hashchange", router);
+    window.addEventListener("DOMContentLoaded", router);
     window.addEventListener("load", router);
   </script>
 </body>
