@@ -29,6 +29,30 @@ body.dash{background:var(--navy-deep);color:var(--ivory)}
 .brand b{font-family:var(--font-display);font-weight:800;font-size:24px;letter-spacing:.14em}
 .brand span{font-size:13px;color:var(--muted-d);display:block;letter-spacing:0}
 .clock{font-family:var(--font-display);font-weight:700;font-size:22px;margin-left:auto}
+.sites{display:flex;gap:6px;flex-wrap:wrap}
+.sites a{padding:7px 14px;border-radius:999px;text-decoration:none;font-weight:500;font-size:14px;border:1.5px solid currentColor}
+.dash .sites a{color:#C9CEDA}
+.dash .sites a:hover{color:var(--ivory)}
+.dash .sites a[aria-current="page"]{background:var(--ivory);color:var(--navy);border-color:var(--ivory)}
+.admin .sites a{color:var(--navy)}
+.admin .sites a:hover{background:var(--stone)}
+.admin .sites a[aria-current="page"]{background:var(--navy);color:var(--ivory);border-color:var(--navy)}
+.barre{display:flex;justify-content:space-between;padding:10px 28px;gap:12px;align-items:center;flex-wrap:wrap}
+.acces{display:flex;gap:10px;flex-wrap:wrap}
+.acces a{display:flex;align-items:center;gap:10px;padding:6px 16px 6px 6px;border-radius:14px;text-decoration:none;font-weight:700;font-size:15px;border:2px solid transparent}
+.acces a .ico{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--orange);color:#fff;flex:none}
+.acces a.adm .ico{background:var(--green)}
+.acces a .ico svg{width:22px;height:22px}
+.dash .acces a{background:var(--navy-2);color:var(--ivory);border-color:var(--navy-3)}
+.admin .acces a{background:#fff;color:var(--navy);border-color:var(--line)}
+.acces a:hover,.acces a[aria-current="page"]{border-color:var(--orange)}
+.admin .c-danger{color:#A32D2D}
+table.inv td{vertical-align:middle}
+.dash .barre{background:var(--navy-deep);border-bottom:1px solid var(--navy-3)}
+.admin .barre{background:var(--stone);border-bottom:1px solid var(--line)}
+.barre .lbl{font-size:13px}
+.dash .barre .lbl{color:var(--muted-d)} .admin .barre .lbl{color:var(--ink-soft)}
+@media (max-width:560px){.barre{padding:8px 14px}.barre .lbl{display:none}}
 .pill{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;font-weight:500;font-size:14px}
 .pill::before{content:"";width:9px;height:9px;border-radius:50%;background:currentColor}
 .pill.ok{background:rgba(63,193,176,.15);color:var(--green-l)}
@@ -110,7 +134,9 @@ body.admin{background:var(--stone);color:var(--navy)}
 .btn.sec:hover{background:var(--stone)}
 .btn.warn{background:var(--orange-dark)}
 .btn.sm{padding:6px 12px;min-height:36px;font-size:14px}
-.btn[aria-pressed="true"]{background:var(--orange-dark);color:#fff;border-color:var(--orange-dark)}
+
+.btn[aria-pressed="true"],.btn.sec[aria-pressed="true"],.btn.sec[aria-pressed="true"]:hover{background:var(--orange-dark);color:#fff;border-color:var(--orange-dark)}
+.tag:empty{display:none}
 .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .crise{border:1.5px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px;background:#fff}
 .crise.active{border-color:var(--orange-dark);background:#FFF6EE}
@@ -148,6 +174,21 @@ legend{font-weight:500;font-size:14px;padding:0 6px}
 .rep{margin-top:12px;padding:12px 14px;border-radius:10px}
 .rep.ok{background:#D4EFEA;color:#1D6F65}.rep.no{background:#F6D5D1;color:#8E2A1F}
 @media (max-width:1000px){.me{grid-template-columns:1fr}}
+.piliers{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.pilier{display:flex;flex-direction:column;gap:2px;padding:14px;border-radius:12px;text-decoration:none;color:inherit;border:1px solid var(--navy-3);background:var(--navy-2)}
+.pilier b{font-family:var(--font-display);font-size:30px;line-height:1}
+.pilier.ok b{color:var(--green-l)} .pilier.warn b{color:var(--amber)} .pilier.danger b{color:#FF8A7A}
+.pilier:hover{border-color:var(--orange)}
+.admin .tabs{background:transparent;border-bottom:1px solid var(--line);padding:0;margin-bottom:18px}
+.admin .tabs button{color:var(--ink-soft)}
+.admin .tabs button:hover{color:var(--navy)}
+.admin .tabs button[aria-selected="true"]{color:var(--navy)}
+.alerte{display:flex;gap:14px;align-items:flex-start;padding:14px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.alerte:last-child{border-bottom:0}
+.alerte .txt{flex:1;min-width:240px}
+.alerte .meta{font-size:13px;color:var(--ink-soft);margin-top:4px}
+.cpt{display:inline-block;min-width:22px;padding:0 7px;margin-left:6px;border-radius:999px;background:var(--orange-dark);color:#fff;font-size:12px;font-weight:700;text-align:center}
+@media (max-width:760px){.piliers{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .toast{position:fixed;right:20px;bottom:20px;background:var(--navy);color:var(--ivory);padding:12px 18px;border-radius:10px;opacity:0;transform:translateY(8px);transition:.2s;pointer-events:none;max-width:360px}
 .toast.show{opacity:1;transform:none}
 @media (prefers-reduced-motion:reduce){.toast{transition:none}}
@@ -179,6 +220,17 @@ const REPAS = [{ h: 420, nom: "Petit-déjeuner" }, { h: 750, nom: "Déjeuner" },
 function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 let rand = mulberry32(42);
 const hhmmM = (t) => { const m = t % 1440; return `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`; };
+// Heure réelle de l'ordinateur, en minutes « heure locale » (Paris pour un navigateur en France)
+// Heure réelle de Paris (en minutes « heure locale »), quel que soit le fuseau de l'ordinateur
+const FMT_PARIS_M = new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Paris", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23" });
+const maintenantM = () => {
+  const p = Object.fromEntries(FMT_PARIS_M.formatToParts(new Date()).map((x) => [x.type, x.value]));
+  return Math.floor(Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute) / 60000);
+};
+const moisCle = (t) => { const d = new Date(t * 60000); return d.getUTCFullYear() + "-" + String(d.getUTCMonth() + 1).padStart(2, "0"); };
+const MOIS_NOMS = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
+const moisLibelle = (cle) => { const [a, m] = cle.split("-"); return `${MOIS_NOMS[+m - 1]} ${a}`; };
+const dateCourte = (t) => { const d = new Date(t * 60000); return `${String(d.getUTCDate()).padStart(2, "0")}/${String(d.getUTCMonth() + 1).padStart(2, "0")}/${d.getUTCFullYear()}`; };
 const clone = (o) => JSON.parse(JSON.stringify(o));
 
 const PRODUITS = {
@@ -260,7 +312,7 @@ const CRISES = {
 };
 
 function etatInitial() {
-  const t0 = 6 * 60;
+  const t0 = Math.floor(maintenantM() / 10) * 10;
   const lots = [];
   let n = 1;
   const ajout = (pid, portions, decalageJ = 0) => {
@@ -284,7 +336,8 @@ function etatInitial() {
     activite: [], repasPerso: {},
     cuisine: { mode: "nominal", attente: null, dernier: null },
     infirmerie: { patients, medbox, seuils, demandes: {}, vide: {}, consoLog: [], isolement: false, incubations: [], casParLot: {}, reponses: {}, demandesPerso: [] },
-    hist: { froid: [], malades: [], autoRepas: [], medbox: [] }
+    hist: { froid: [], malades: [], autoRepas: [], medbox: [] },
+    horloge: t0, accu: 0, mois: nouveauMois(t0), inventaires: [], alertes: [], comptage: null, comptages: [], cache: {}
   };
 }
 
@@ -428,7 +481,7 @@ function initArmoire() {
     perte(l, e.data.motif === "allergene" ? "Allergène non déclaré" : "Contamination suspectée");
     const p = Math.round(l.portions);
     l.statut = "quarantaine"; l.portions = 0;
-    bus.publish("armoire.lot.quarantaine", { lotId: l.id }, { cause: e, level: "warn", message: `Lot ${l.id} (${PRODUITS[l.pid].nom}) retiré de l'armoire : ${p} portions en quarantaine`, label: `Lot ${l.id} en quarantaine` });
+    bus.publish("armoire.lot.quarantaine", { lotId: l.id, pid: l.pid, qty: p, motif: e.data.motif === "allergene" ? "Allergène non déclaré" : "Contamination suspectée" }, { cause: e, level: "warn", message: `Lot ${l.id} (${PRODUITS[l.pid].nom}) retiré de l'armoire : ${p} portions en quarantaine`, label: `Lot ${l.id} en quarantaine` });
   });
   bus.on("admin.livraison", (e) => {
     const { pid, qty } = e.data;
@@ -492,13 +545,14 @@ function tickArmoire() {
         A.pertes.unshift({ t: S.t, lot: l.id, nom: p.nom, portions: Math.round(l.portions), motif: "Chaîne du froid rompue" });
         const qte = Math.round(l.portions);
         l.statut = "perdu"; l.portions = 0;
-        causes.perte = bus.publish("armoire.lot.perdu", { lotId: l.id }, { cause: causes.froid, level: "danger", message: `Lot ${l.id} (${p.nom}) jeté : ${qte} portions exposées plus d'une heure au-dessus de 8 °C`, label: `Lot ${l.id} jeté (${qte} portions)` });
+        causes.perte = bus.publish("armoire.lot.perdu", { lotId: l.id, pid: l.pid, qty: qte, motif: "Chaîne du froid rompue" }, { cause: causes.froid, level: "danger", message: `Lot ${l.id} (${p.nom}) jeté : ${qte} portions exposées plus d'une heure au-dessus de 8 °C`, label: `Lot ${l.id} jeté (${qte} portions)` });
       }
     }
     if (S.t > l.peremption) {
       A.pertes.unshift({ t: S.t, lot: l.id, nom: p.nom, portions: Math.round(l.portions), motif: "Date de péremption dépassée" });
+      const qp = Math.round(l.portions);
       l.statut = "perime"; l.portions = 0;
-      causes.perte = bus.publish("armoire.lot.perime", { lotId: l.id }, { level: "warn", message: `Lot ${l.id} (${p.nom}) périmé et retiré`, label: `Lot ${l.id} périmé` });
+      causes.perte = bus.publish("armoire.lot.perime", { lotId: l.id, pid: l.pid, qty: qp, motif: "Date de péremption dépassée" }, { level: "warn", message: `Lot ${l.id} (${p.nom}) périmé et retiré`, label: `Lot ${l.id} périmé` });
     }
   }
   A.pertes = A.pertes.slice(0, 30);
@@ -682,6 +736,18 @@ function initInfirmerie() {
     }
   });
 }
+function constantes(P) {
+  const cc = P.cond;
+  const n = () => rand() - 0.5;
+  let temp = 36.7 + n() * 0.3, fc = 70 + n() * 6, spo2 = 98 + n() * 1.2;
+  if (cc) {
+    if (cc.type === "grippe") { temp += cc.sev * 3.2; fc += cc.sev * 35; spo2 -= cc.sev * (cc.bacterien ? 7 : 3); }
+    if (cc.type === "intox") { temp += cc.sev * 1.4; fc += cc.sev * 40; spo2 -= cc.sev * 2; }
+    if (cc.type === "anaphylaxie") { fc += cc.sev * 60; spo2 -= cc.sev * 16; }
+    if (temp > 37 && S.t - (P.doses.paracetamol ?? -1e9) < 360) temp = 37 + (temp - 37) * 0.45;
+  }
+  return { temp: +temp.toFixed(1), fc: Math.round(fc), spo2: Math.round(Math.min(100, spo2)) };
+}
 function tickInfirmerie() {
   const I = S.infirmerie;
   // Déclenchement des cas liés aux repas (incubation)
@@ -734,15 +800,7 @@ function tickInfirmerie() {
       }
     }
     const cc = P.cond;
-    const n = () => rand() - 0.5;
-    let temp = 36.7 + n() * 0.3, fc = 70 + n() * 6, spo2 = 98 + n() * 1.2;
-    if (cc) {
-      if (cc.type === "grippe") { temp += cc.sev * 3.2; fc += cc.sev * 35; spo2 -= cc.sev * (cc.bacterien ? 7 : 3); }
-      if (cc.type === "intox") { temp += cc.sev * 1.4; fc += cc.sev * 40; spo2 -= cc.sev * 2; }
-      if (cc.type === "anaphylaxie") { fc += cc.sev * 60; spo2 -= cc.sev * 16; }
-      if (temp > 37 && S.t - (P.doses.paracetamol ?? -1e9) < 360) temp = 37 + (temp - 37) * 0.45;
-    }
-    P.vitals = { temp: +temp.toFixed(1), fc: Math.round(fc), spo2: Math.round(Math.min(100, spo2)) };
+    P.vitals = constantes(P);
     const v = P.vitals;
     const triage = (v.spo2 < 92 || v.temp >= 39.5 || v.fc >= 125) ? "rouge" : (v.spo2 < 95 || v.temp >= 38 || v.fc >= 100) ? "orange" : "vert";
     if (triage !== P.triage) {
@@ -776,6 +834,264 @@ function tickInfirmerie() {
   I.consoLog = I.consoLog.filter((c) => c.t > S.t - 2880);
 }
 
+/* ---------- Module INVENTAIRE (compteurs du mois et rapports) ---------- */
+function nouveauMois(t) {
+  return { cle: moisCle(t), debut: t, repas: 0, portions: 0, recoltes: 0, pertesMotifs: {},
+    alim: { entrees: {}, sorties: {}, pertes: {} }, meds: { entrees: {}, delivres: {} }, graines: { entrees: {}, sorties: {} } };
+}
+function initInventaire() {
+  const M = () => S.mois;
+  const add = (o, k, q) => { o[k] = (o[k] || 0) + q; };
+  bus.on("cuisine.repas.servi", (e) => { M().repas += e.data.servings.length; });
+  bus.on("cuisine.retrait", (e) => { for (const r of e.data.retraits) { const l = lotParId(r.lotId); if (l) add(M().alim.sorties, l.pid, r.qty); M().portions += r.qty; } });
+  bus.on("armoire.lot.ajoute", (e) => { const l = lotParId(e.data.lotId); if (!l) return; add(M().alim.entrees, l.pid, l.portions); if (l.pid === "legumes") M().recoltes += l.portions; });
+  const perte = (e) => { add(M().alim.pertes, e.data.pid, e.data.qty || 0); add(M().pertesMotifs, e.data.motif || "Autre", e.data.qty || 0); };
+  bus.on("armoire.lot.perdu", perte); bus.on("armoire.lot.perime", perte); bus.on("armoire.lot.quarantaine", perte);
+  bus.on("infirmerie.soin", (e) => add(M().meds.delivres, e.data.med, 1));
+  bus.on("admin.reappro", (e) => add(M().meds.entrees, e.data.med, e.data.qty));
+  bus.on("armoire.graines.sorties", (e) => add(M().graines.sorties, e.data.esp, e.data.qty));
+  bus.on("admin.graines", (e) => add(M().graines.entrees, e.data.esp, e.data.qty));
+}
+function rapportInventaire(type) {
+  const M = S.mois;
+  const somme = (o) => Object.values(o).reduce((a, b) => a + b, 0);
+  const aliments = Object.entries(PRODUITS).map(([pid, p]) => ({
+    nom: p.nom, stock: Math.round(lotsDispo().filter((l) => l.pid === pid).reduce((s, l) => s + l.portions, 0)),
+    entrees: Math.round(M.alim.entrees[pid] || 0), sorties: Math.round(M.alim.sorties[pid] || 0), pertes: Math.round(M.alim.pertes[pid] || 0)
+  }));
+  const meds = Object.entries(MEDS).map(([k, m]) => { const a = autonomieMed(k); return {
+    nom: m.nom, reserve: S.armoire.reserve[k], medbox: S.infirmerie.medbox[k], entrees: M.meds.entrees[k] || 0, delivres: M.meds.delivres[k] || 0, autonomie: a === Infinity ? null : +a.toFixed(1) }; });
+  const graines = Object.entries(GRAINES).map(([k, g]) => ({ nom: g.nom, stock: S.armoire.graines[k], seuil: g.seuil, entrees: M.graines.entrees[k] || 0, sorties: M.graines.sorties[k] || 0 }));
+  const autoR = autonomieRepas();
+  const aCommander = [
+    ...(autoR < 14 ? [`Repas : ${autoR.toFixed(1).replace(".", ",")} jours d'autonomie, prévoir une livraison ou plus de récoltes`] : []),
+    ...meds.filter((m) => m.autonomie !== null && m.autonomie < 30).map((m) => `${m.nom} : ${String(m.autonomie).replace(".", ",")} jours d'autonomie`),
+    ...graines.filter((g) => g.stock < g.seuil).map((g) => `Graines de ${g.nom.toLowerCase()} : ${g.stock} (seuil ${g.seuil})`)
+  ];
+  return {
+    id: "INV" + (++S.seq), type, cle: M.cle,
+    titre: type === "mensuel" ? `Inventaire de fin de mois : ${moisLibelle(M.cle)}` : `Inventaire de contrôle du ${dateCourte(S.t)}`,
+    debut: M.debut, fin: S.t, repas: M.repas, portions: Math.round(M.portions), recoltes: Math.round(M.recoltes),
+    pertes: Math.round(somme(M.pertesMotifs)), pertesMotifs: Object.fromEntries(Object.entries(M.pertesMotifs).map(([k, v]) => [k, Math.round(v)])),
+    medsDelivres: somme(M.meds.delivres), grainesUtilisees: somme(M.graines.sorties), autonomieRepas: +autoR.toFixed(1),
+    aliments, meds, graines, aCommander
+  };
+}
+function archiverInventaire(r, cause) {
+  S.inventaires.unshift(r);
+  if (S.inventaires.length > 24) S.inventaires.pop();
+  bus.publish("inventaire.cloture", { id: r.id }, { cause, source: "inventaire", level: "ok", message: `${r.titre} : rapport disponible dans l'onglet Inventaire`, label: r.titre });
+}
+function verifierFinDeMois() {
+  if (moisCle(S.t) === S.mois.cle) return;
+  const r = rapportInventaire("mensuel");
+  archiverInventaire(r, null);
+  ouvrirComptage(`Inventaire physique de ${moisLibelle(S.mois.cle)}`, null, r.id);
+  S.mois = nouveauMois(S.t);
+}
+
+/* ---------- Inventaire physique : l'équipage ou l'admin compte tous les approvisionnements ----------
+   Le système connaît le stock « théorique ». Dans la réalité, il peut y avoir de petites
+   différences (casse, oubli de saisie, perte) : le comptage les révèle, puis l'administrateur
+   valide et le stock est corrigé. Le lecteur RFID simulé donne la quantité réelle. */
+const CATEGORIES = { repas: "Repas", reserve: "Médicaments (réserve de l'armoire)", medbox: "Médicaments (MedBox)", graines: "Graines" };
+function stockSysteme(cat, cle) {
+  if (cat === "repas") return Math.round(lotsDispo().filter((l) => l.pid === cle).reduce((s, l) => s + l.portions, 0));
+  if (cat === "reserve") return S.armoire.reserve[cle] ?? 0;
+  if (cat === "medbox") return Math.floor(S.infirmerie.medbox[cle] ?? 0);
+  if (cat === "graines") return S.armoire.graines[cle] ?? 0;
+  return 0;
+}
+function quantiteReelle(id) {
+  const [cat, cle] = id.split(":");
+  return Math.max(0, stockSysteme(cat, cle) + (S.cache[id] || 0));
+}
+function lignesComptage() {
+  return [
+    ...Object.entries(PRODUITS).map(([k, p]) => ({ cat: "repas", cle: k, nom: p.nom, unite: "portions" })),
+    ...Object.entries(MEDS).map(([k, m]) => ({ cat: "reserve", cle: k, nom: m.nom, unite: "unités" })),
+    ...Object.entries(MEDS).map(([k, m]) => ({ cat: "medbox", cle: k, nom: m.nom, unite: "unités" })),
+    ...Object.entries(GRAINES).map(([k, g]) => ({ cat: "graines", cle: k, nom: g.nom, unite: "graines" }))
+  ].map((l) => ({ ...l, id: l.cat + ":" + l.cle, compte: null, attendu: null, par: null, t: null, rfid: false }));
+}
+function ouvrirComptage(titre, cause, inventaireId = null) {
+  if (S.comptage) return S.comptage;
+  S.comptage = { id: `CPT-${moisCle(S.t)}-${Date.now().toString(36)}`, titre, ouvert: S.t, statut: "en cours", inventaireId, lignes: lignesComptage() };
+  bus.publish("inventaire.comptage.ouvert", { id: S.comptage.id }, { cause, source: "inventaire", level: "warn", message: `${titre} à réaliser : l'équipage ou l'administrateur doit compter tous les approvisionnements`, label: "Inventaire physique à faire" });
+  return S.comptage;
+}
+// Chaque nuit, une petite différence invisible peut apparaître entre le stock réel et le système
+function derivesCachees() {
+  if (!((S.t - MIN_PAR_TICK) % 1440 < 180 && S.t % 1440 >= 180)) return;
+  if (rand() > 0.6) return;
+  const L = lignesComptage();
+  const l = L[Math.floor(rand() * L.length)];
+  const q = 1 + Math.floor(rand() * 3);
+  if (quantiteReelle(l.id) >= q) S.cache[l.id] = (S.cache[l.id] || 0) - q;
+}
+function initComptage() {
+  // Les corrections de stock sont appliquées par le module propriétaire de chaque stock
+  bus.on("inventaire.ajustement", (e) => {
+    const { cat, cle, delta } = e.data;
+    const A = S.armoire;
+    if (cat === "reserve") A.reserve[cle] = Math.max(0, A.reserve[cle] + delta);
+    if (cat === "graines") A.graines[cle] = Math.max(0, A.graines[cle] + delta);
+    if (cat === "medbox") S.infirmerie.medbox[cle] = Math.max(0, S.infirmerie.medbox[cle] + delta);
+    if (cat === "repas") {
+      if (delta > 0) {
+        const lot = A.lots.filter((l) => l.pid === cle && l.statut === "ok").sort((a, b) => b.peremption - a.peremption)[0];
+        if (lot) lot.portions += delta;
+        else { const id = "L" + String(A.nextLot++).padStart(3, "0"); A.lots.push({ id, pid: cle, portions: delta, peremption: S.t + PRODUITS[cle].dureeJ * 1440, expo: 0, statut: "ok", allergenesReels: [...PRODUITS[cle].allergenes], contamine: false }); }
+      } else {
+        let reste = -delta;
+        for (const l of A.lots.filter((x) => x.pid === cle && x.statut === "ok" && x.portions > 0).sort((a, b) => b.portions - a.portions)) {
+          const pris = Math.min(reste, l.portions); l.portions -= pris; reste -= pris; if (reste <= 0) break;
+        }
+      }
+    }
+    const id = cat + ":" + cle;
+    S.cache[id] = (S.cache[id] || 0) - delta;
+    if (S.cache[id] === 0) delete S.cache[id];
+  });
+}
+function compterLigne(args) {
+  const C = S.comptage;
+  if (!C) return "Aucun inventaire physique en cours.";
+  const l = C.lignes.find((x) => x.id === args.id);
+  if (!l) return "Article inconnu.";
+  const q = args.rfid ? quantiteReelle(l.id) : Math.round(Number(args.qty));
+  if (!Number.isFinite(q) || q < 0 || q > 100000) return "Quantité invalide.";
+  l.compte = q; l.attendu = stockSysteme(l.cat, l.cle); l.rfid = !!args.rfid;
+  l.par = String(args.par || "").trim().slice(0, 40) || "Équipage"; l.t = S.t;
+  if (C.lignes.every((x) => x.compte !== null) && C.statut === "en cours") {
+    C.statut = "à valider";
+    bus.publish("inventaire.comptage.complet", { id: C.id }, { source: "inventaire", level: "info", message: `${C.titre} : tous les articles sont comptés, en attente de validation par l'administrateur` });
+  }
+  return null;
+}
+function validerComptage(par) {
+  const C = S.comptage;
+  if (!C) return "Aucun inventaire physique en cours.";
+  const manquants = C.lignes.filter((x) => x.compte === null).length;
+  if (manquants) return `Il reste ${manquants} article(s) à compter avant de valider.`;
+  par = String(par || "").trim().slice(0, 40) || "Administrateur";
+  const ev = bus.publish("inventaire.comptage.valide", { id: C.id }, { source: "admin", level: "ok", message: `${C.titre} validé par ${par}`, label: "Inventaire physique validé" });
+  const ecarts = [];
+  for (const l of C.lignes) {
+    const d = l.compte - l.attendu;
+    if (d === 0) continue;
+    ecarts.push({ id: l.id, cat: l.cat, nom: l.nom, unite: l.unite, attendu: l.attendu, compte: l.compte, ecart: d, par: l.par });
+    bus.publish("inventaire.ajustement", { cat: l.cat, cle: l.cle, delta: d }, { cause: ev, silent: true });
+  }
+  for (const x of ecarts) {
+    if (Math.abs(x.ecart) < Math.max(1, Math.round(x.attendu * 0.02))) continue;
+    bus.publish("inventaire.ecart", { id: x.id }, { cause: ev, source: "inventaire", level: "warn", message: `Écart d'inventaire : ${x.nom} (${CATEGORIES[x.cat].toLowerCase()}) : ${x.compte} comptés pour ${x.attendu} dans le système (${x.ecart > 0 ? "+" : ""}${x.ecart})`, label: `Écart : ${x.nom}` });
+  }
+  bus.publish("inventaire.stock.corrige", {}, { cause: ev, source: "inventaire", level: "ok", message: ecarts.length ? `Stocks corrigés selon le comptage : ${ecarts.length} écart(s)` : "Aucun écart : le stock réel correspond exactement au système", label: "Stocks corrigés" });
+  const bilan = { id: C.id, titre: C.titre, ouvert: C.ouvert, validePar: par, valideLe: S.t, ecarts, articles: C.lignes.length, compteurs: [...new Set(C.lignes.map((l) => l.par))], rfid: C.lignes.filter((l) => l.rfid).length };
+  S.comptages.unshift(bilan);
+  if (S.comptages.length > 12) S.comptages.pop();
+  const r = S.inventaires.find((x) => x.id === C.inventaireId);
+  if (r) r.comptage = bilan;
+  S.comptage = null;
+  return null;
+}
+
+/* ---------- Module ALERTES : un système d'alerte séparé pour chaque pilier ---------- */
+const PILIERS = {
+  infirmerie: { nom: "Infirmerie", desc: "Malades, soins, MedBox et réserve de médicaments" },
+  alimentation: { nom: "Alimentation", desc: "Repas, stock de nourriture, chaîne du froid" },
+  agriculture: { nom: "Agriculture", desc: "Serre, CropGuard et armoire à graines" },
+  robotique: { nom: "Robotique et maintenance", desc: "Pannes d'équipement (compresseur du froid)" },
+  central: { nom: "Pilier central", desc: "Vue globale : toutes les alertes, inventaires et logistique ARKA" }
+};
+function piliersDe(type) {
+  if (type.startsWith("armoire.froid.")) return ["alimentation", "robotique"];
+  if (type.startsWith("infirmerie.") || type.startsWith("equipage.") || type === "armoire.rupture.med" || type === "armoire.reserve.maj") return ["infirmerie"];
+  if (type.startsWith("cuisine.") || type.startsWith("armoire.lot.") || type === "armoire.stock.bas" || type === "armoire.etiquetage") return ["alimentation"];
+  if (type.startsWith("serre.") || type.startsWith("armoire.graines.")) return ["agriculture"];
+  return ["central"];
+}
+let hookAlerte = null;
+function surAlerte(fn) { hookAlerte = fn; }
+function majAlerte(al) { if (hookAlerte) { try { hookAlerte(al); } catch (err) { console.error(err); } } }
+function creerAlerte(ev, pilier) {
+  const L = S.alertes;
+  const doublon = L.find((x) => x.pilier === pilier && x.type === ev.type && x.message === ev.message && x.statut !== "resolue" && S.t - x.tDernier <= 60);
+  if (doublon) { doublon.nb++; doublon.tDernier = S.t; majAlerte(doublon); return; }
+  const cles = Object.values(ev.data || {}).filter((v) => typeof v === "string");
+  const al = { id: `A${Date.now().toString(36)}${ev.id}${pilier.slice(0, 3)}`, t: S.t, tDernier: S.t, pilier, niveau: ev.level, type: ev.type, message: ev.message, statut: "nouvelle", par: null, tPris: null, tResolu: null, nb: 1, cles, motif: null };
+  L.push(al);
+  if (L.length > 300) { const i = L.findIndex((x) => x.statut === "resolue"); L.splice(i >= 0 ? i : 0, 1); }
+  majAlerte(al);
+}
+function resoudreAuto(filtre, motif) {
+  for (const al of S.alertes) if (al.statut !== "resolue" && filtre(al)) { al.statut = "resolue"; al.tResolu = S.t; al.par = al.par || "Automatique"; al.motif = motif; majAlerte(al); }
+}
+function initAlertes() {
+  bus.on("*", (ev) => {
+    if (!S.alertes) S.alertes = [];
+    if (!ev.silent && (ev.level === "warn" || ev.level === "danger") && ev.source !== "admin") piliersDe(ev.type).forEach((p) => creerAlerte(ev, p));
+    const d = ev.data || {};
+    const a = (al, v) => al.cles && al.cles.includes(v);
+    if (ev.type === "armoire.froid.normal" || ev.type === "armoire.froid.repare") resoudreAuto((al) => al.type.startsWith("armoire.froid."), "Froid rétabli");
+    if (ev.type === "infirmerie.guerison") resoudreAuto((al) => al.pilier === "infirmerie" && a(al, d.membre), "Patient guéri");
+    if (ev.type === "armoire.reappro.medbox") resoudreAuto((al) => al.type === "infirmerie.medbox.vide" && a(al, d.med), "MedBox réapprovisionnée");
+    if (ev.type === "armoire.reserve.maj" && ev.level === "ok") resoudreAuto((al) => (al.type === "armoire.rupture.med" || al.type === "armoire.reserve.maj") && a(al, d.med), "Réserve réapprovisionnée");
+    if (ev.type === "armoire.graines.maj") resoudreAuto((al) => al.type.startsWith("armoire.graines.") && a(al, d.esp), "Graines livrées");
+    if (ev.type === "serre.semis") resoudreAuto((al) => al.type.startsWith("serre.") && a(al, d.zone), "Zone replantée");
+    if (ev.type === "cuisine.mode" && d.mode === "nominal") resoudreAuto((al) => al.type === "cuisine.mode", "Fin du rationnement");
+    if (ev.type === "inventaire.comptage.valide") resoudreAuto((al) => al.type.startsWith("inventaire.comptage."), "Inventaire physique validé");
+  });
+}
+
+
+/* ---------- Temps : synchronisé sur l'heure réelle, ou accéléré pour une démonstration ---------- */
+function decalerTemps(delta) {
+  const CLES = new Set(["t", "peremption", "scan", "traitee", "debut", "horloge", "ouvert", "tDernier", "tPris", "tResolu", "valideLe"]);
+  const visiter = (o) => {
+    if (Array.isArray(o)) { o.forEach(visiter); return; }
+    if (!o || typeof o !== "object") return;
+    for (const k of Object.keys(o)) {
+      const v = o[k];
+      if (k === "inventaires" || k === "hist") continue;
+      if (k === "doses" && v && typeof v === "object") { for (const d in v) v[d] += delta; continue; }
+      if (typeof v === "number" && CLES.has(k)) o[k] = v + delta;
+      else if (v && typeof v === "object") visiter(v);
+    }
+  };
+  visiter(S);
+  S.mois.cle = moisCle(S.t);
+}
+const VITESSES = { 1: "Heure réelle", 60: "1 s = 1 min", 600: "1 s = 10 min", 3600: "1 s = 1 h" };
+const RATTRAPAGE_MAX = 3 * 1440;  // au-delà de 3 jours d'absence, on saute directement à l'heure réelle
+function avancer() {
+  const v = S.vitesse || 1;
+  if (v === 1) {
+    const cible = Math.floor(maintenantM() / 10) * 10;
+    if (cible - S.t > RATTRAPAGE_MAX) decalerTemps(cible - RATTRAPAGE_MAX - S.t);
+    let n = 0;
+    while (S.t + MIN_PAR_TICK <= cible && n++ < 500) tick();
+    // Entre deux pas de 10 minutes, les constantes continuent de bouger légèrement
+    for (const m of S.equipage) { const P = S.infirmerie.patients[m.id]; if (P) P.vitals = constantes(P); }
+    S.horloge = maintenantM();
+  } else {
+    const ecoule = Math.min(30, Math.max(0, (Date.now() - (dernierAvance || Date.now())) / 1000));
+    S.accu = (S.accu || 0) + ecoule * v / 600;
+    let n = 0;
+    while (S.accu >= 1 && n++ < 200) { S.accu -= 1; tick(); }
+    S.horloge = S.t;
+  }
+  dernierAvance = Date.now();
+}
+let dernierAvance = null;
+function resynchroniser() {
+  const cible = Math.floor(maintenantM() / 10) * 10;
+  if (S.t > cible) decalerTemps(cible - S.t);
+  S.accu = 0;
+  S.horloge = maintenantM();
+}
+
 /* ---------- Boucle et commandes ---------- */
 function historiser() {
   const h = S.hist, push = (k, v) => { h[k].push(v); if (h[k].length > 144) h[k].shift(); };
@@ -786,6 +1102,8 @@ function historiser() {
 }
 function tick() {
   S.t += MIN_PAR_TICK; S.tick++;
+  verifierFinDeMois();
+  derivesCachees();
   tickArmoire(); tickSerre(); tickCuisine(); tickInfirmerie();
   historiser();
 }
@@ -793,7 +1111,26 @@ function commande(c) {
   const src = { source: "admin" };
   switch (c.cmd) {
     case "pause": S.running = !S.running; bus.publish("admin.simulation", {}, { ...src, message: S.running ? "Simulation relancée" : "Simulation en pause" }); break;
-    case "vitesse": S.vitesse = c.args.v; break;
+    case "vitesse": {
+      const avant = S.vitesse;
+      S.vitesse = c.args.v;
+      if (c.args.v === 1 && avant !== 1) {
+        resynchroniser();
+        bus.publish("admin.horloge", {}, { ...src, level: "ok", message: "Retour à l'heure réelle : l'horloge de bord est resynchronisée" });
+      } else if (c.args.v !== 1 && avant === 1) {
+        bus.publish("admin.horloge", {}, { ...src, level: "warn", message: `Mode démonstration : temps accéléré (${VITESSES[c.args.v] || "×" + c.args.v})` });
+      }
+      break;
+    }
+    case "cloture": {
+      const ev = bus.publish("admin.cloture", {}, { ...src, message: "Clôture du mois demandée par l'administrateur" });
+      const r = rapportInventaire("mensuel");
+      r.titre += " (clôture anticipée)";
+      archiverInventaire(r, ev);
+      S.mois = nouveauMois(S.t);
+      break;
+    }
+    case "inventaire": archiverInventaire(rapportInventaire("controle"), bus.publish("admin.inventaire", {}, { ...src, message: "Inventaire de contrôle demandé" })); break;
     case "crise":
       if (!CRISES[c.args.nom]) return;
       S.crises.push({ nom: c.args.nom, t: S.t });
@@ -869,6 +1206,17 @@ function commande(c) {
       }
       break;
     }
+    case "ouvrir-comptage": ouvrirComptage(`Inventaire physique du ${dateCourte(S.t)}`, bus.publish("admin.comptage", {}, { ...src, message: "Inventaire physique lancé par l'administrateur" })); break;
+    case "compter": compterLigne(c.args); break;
+    case "valider-comptage": validerComptage(c.args.par); break;
+    case "alerte": {
+      const al = S.alertes.find((x) => x.id === c.args.id);
+      if (!al) return;
+      const par = String(c.args.par || "").trim().slice(0, 40) || "Équipe";
+      if (c.args.action === "prendre" && al.statut === "nouvelle") { al.statut = "en cours"; al.par = par; al.tPris = S.t; }
+      else if (c.args.action === "resoudre" && al.statut !== "resolue") { al.statut = "resolue"; al.par = par; al.tResolu = S.t; al.tPris = al.tPris ?? S.t; al.motif = "Résolue par l'équipe"; }
+      break;
+    }
     case "membre": {
       const nom = String(c.args.nom || "").trim().slice(0, 40);
       if (!nom) return;
@@ -883,7 +1231,8 @@ function commande(c) {
 let moteurPret = false;
 function initMoteur() {
   if (moteurPret) return;
-  initArmoire(); initSerre(); initCuisine(); initInfirmerie();
+  initAlertes(); initComptage();
+  initArmoire(); initSerre(); initCuisine(); initInfirmerie(); initInventaire();
   moteurPret = true;
 }
 /*ENGINE-END*/
@@ -893,9 +1242,9 @@ function initMoteur() {
    Le tableau de bord fait tourner la simulation et publie l'état ;
    la console admin envoie des commandes. Tout passe par le navigateur.
    ===================================================================== */
-const MODE = location.hash === "#admin" ? "admin" : location.hash === "#equipage" ? "equip" : "dash";
+const MODE = location.hash === "#admin" ? "admin" : location.hash === "#equipage" ? "equip" : location.hash === "#alertes" ? "alertes" : location.hash === "#inventaire" ? "inv" : "dash";
 const TAB_ID = Math.random().toString(36).slice(2);
-const K_SNAP = "arka-v3-snap", K_CMD = "arka-v3-cmd", K_LEAD = "arka-v3-leader";
+const K_SNAP = "arka-v5-snap", K_CMD = "arka-v5-cmd", K_LEAD = "arka-v5-leader";
 let V = null;           // dernier état reçu (vue)
 let leader = false;
 const vus = new Set();
@@ -904,10 +1253,12 @@ function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return n
 function lsSet(k, v) { try { localStorage.setItem(k, v); return true; } catch (e) { return false; } }
 
 function devenirLeader() {
-  if (MODE !== "dash") return false;
+  // Un seul onglet fait avancer le vaisseau. On préfère un onglet visible, car les
+  // navigateurs ralentissent les onglets en arrière-plan (d'où les heures décalées).
+  const moi = { id: TAB_ID, ts: Date.now(), visible: !document.hidden };
   try {
     const l = JSON.parse(lsGet(K_LEAD) || "null");
-    if (!l || Date.now() - l.ts > 3000 || l.id === TAB_ID) { lsSet(K_LEAD, JSON.stringify({ id: TAB_ID, ts: Date.now() })); return true; }
+    if (!l || l.id === TAB_ID || Date.now() - l.ts > 2500 || (!l.visible && moi.visible)) { lsSet(K_LEAD, JSON.stringify(moi)); return true; }
     return false;
   } catch (e) { return true; }
 }
@@ -934,33 +1285,48 @@ window.addEventListener("storage", (e) => {
 });
 window.addEventListener("hashchange", () => location.reload());
 
-function boucle() {
-  if (MODE === "dash" && devenirLeader()) {
+function etape() {
+  if (devenirLeader()) {
     if (!leader) {
+      // On reprend toujours le dernier état publié, pour ne rien perdre en changeant d'onglet
       leader = true;
       const saved = lsGet(K_SNAP);
-      if (saved) { try { const snap = JSON.parse(saved); if (snap && snap.S && snap.S.armoire) S = snap.S; } catch (e) {} }
+      let ts = Date.now();
+      if (saved) { try { const snap = JSON.parse(saved); if (snap && snap.S && snap.S.armoire && snap.S.mois) { S = snap.S; ts = snap.ts; if (!S.alertes) S.alertes = []; if (S.comptage === undefined) S.comptage = null; if (!S.comptages) S.comptages = []; if (!S.cache) S.cache = {}; } } catch (e) {} }
+      dernierAvance = ts;
       rand = mulberry32(Date.now() & 0xffffffff);
       initMoteur();
-      if (!S.journal.length) bus.publish("systeme.demarrage", {}, { source: "systeme", level: "ok", message: "ARKA démarré : armoire, cuisine et infirmerie en ligne" });
+      if (!S.journal.length) bus.publish("systeme.demarrage", {}, { source: "systeme", level: "ok", message: "ARKA démarré : armoire, serre, cuisine et infirmerie en ligne" });
     }
-    if (S.running) tick();
+    if (S.running) avancer(); else { dernierAvance = Date.now(); S.horloge = S.vitesse === 1 ? S.horloge : S.t; }
     publierSnapshot();
-    rendre();
   } else {
     leader = false;
-    rendre();
   }
-  const delai = leader && S.running ? 1000 / (S.vitesse || 1) : 1000;
-  setTimeout(boucle, delai);
+  rendre();
 }
+function boucle() { etape(); setTimeout(boucle, 1000); }
+document.addEventListener("visibilitychange", () => { if (!document.hidden) etape(); });
 
 /* =====================================================================
    Affichage
    ===================================================================== */
 const root = document.getElementById("root");
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const heure = (t) => { const d = Math.floor(t / 1440) + 1, m = t % 1440; return `Jour ${d} · ${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`; };
+const JOURS = ["dim.", "lun.", "mar.", "mer.", "jeu.", "ven.", "sam."];
+const heure = (t) => { const d = new Date(t * 60000); const m = t % 1440; return `${JOURS[d.getUTCDay()]} ${String(d.getUTCDate()).padStart(2, "0")}/${String(d.getUTCMonth() + 1).padStart(2, "0")} · ${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`; };
+const FMT_PARIS = new Intl.DateTimeFormat("fr-FR", { timeZone: "Europe/Paris", weekday: "short", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23" });
+function texteHorloge() {
+  const s0 = V ? V.S : S;
+  if (s0.vitesse === 1 && s0.running) {
+    const p = Object.fromEntries(FMT_PARIS.formatToParts(new Date()).map((x) => [x.type, x.value]));
+    return `${p.weekday} ${p.day}/${p.month} · ${p.hour}:${p.minute}:${p.second}`;
+  }
+  return heure(s0.horloge ?? s0.t) + (s0.running ? " · accéléré" : " · en pause");
+}
+const horlogeBord = () => `<span data-h>${texteHorloge()}</span>`;
+setInterval(() => document.querySelectorAll("[data-h]").forEach((e) => { const t = texteHorloge(); if (e.textContent !== t) e.textContent = t; }), 250);
+const libVitesse = (v) => v === 1 ? "Heure réelle" : `Accéléré : ${VITESSES[v] || "×" + v}`;
 const hhmm = (t) => { const m = t % 1440; return `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`; };
 const jours = (x) => x === Infinity ? "> 90" : x > 90 ? "> 90" : x.toFixed(1).replace(".", ",");
 const niveauJours = (x, crit, warn) => x < crit ? "danger" : x < warn ? "warn" : "ok";
@@ -1032,11 +1398,26 @@ function cascadesHTML(n, filtreNiveau) {
   }).join("");
 }
 
+/* ---------- Barre de navigation commune aux trois espaces ---------- */
+const ICO_EQUIPAGE = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>`;
+const ICO_ADMIN = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8.2-8 9-4.6-.8-8-4.5-8-9V6l8-3z"/><path d="M9 12l2 2 4-4"/></svg>`;
+function barreSites(courant) {
+  const lien = (id, href, lib) => `<a href="${href}"${courant === id ? ' aria-current="page"' : ""}>${lib}</a>`;
+  const gros = (id, href, lib, ico, cls) => `<a class="${cls}" href="${href}"${courant === id ? ' aria-current="page"' : ""}><span class="ico">${ico}</span>${lib}</a>`;
+  return `<div class="barre"><nav class="sites" aria-label="Espaces ARKA">${lien("dash", "#", "Tableau de bord")}${lien("inv", "#inventaire", "Inventaire")}${lien("alertes", "#alertes", "Alertes des piliers")}</nav><nav class="acces" aria-label="Accès rapides">${gros("equip", "#equipage", "Espace équipage", ICO_EQUIPAGE, "")}${gros("admin", "#admin", "Administration", ICO_ADMIN, "adm")}</nav></div>`;
+}
+
 /* ---------- Info-bulles : un petit « i » à côté de chaque élément ---------- */
 const ib = (t) => `<button type="button" class="info" data-info="${esc(t)}" aria-label="Explication">i</button>`;
 const INFO = {
   statut: "État général du vaisseau. Nominal : tout va bien. Alerte : un problème est en cours (malades, panne, rationnement). Critique : il faut agir tout de suite (triage rouge, froid rompu, personne sans repas).",
-  horloge: "Heure à bord du vaisseau. La simulation va plus vite que la réalité : 1 seconde = 10 minutes à bord.",
+  horloge: "Heure de Paris, à la seconde près : tous les onglets affichent la même heure. Pendant une démonstration, l'administrateur peut accélérer le temps : l'horloge avance alors plus vite, puis se resynchronise quand il repasse en heure réelle.",
+  invEncours: "Les chiffres du mois qui se remplissent en direct. Ils deviennent définitifs à l'inventaire de fin de mois.",
+  invArchives: "Les inventaires terminés : un par fin de mois, plus les inventaires de contrôle lancés par l'administrateur. Cliquez sur un inventaire pour l'afficher.",
+  aCommander: "Ce qu'il faut commander ou surveiller : moins de 14 jours de repas, un médicament qui tiendra moins de 30 jours, ou des graines sous leur seuil.",
+  inventaire: "Chaque fin de mois, à minuit, ARKA fait automatiquement l'inventaire : ce qu'il reste dans l'armoire, ce qui est entré, ce qui est sorti, ce qui a été perdu, et ce qu'il faut commander. Les rapports sont gardés ici et téléchargeables.",
+  moisEnCours: "Les chiffres du mois en cours, mis à jour en direct. Ils deviendront le rapport de fin de mois à minuit le dernier jour.",
+  aCommander: "Ce qui risque de manquer : moins de 30 jours d'autonomie pour un médicament, moins de 14 jours pour les repas, ou des graines sous le seuil.",
   autoRepas: "Nombre de jours pendant lesquels on peut nourrir tout l'équipage avec les repas rangés dans l'armoire (3 repas par jour et par personne).",
   medCrit: "Le médicament qui sera épuisé le plus vite si on continue à le consommer comme ces dernières 24 heures (réserve de l'armoire + MedBox).",
   malades: "Nombre de membres d'équipage suivis par l'infirmerie. Les couleurs indiquent la gravité (triage).",
@@ -1066,7 +1447,10 @@ const INFO = {
   demandesAdmin: "Les demandes envoyées depuis l'espace équipage. Les vérifications (allergie, dernière prise, stock) sont faites pour vous aider à décider. « Débloquer la MedBox » délivre le médicament, « Refuser » renvoie la personne vers l'infirmerie.",
   prochainPlat: "Le plat que la cuisine vous servira si le stock ne change pas d'ici là. Il respecte vos allergies, votre régime et votre état de santé.",
   restrictions: "Les informations de votre fiche d'identification. Elles servent à bloquer automatiquement les repas et médicaments dangereux pour vous.",
-  historique: "Ce que vous avez reçu récemment, avec l'heure à bord."
+  historique: "Ce que vous avez reçu récemment, avec l'heure à bord.",
+  inventairePhysique: "Le système connaît le stock théorique, mais dans la réalité il peut manquer des articles (casse, oubli de saisie, perte). Le comptage révèle ces écarts. Le lecteur RFID de l'armoire donne directement la quantité réelle.",
+  alertesPiliers: "Chaque pilier a son propre fil d'alertes : il ne voit que ce qui le concerne. Une alerte passe de « nouvelle » à « en cours » quand quelqu'un la prend en charge, puis à « résolue ». Certaines se résolvent toutes seules (froid rétabli, patient guéri…). Le pilier central voit toutes les alertes.",
+  vueAlertes: "Nombre d'alertes non résolues pour chaque pilier. Cliquez pour ouvrir l'espace d'alertes du pilier."
 };
 document.addEventListener("click", (e) => {
   const pop = document.getElementById("pop");
@@ -1094,8 +1478,60 @@ function activiteHTML(n, idMembre) {
   return `<ul class="feed">${liste.map((a) => `<li><span class="when">${hhmm(a.t)}</span><span class="tag ${a.type === "med" ? "warn" : "ok"}">${a.type === "med" ? "Médicament" : "Repas"}</span><span>${a.nom && !idMembre ? `<b>${esc(a.nom)}</b> : ` : ""}${esc(a.texte)}${MODES[a.mode] ? ` <span class="c-mut">(${MODES[a.mode]})</span>` : ""}</span></li>`).join("")}</ul>`;
 }
 
+/* ---------- Inventaire : affichage et export ---------- */
+let invSel = null;
+function rapportHTML(r) {
+  const motifs = Object.entries(r.pertesMotifs || {}).filter(([, v]) => v > 0).map(([k, v]) => `${esc(k)} : ${v}`).join(", ");
+  return `
+    <p class="c-mut" style="margin:0 0 12px">Période du ${esc(heure(r.debut))} au ${esc(heure(r.fin))}</p>
+    <div class="grid g4" style="margin-bottom:14px">
+      <div><div class="big">${r.repas}</div><div class="c-mut" style="font-size:13px">repas servis</div></div>
+      <div><div class="big">${r.recoltes}</div><div class="c-mut" style="font-size:13px">portions récoltées à la serre</div></div>
+      <div><div class="big">${r.medsDelivres}</div><div class="c-mut" style="font-size:13px">médicaments délivrés</div></div>
+      <div><div class="big">${r.grainesUtilisees}</div><div class="c-mut" style="font-size:13px">graines semées</div></div>
+    </div>
+    ${r.pertes ? `<p>Pertes : <b>${r.pertes} portions</b>${motifs ? ` (${motifs})` : ""}.</p>` : ""}
+    <p style="margin-bottom:4px"><b>À commander ou à surveiller</b> ${ib(INFO.aCommander)}</p>
+    ${r.aCommander.length ? `<div style="margin-bottom:14px">${r.aCommander.map((x) => `<span class="tag warn">${esc(x)}</span>`).join("")}</div>` : `<p class="c-mut" style="margin-top:0">Rien à signaler : tous les stocks sont suffisants.</p>`}
+    <div class="scroll"><table>
+      <thead><tr><th>Repas (portions)</th><th>Stock</th><th>Entrées</th><th>Sorties</th><th>Pertes</th></tr></thead>
+      <tbody>${r.aliments.map((a) => `<tr><td>${esc(a.nom)}</td><td>${a.stock}</td><td>${a.entrees}</td><td>${a.sorties}</td><td class="${a.pertes ? "c-danger" : ""}">${a.pertes}</td></tr>`).join("")}</tbody>
+    </table></div>
+    <div class="grid g2" style="margin-top:14px">
+      <div class="scroll"><table>
+        <thead><tr><th>Médicament</th><th>Réserve</th><th>MedBox</th><th>Livrés</th><th>Délivrés</th><th>Autonomie</th></tr></thead>
+        <tbody>${r.meds.map((m) => `<tr><td>${esc(m.nom)}</td><td>${m.reserve}</td><td>${m.medbox}</td><td>${m.entrees}</td><td>${m.delivres}</td><td>${m.autonomie === null ? "> 90 j" : String(m.autonomie).replace(".", ",") + " j"}</td></tr>`).join("")}</tbody>
+      </table></div>
+      <div class="scroll"><table>
+        <thead><tr><th>Graines</th><th>Stock</th><th>Seuil</th><th>Livrées</th><th>Semées</th></tr></thead>
+        <tbody>${r.graines.map((g) => `<tr><td>${esc(g.nom)}</td><td class="${g.stock < g.seuil ? "c-warn" : ""}">${g.stock}</td><td>${g.seuil}</td><td>${g.entrees}</td><td>${g.sorties}</td></tr>`).join("")}</tbody>
+      </table></div>
+    </div>`;
+}
+function telechargerCSV(r) {
+  const L = [];
+  const q = (x) => `"${String(x ?? "").replace(/"/g, '""')}"`;
+  L.push([q(r.titre)].join(";"));
+  L.push([q("Période"), q(`${heure(r.debut)} au ${heure(r.fin)}`)].join(";"));
+  L.push([q("Repas servis"), r.repas].join(";"), [q("Portions récoltées"), r.recoltes].join(";"), [q("Portions perdues"), r.pertes].join(";"), [q("Médicaments délivrés"), r.medsDelivres].join(";"), [q("Graines semées"), r.grainesUtilisees].join(";"));
+  L.push("", q("REPAS (portions)") + ";Stock;Entrées;Sorties;Pertes");
+  r.aliments.forEach((a) => L.push([q(a.nom), a.stock, a.entrees, a.sorties, a.pertes].join(";")));
+  L.push("", q("MÉDICAMENTS") + ";Réserve;MedBox;Livrés;Délivrés;Autonomie (jours)");
+  r.meds.forEach((m) => L.push([q(m.nom), m.reserve, m.medbox, m.entrees, m.delivres, m.autonomie === null ? "> 90" : String(m.autonomie).replace(".", ",")].join(";")));
+  L.push("", q("GRAINES") + ";Stock;Seuil;Livrées;Semées");
+  r.graines.forEach((g) => L.push([q(g.nom), g.stock, g.seuil, g.entrees, g.sorties].join(";")));
+  L.push("", q("À COMMANDER OU À SURVEILLER"));
+  (r.aCommander.length ? r.aCommander : ["Rien à signaler"]).forEach((x) => L.push(q(x)));
+  const blob = new Blob(["\ufeff" + L.join("\r\n")], { type: "text/csv;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `ARKA-${r.titre.replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-|-$/g, "")}.csv`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
 /* ---------- Tableau de bord ---------- */
-let onglet = "vue";
+let onglet = (() => { try { const o = sessionStorage.getItem("arka-onglet"); sessionStorage.removeItem("arka-onglet"); return o || "vue"; } catch (e) { return "vue"; } })();
 function rendreDash() {
   if (!V) { root.innerHTML = `<main><p class="empty">Démarrage de la simulation…</p></main>`; return; }
   avecVue(() => {
@@ -1126,6 +1562,7 @@ function rendreDash() {
         <div class="card chart"><h2>Membres malades ${ib(INFO.courbeMalades)}</h2>${sparkline(S.hist.malades, { min: 0, max: Math.max(6, ...S.hist.malades), couleur: "#E9B949" })}<div class="cap"><span>24 h</span><span>maintenant : ${malades}</span></div></div>
         <div class="card chart"><h2>Autonomie en repas ${ib(INFO.courbeRepas)}</h2>${sparkline(S.hist.autoRepas, { min: 0, max: 14, couleur: "#3FC1B0", seuil: 7 })}<div class="cap"><span>24 h</span><span>rationnement sous 7 j</span></div></div>
       </div>
+      <div class="card" style="margin-top:18px"><h2>Alertes par pilier ${ib(INFO.vueAlertes)}</h2><div class="piliers">${Object.entries(PILIERS).filter(([k]) => k !== "central").map(([k, p]) => { const L = S.alertes.filter((x) => x.pilier === k && x.statut !== "resolue"); const urg = L.some((x) => x.niveau === "danger"); return `<a class="pilier ${L.length ? (urg ? "danger" : "warn") : "ok"}" href="#alertes" data-pil="${k}"><b>${L.length}</b><span>${esc(p.nom)}</span></a>`; }).join("")}</div></div>
       <div class="grid g3" style="margin-top:18px">
         <div class="card"><h2>Activité à bord ${ib(INFO.activite)}</h2>${activiteHTML(10)}</div>
         <div class="card"><h2>Dernières cascades ${ib(INFO.cascades)}</h2>${cascadesHTML(3)}</div>
@@ -1225,29 +1662,75 @@ function rendreDash() {
       </div>`;
     }
 
+    if (onglet === "inv") {
+      const cours = rapportInventaire("encours");
+      cours.titre = `Mois en cours : ${moisLibelle(S.mois.cle)} (provisoire)`;
+      const liste = S.inventaires;
+      const sel = liste.find((r) => r.id === invSel) || liste[0];
+      const d = new Date(S.t * 60000);
+      const finMois = Math.floor(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 1) / 60000) - 1;
+      const Cd = S.comptage, dernier = S.comptages[0];
+      const blocPhysique = `<div class="card" style="margin-top:18px"><h2>Inventaire physique ${ib(INFO.inventairePhysique)}</h2>${Cd
+        ? `<p>${esc(Cd.titre)} : <b>${Cd.lignes.filter((l) => l.compte !== null).length} / ${Cd.lignes.length}</b> articles comptés. <a href="#inventaire" style="color:inherit">Ouvrir l'espace inventaire</a></p>`
+        : `<p class="c-mut">Aucun comptage en cours. Le prochain s'ouvrira le ${dateCourte(finMois)} à minuit.</p>`}
+        ${dernier ? `<p>Dernier comptage : ${esc(dernier.titre)}, validé par ${esc(dernier.validePar)} : ${dernier.ecarts.length ? `<span class="c-warn">${dernier.ecarts.length} écart(s) corrigé(s)</span>` : `<span class="c-ok">aucun écart</span>`}.</p>` : ""}</div>`;
+      corps = `
+      <p class="intro">Chaque fin de mois, à minuit, ARKA fait automatiquement l'inventaire complet de l'armoire : repas, médicaments et graines. Le mois en cours se remplit en direct ; les inventaires terminés sont archivés en dessous et peuvent être téléchargés pour Excel.</p>
+      <div class="grid g4">
+        <div class="card kpi"><div class="v" style="font-size:30px">${dateCourte(finMois)}</div><div class="l">Prochain inventaire automatique ${ib(INFO.inventaire)}</div><div class="s c-mut">à minuit</div></div>
+        <div class="card kpi"><div class="v">${cours.repas}</div><div class="l">Repas servis ce mois ${ib("Nombre de plats distribués depuis le début du mois (ou depuis le dernier inventaire de fin de mois).")}</div></div>
+        <div class="card kpi"><div class="v ${cours.pertes ? "c-warn" : "c-ok"}">${cours.pertes}</div><div class="l">Portions perdues ce mois ${ib("Portions jetées ou retirées : froid rompu, date dépassée, contamination ou allergène non déclaré.")}</div></div>
+        <div class="card kpi"><div class="v ${cours.aCommander.length ? "c-warn" : "c-ok"}">${cours.aCommander.length}</div><div class="l">Points à commander ${ib(INFO.aCommander)}</div></div>
+      </div>
+      ${blocPhysique}
+      <div class="card" style="margin-top:18px">
+        <div class="row" style="justify-content:space-between;margin-bottom:8px"><h2 style="margin:0">${esc(cours.titre)} ${ib(INFO.invEncours)}</h2><button class="btn sec sm" data-csv="encours" style="color:inherit;border-color:currentColor">Télécharger (Excel)</button></div>
+        ${rapportHTML(cours)}
+      </div>
+      <div class="card" style="margin-top:18px">
+        <h2>Inventaires archivés ${ib(INFO.invArchives)}</h2>
+        ${liste.length ? `<div class="row" style="margin-bottom:14px">${liste.map((r) => `<button class="btn sm ${sel && r.id === sel.id ? "" : "sec"}" data-inv="${r.id}" aria-pressed="${sel && r.id === sel.id}" style="${sel && r.id === sel.id ? "" : "color:inherit;border-color:currentColor"}">${esc(r.titre.replace("Inventaire de fin de mois : ", "").replace("Inventaire de contrôle du ", "Contrôle du "))}</button>`).join("")}</div>
+          <div class="row" style="justify-content:space-between;margin-bottom:8px"><b>${esc(sel.titre)}</b><button class="btn sec sm" data-csv="${sel.id}" style="color:inherit;border-color:currentColor">Télécharger (Excel)</button></div>
+          ${rapportHTML(sel)}`
+          : `<p class="empty">Aucun inventaire archivé pour l'instant. Le premier sera fait automatiquement le ${dateCourte(finMois)} à minuit. Pour la démonstration, l'administrateur peut aussi en lancer un depuis sa console.</p>`}
+      </div>`;
+    }
+
     if (onglet === "journal") {
       corps = `<p class="intro">Tout ce qui s'est passé à bord, regroupé par cause. La première ligne de chaque bloc est la cause, les lignes décalées sont ses conséquences.</p><div class="card"><h2>Journal de bord ${ib(INFO.journal)}</h2>${cascadesHTML(30)}</div>`;
     }
 
     const tab = (id, l) => `<button role="tab" aria-selected="${onglet === id}" data-tab="${id}">${l}</button>`;
     const popOuvert = !document.getElementById("pop").hidden;
-    root.innerHTML = `
+    root.innerHTML = `${barreSites("dash")}
       <header>
         <a class="brand" href="#" aria-label="ARKA">${LOGO.replaceAll("COL", "#F5F3EE")}<div><b>ARKA</b><span>Tableau de bord du vaisseau</span></div></a>
         <span class="pill ${niv}">${lib}</span>${ib(INFO.statut)}
-        ${!S.running ? `<span class="pill off">En pause</span>` : S.vitesse > 1 ? `<span class="pill off">Vitesse ×${S.vitesse}</span>` : ""}
-        <div class="clock" aria-live="off">${heure(S.t)} ${ib(INFO.horloge)}</div>
+        ${!S.running ? `<span class="pill off">En pause</span>` : `<span class="pill ${S.vitesse > 1 ? "warn" : "ok"}">${libVitesse(S.vitesse)}</span>`}
+        <div class="clock" aria-live="off">${horlogeBord()} ${ib(INFO.horloge)}</div>
       </header>
-      <nav class="tabs" role="tablist" aria-label="Secteurs">${tab("vue", "Vue d'ensemble")}${tab("alim", "Alimentation")}${tab("serre", "Serre et graines")}${tab("inf", "Infirmerie")}${tab("journal", "Journal")}</nav>
+      <nav class="tabs" role="tablist" aria-label="Secteurs">${tab("vue", "Vue d'ensemble")}${tab("alim", "Alimentation")}${tab("serre", "Serre et graines")}${tab("inf", "Infirmerie")}${tab("inv", "Inventaire")}${tab("journal", "Journal")}</nav>
       <main>
-        ${vieux ? `<div class="banner">Ce tableau de bord ne reçoit plus de données. Fermez les autres onglets du tableau de bord puis rechargez cette page.</div>` : ""}
+        ${vieux ? `<div class="banner">Synchronisation en cours avec les autres onglets…</div>` : ""}
         ${corps}
-        <p class="foot">Simulation ARKA : 1 seconde = 10 minutes à bord. <a href="#equipage" target="_blank" rel="noopener">Espace équipage</a> · <a href="#admin" target="_blank" rel="noopener">Console d'administration</a></p>
+        <p class="foot">${S.vitesse > 1 ? `Mode démonstration : temps accéléré (${VITESSES[S.vitesse] || "×" + S.vitesse}). Heure réelle : ${hhmm(maintenantM())}.` : "Horloge de bord synchronisée sur l'heure réelle."}</p>
       </main>`;
     if (popOuvert) { const f = document.getElementById("pop").dataset.for; document.querySelectorAll(".info").forEach((x) => { if (x.dataset.info === f) x.setAttribute("aria-expanded", "true"); }); }
   });
 }
 root.addEventListener("click", (e) => {
+  const bp = e.target.closest("[data-pil]");
+  if (bp && MODE === "dash") { try { sessionStorage.setItem("arka-pilier", bp.dataset.pil); } catch (err) {} return; }
+  const bi = e.target.closest("[data-inv]");
+  if (bi && MODE === "dash") { invSel = bi.dataset.inv; rendre(); return; }
+  const bc = e.target.closest("[data-csv]");
+  if (bc && V) {
+    const r = bc.dataset.csv === "encours"
+      ? avecVue(() => { const x = rapportInventaire("encours"); x.titre = `Inventaire provisoire ${moisLibelle(S.mois.cle)}`; return x; })
+      : V.S.inventaires.find((x) => x.id === bc.dataset.csv);
+    if (r) { telechargerCSV(r); toast("Inventaire téléchargé"); }
+    return;
+  }
   const b = e.target.closest("[data-tab]");
   if (b && MODE === "dash") { onglet = b.dataset.tab; rendre(); }
 });
@@ -1258,7 +1741,7 @@ let adminMonte = false, filtreJournal = "";
 function adminConnecte() { try { return sessionStorage.getItem("arka-admin") === "1"; } catch (e) { return false; } }
 
 function rendreLogin() {
-  root.innerHTML = `
+  root.innerHTML = `${barreSites("admin")}
     <div class="login">
       <div class="brand" style="margin-bottom:18px">${LOGO.replaceAll("COL", "#14213D")}<div><b>ARKA</b><span>Console d'administration</span></div></div>
       <h1>Accès réservé</h1>
@@ -1284,13 +1767,11 @@ function rendreLogin() {
 function monterAdmin() {
   const opt = (obj, lab) => Object.entries(obj).map(([k, v]) => `<option value="${k}">${esc(lab(v))}</option>`).join("");
   const checks = (name, list) => list.map((x) => `<label><input type="checkbox" name="${name}" value="${esc(x)}"> ${esc(x)}</label>`).join("");
-  root.innerHTML = `
+  root.innerHTML = `${barreSites("admin")}
     <header>
       <div class="brand">${LOGO.replaceAll("COL", "#14213D")}<div><b>ARKA</b><span>Console d'administration</span></div></div>
       <span id="a-statut" class="pill off">Connexion…</span>
       <div class="clock" id="a-heure" style="font-size:20px"></div>
-      <a class="btn sec sm" href="./" target="_blank" rel="noopener" id="a-ouvrir">Ouvrir le tableau de bord</a>
-      <a class="btn sec sm" href="#equipage" target="_blank" rel="noopener">Espace équipage</a>
       <button class="btn sec sm" id="a-deco">Se déconnecter</button>
     </header>
     <main>
@@ -1301,11 +1782,11 @@ function monterAdmin() {
       </section>
       <div class="grid g2">
         <section class="card">
-          <h2>Simulation ${ib("Mettre en pause ou accélérer le temps à bord. ×10 est pratique pendant une présentation pour voir les conséquences arriver vite.")}</h2>
+          <h2>Horloge de bord ${ib("Par défaut, l'horloge du vaisseau suit l'heure réelle : les repas sont servis aux vraies heures. Pour une présentation, accélérez le temps (1 s = 10 min par exemple) puis revenez à l'heure réelle : l'horloge se resynchronise toute seule.")}</h2>
           <div class="row">
             <button class="btn" id="a-pause">Mettre en pause</button>
             <span class="muted">Vitesse :</span>
-            ${[1, 2, 5, 10].map((v) => `<button class="btn sec sm" data-vit="${v}" aria-pressed="false">×${v}</button>`).join("")}
+            ${Object.entries(VITESSES).map(([v, l]) => `<button class="btn sec sm" data-vit="${v}" aria-pressed="false">${l}</button>`).join("")}
           </div>
           <div id="a-resume" class="muted" style="margin-top:14px"></div>
         </section>
@@ -1337,6 +1818,13 @@ function monterAdmin() {
             <button class="btn sm" type="submit">Livrer des graines</button>
           </form>
           <p id="a-form-err" class="err" aria-live="polite"></p>
+          <h3 style="font-size:15px;margin:14px 0 8px">Inventaire ${ib("L'inventaire de fin de mois se fait tout seul à minuit le dernier jour du mois. Vous pouvez aussi faire un inventaire de contrôle (sans remettre les compteurs à zéro) ou clôturer le mois tout de suite pour une démonstration.")}</h3>
+          <div class="row">
+            <button class="btn sec" id="a-inv">Inventaire de contrôle</button>
+            <button class="btn sec" id="a-cloture">Clôturer le mois maintenant</button>
+            <a href="#" class="muted" id="a-voirinv">Voir les inventaires</a>
+          </div>
+          <div id="a-comptage" style="margin-top:12px"></div>
         </section>
       </div>
 
@@ -1386,9 +1874,18 @@ function monterAdmin() {
 
   const $ = (id) => document.getElementById(id);
   $("a-deco").onclick = () => { try { sessionStorage.removeItem("arka-admin"); } catch (e) {} adminMonte = false; rendre(); };
-  $("a-ouvrir").href = location.href.split("#")[0];
   $("a-pause").onclick = () => envoyer("pause");
-  document.querySelectorAll("[data-vit]").forEach((b) => b.onclick = () => { envoyer("vitesse", { v: +b.dataset.vit }); toast(`Vitesse ×${b.dataset.vit}`); });
+  document.querySelectorAll("[data-vit]").forEach((b) => b.onclick = () => { envoyer("vitesse", { v: +b.dataset.vit }); toast(+b.dataset.vit === 1 ? "Retour à l'heure réelle" : "Temps accéléré : " + VITESSES[b.dataset.vit]); });
+  $("a-inv").onclick = () => { envoyer("inventaire"); toast("Inventaire de contrôle archivé"); };
+  $("a-cloture").onclick = () => { if (confirm("Clôturer le mois maintenant ? Les compteurs du mois repartiront de zéro.")) { envoyer("cloture"); toast("Mois clôturé : inventaire archivé"); } };
+  $("a-comptage").addEventListener("click", (e) => {
+    const b = e.target.closest("button");
+    if (!b) return;
+    b.disabled = true;
+    if (b.id === "a-cpt-ouvrir") { envoyer("ouvrir-comptage"); toast("Inventaire physique lancé"); }
+    if (b.id === "a-cpt-valider") { envoyer("valider-comptage", { par: "Administrateur" }); toast("Inventaire physique validé : stocks corrigés"); }
+  });
+  $("a-voirinv").onclick = () => { try { sessionStorage.setItem("arka-onglet", "inv"); } catch (e) {} };
   $("a-reparer").onclick = () => { envoyer("reparer"); toast("Réparation demandée"); };
   $("a-isol").onclick = () => { const actif = $("a-isol").getAttribute("aria-pressed") !== "true"; envoyer("isolement", { actif }); toast(actif ? "Isolement activé" : "Isolement levé"); };
   $("a-reset").onclick = () => { envoyer("reset"); toast("Simulation réinitialisée"); };
@@ -1464,14 +1961,14 @@ function demandesHTML() {
 }
 function majAdmin() {
   const $ = (id) => document.getElementById(id);
-  if (!V) { $("a-statut").className = "pill off"; $("a-statut").textContent = "En attente"; $("a-banner").innerHTML = `<div class="card" style="margin-bottom:18px"><b>La simulation ne tourne pas encore.</b> Ouvrez le tableau de bord dans un autre onglet : c'est lui qui fait tourner le vaisseau. Cette console le pilote à distance.</div>`; return; }
+  if (!V) { $("a-statut").className = "pill off"; $("a-statut").textContent = "Démarrage…"; return; }
   const vieux = Date.now() - V.ts > 4000;
   avecVue(() => {
     const [niv, lib] = statutGlobal();
     $("a-statut").className = "pill " + (vieux ? "off" : niv);
-    $("a-statut").textContent = vieux ? "Tableau de bord fermé" : lib;
-    $("a-heure").textContent = heure(S.t);
-    $("a-banner").innerHTML = vieux ? `<div class="card" style="margin-bottom:18px"><b>Le tableau de bord ne répond plus.</b> Ouvrez-le dans un autre onglet pour relancer la simulation (bouton « Ouvrir le tableau de bord »).</div>` : "";
+    $("a-statut").textContent = vieux ? "Synchronisation…" : lib;
+    $("a-heure").innerHTML = horlogeBord();
+    $("a-banner").innerHTML = "";
     $("a-pause").textContent = S.running ? "Mettre en pause" : "Relancer";
     document.querySelectorAll("[data-vit]").forEach((b) => b.setAttribute("aria-pressed", String(+b.dataset.vit === S.vitesse)));
     $("a-isol").setAttribute("aria-pressed", String(S.infirmerie.isolement));
@@ -1482,6 +1979,12 @@ function majAdmin() {
     const mc = medCritique();
     $("a-resume").innerHTML = `Autonomie en repas : <b>${jours(autonomieRepas())} jours</b> · Malades : <b>${malades}</b> · Froid : <b>${S.armoire.froid.temp.toFixed(1).replace(".", ",")} °C</b> · Médicament le plus critique : <b>${esc(MEDS[mc.k].nom)} (${jours(mc.a)} j)</b>`;
     $("a-journal").innerHTML = cascadesHTML(40, filtreJournal);
+    const C = S.comptage;
+    const faitsC = C ? C.lignes.filter((l) => l.compte !== null).length : 0;
+    const htmlC = !C
+      ? `<p class="muted" style="margin:0 0 6px"><b>Inventaire physique</b> : aucun en cours (ouverture automatique en fin de mois).</p><div class="row"><button class="btn sec sm" id="a-cpt-ouvrir">Lancer un inventaire physique</button><a class="muted" href="#inventaire">Espace inventaire</a></div>`
+      : `<p style="margin:0 0 6px"><b>${esc(C.titre)}</b> : ${faitsC} / ${C.lignes.length} articles comptés.</p><div class="row"><button class="btn sm" id="a-cpt-valider" ${faitsC === C.lignes.length ? "" : "disabled"}>Valider et corriger les stocks</button><a class="muted" href="#inventaire">Ouvrir l'espace inventaire</a></div>`;
+    if ($("a-comptage").dataset.cle !== htmlC) { $("a-comptage").dataset.cle = htmlC; $("a-comptage").innerHTML = htmlC; }
     const dem = demandesHTML();
     const cle = JSON.stringify(S.infirmerie.demandesPerso.map((d) => d.id + d.statut)) + Math.floor(S.t / 60);
     if (cle !== cleDemandes) { cleDemandes = cle; $("a-demandes").innerHTML = dem.h; }
@@ -1510,7 +2013,7 @@ function rendreAdmin() {
 let equipMonte = false;
 const moiId = () => { try { return sessionStorage.getItem("arka-moi") || ""; } catch (e) { return ""; } };
 function monterEquip() {
-  root.innerHTML = `
+  root.innerHTML = `${barreSites("equip")}
     <header>
       <div class="brand">${LOGO.replaceAll("COL", "#14213D")}<div><b>ARKA</b><span>Espace équipage</span></div></div>
       <div class="clock" id="e-heure" style="font-size:20px"></div>
@@ -1541,11 +2044,9 @@ function monterEquip() {
         </div>
         <section class="card" style="margin-top:18px"><h2>Activité à bord ${ib(INFO.activite)}</h2><div id="e-feed"></div></section>
       </div>
-      <p class="foot"><a href="./" target="_blank" rel="noopener" id="e-dash">Tableau de bord du vaisseau</a></p>
     </main>`;
   equipMonte = true;
   const $ = (id) => document.getElementById(id);
-  $("e-dash").href = location.href.split("#")[0];
   const raisons = () => { $("e-raison").innerHTML = LIBRE_SERVICE[$("e-med").value].raisons.map((r) => `<option>${esc(r)}</option>`).join(""); };
   $("e-med").onchange = raisons; raisons();
   $("e-moi").onchange = () => { try { sessionStorage.setItem("arka-moi", $("e-moi").value); } catch (e) {} majEquip(); };
@@ -1561,11 +2062,13 @@ function monterEquip() {
 let nbEquipAffiches = 0;
 function majEquip() {
   const $ = (id) => document.getElementById(id);
-  if (!V) { $("e-banner").innerHTML = `<div class="card" style="margin-bottom:18px"><b>Le vaisseau n'est pas encore démarré.</b> Ouvrez le tableau de bord dans un autre onglet pour lancer la simulation.</div>`; return; }
+  if (!V) { $("e-banner").innerHTML = `<p class="muted">Démarrage…</p>`; return; }
   const vieux = Date.now() - V.ts > 4000;
   avecVue(() => {
-    $("e-heure").innerHTML = `${heure(S.t)} ${ib(INFO.horloge)}`;
-    $("e-banner").innerHTML = vieux ? `<div class="card" style="margin-bottom:18px"><b>Le tableau de bord ne répond plus.</b> Ouvrez-le dans un autre onglet pour relancer la simulation.</div>` : "";
+    $("e-heure").innerHTML = `${horlogeBord()} ${ib(INFO.horloge)}`;
+    const Cq = S.comptage;
+    const bannE = Cq ? `<div class="card" style="margin-bottom:18px;border-color:var(--orange)"><b>${esc(Cq.titre)} en cours</b> : ${Cq.lignes.filter((l) => l.compte !== null).length} / ${Cq.lignes.length} articles comptés. Vous pouvez aider à compter les approvisionnements. <a href="#inventaire">Ouvrir l'espace inventaire</a></div>` : "";
+    if ($("e-banner").innerHTML !== bannE) $("e-banner").innerHTML = bannE;
     const sel = $("e-moi");
     if (S.equipage.length !== nbEquipAffiches) {
       sel.innerHTML = `<option value="">Choisissez votre nom…</option>` + S.equipage.map((m) => `<option value="${m.id}">${esc(m.nom)}</option>`).join("");
@@ -1610,11 +2113,219 @@ function majEquip() {
 }
 function rendreEquip() { if (!equipMonte) { monterEquip(); return; } majEquip(); }
 
-function rendre() { if (MODE === "admin") rendreAdmin(); else if (MODE === "equip") rendreEquip(); else rendreDash(); }
+/* ---------- Alertes des piliers : un espace d'alerte séparé pour chaque pilier ---------- */
+let alertesMonte = false, cleAlertesAff = "";
+let pilierSel = (() => { try { return sessionStorage.getItem("arka-pilier") || "infirmerie"; } catch (e) { return "infirmerie"; } })();
+const nomAgent = () => { try { return sessionStorage.getItem("arka-agent") || ""; } catch (e) { return ""; } };
+function monterAlertes() {
+  root.innerHTML = `${barreSites("alertes")}
+    <header>
+      <div class="brand">${LOGO.replaceAll("COL", "#14213D")}<div><b>ARKA</b><span>Alertes des piliers</span></div></div>
+      <div class="clock" id="al-heure" style="font-size:20px"></div>
+    </header>
+    <main>
+      <p class="intro">Chaque pilier a son propre système d'alerte. Choisissez votre pilier : vous ne voyez que les alertes qui vous concernent, et vous pouvez les prendre en charge. ${ib(INFO.alertesPiliers)}</p>
+      <div id="al-banner"></div>
+      <nav class="tabs" role="tablist" aria-label="Piliers" id="al-tabs"></nav>
+      <p id="al-desc" class="muted" style="margin:-6px 0 16px"></p>
+      <section class="card" style="margin-bottom:18px">
+        <div class="field" style="max-width:360px"><label for="al-nom">Votre nom</label><input type="text" id="al-nom" maxlength="40" autocomplete="name" placeholder="Pour signer la prise en charge"><span id="al-err" class="err" aria-live="polite"></span></div>
+      </section>
+      <section class="card" style="margin-bottom:18px"><h2>À traiter <span id="al-nb" class="tag"></span></h2><div id="al-actives"></div></section>
+      <section class="card"><h2>Résolues récemment</h2><div id="al-resolues"></div></section>
+    </main>`;
+  alertesMonte = true;
+  const $ = (id) => document.getElementById(id);
+  $("al-nom").value = nomAgent();
+  $("al-nom").addEventListener("input", () => { $("al-err").textContent = ""; try { sessionStorage.setItem("arka-agent", $("al-nom").value.trim()); } catch (e) {} });
+  $("al-tabs").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-pilier]");
+    if (!b) return;
+    pilierSel = b.dataset.pilier;
+    try { sessionStorage.setItem("arka-pilier", pilierSel); } catch (err) {}
+    cleAlertesAff = ""; majAlertes();
+  });
+  $("al-actives").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-al]");
+    if (!b) return;
+    const par = $("al-nom").value.trim();
+    if (!par) { $("al-err").textContent = "Indiquez votre nom avant de traiter une alerte."; $("al-nom").focus(); return; }
+    b.disabled = true;
+    envoyer("alerte", { id: b.dataset.al, action: b.dataset.action, par });
+    toast(b.dataset.action === "prendre" ? "Alerte prise en charge" : "Alerte résolue");
+  });
+  majAlertes();
+}
+function majAlertes() {
+  const $ = (id) => document.getElementById(id);
+  if (!V) { $("al-banner").innerHTML = `<div class="banner">Connexion au serveur…</div>`; return; }
+  avecVue(() => {
+    $("al-heure").innerHTML = `${horlogeBord()} ${ib(INFO.horloge)}`;
+    $("al-banner").innerHTML = (Date.now() - V.ts > 5000) ? `<div class="banner">Connexion au serveur perdue : reconnexion en cours…</div>` : "";
+    // Le pilier central voit tout ; une même alerte envoyée à deux piliers n'y apparaît qu'une fois
+    const unique = (L) => { const vus = new Set(); return L.filter((a) => { const c = a.type + a.message + a.t; if (vus.has(c)) return false; vus.add(c); return true; }); };
+    const duPilier = (k) => k === "central" ? unique(S.alertes) : S.alertes.filter((a) => a.pilier === k);
+    const actives = (k) => duPilier(k).filter((a) => a.statut !== "resolue");
+    const onglets = Object.entries(PILIERS).map(([k, p]) => { const n = actives(k).length; return `<button role="tab" data-pilier="${k}" aria-selected="${pilierSel === k}">${esc(p.nom)}${n ? `<span class="cpt">${n}</span>` : ""}</button>`; }).join("");
+    if ($("al-tabs").innerHTML !== onglets) $("al-tabs").innerHTML = onglets;
+    $("al-desc").textContent = PILIERS[pilierSel] ? PILIERS[pilierSel].desc : "";
+    const L = actives(pilierSel).sort((a, b) => (b.niveau === "danger") - (a.niveau === "danger") || b.tDernier - a.tDernier);
+    const R = duPilier(pilierSel).filter((a) => a.statut === "resolue").sort((a, b) => b.tResolu - a.tResolu).slice(0, 12);
+    $("al-nb").textContent = L.length ? `${L.length} en cours` : "";
+    $("al-nb").className = "tag " + (L.length ? "warn" : "");
+    document.title = (L.length ? `(${L.length}) ` : "") + "ARKA – Alertes " + (PILIERS[pilierSel] ? PILIERS[pilierSel].nom : "");
+    const cle = pilierSel + JSON.stringify(L.map((a) => [a.id, a.statut, a.nb])) + JSON.stringify(R.map((a) => a.id));
+    if (cle === cleAlertesAff) return;
+    cleAlertesAff = cle;
+    const lab = { danger: "Urgent", warn: "À surveiller" };
+    $("al-actives").innerHTML = L.length ? L.map((a) => `<div class="alerte">
+        <span class="tag ${a.niveau}">${lab[a.niveau] || "Info"}</span>
+        <div class="txt"><div>${esc(a.message)}${a.nb > 1 ? ` <span class="tag">× ${a.nb}</span>` : ""}</div>
+          <div class="meta">${heure(a.t)}${pilierSel === "central" ? ` · ${esc(PILIERS[a.pilier] ? PILIERS[a.pilier].nom : a.pilier)}` : ""} · ${a.statut === "nouvelle" ? "<b>Nouvelle</b> : personne ne s'en occupe encore" : `En cours : prise en charge par <b>${esc(a.par)}</b> à ${hhmm(a.tPris)}`}</div></div>
+        <div class="row">${a.statut === "nouvelle" ? `<button class="btn sm" data-al="${esc(a.id)}" data-action="prendre">Prendre en charge</button>` : ""}<button class="btn sec sm" data-al="${esc(a.id)}" data-action="resoudre">Marquer comme résolue</button></div>
+      </div>`).join("") : `<p class="empty">Aucune alerte à traiter pour ce pilier.</p>`;
+    $("al-resolues").innerHTML = R.length ? `<ul class="feed">${R.map((a) => `<li><span class="when">${hhmm(a.tResolu)}</span><span class="tag ok">Résolue</span><span>${esc(a.message)} <span class="c-mut">(${esc(a.motif || "")}${a.par ? " · " + esc(a.par) : ""})</span></span></li>`).join("")}</ul>` : `<p class="empty">Rien pour le moment.</p>`;
+  });
+}
+function rendreAlertes() { if (!alertesMonte) { monterAlertes(); return; } majAlertes(); }
+
+/* ---------- Espace inventaire : l'équipage ou l'admin compte tous les approvisionnements ---------- */
+let invMonte = false, cleInvStruct = "", cleInvHist = "";
+const nomCompteur = () => { try { return sessionStorage.getItem("arka-compteur") || ""; } catch (e) { return ""; } };
+function monterInventaire() {
+  root.innerHTML = `${barreSites("inv")}
+    <header>
+      <div class="brand">${LOGO.replaceAll("COL", "#14213D")}<div><b>ARKA</b><span>Espace inventaire</span></div></div>
+      <div class="clock" id="iv-heure" style="font-size:20px"></div>
+    </header>
+    <main>
+      <p class="intro">À la fin de chaque mois, ARKA ouvre un inventaire physique : l'équipage ou l'administrateur compte tout ce qui est rangé dans l'armoire (repas, médicaments de la réserve et de la MedBox, graines). Les quantités comptées sont comparées au stock du système, puis l'administrateur valide et le stock est corrigé. ${ib(INFO.inventairePhysique)}</p>
+      <div id="iv-banner"></div>
+      <div id="iv-contenu"></div>
+      <section class="card" style="margin-top:18px"><h2>Derniers inventaires physiques ${ib("Les inventaires physiques déjà validés, avec les écarts trouvés entre le stock réel et le système.")}</h2><div id="iv-hist"></div></section>
+    </main>`;
+  invMonte = true;
+  const $ = (id) => document.getElementById(id);
+  const zone = $("iv-contenu");
+  const nom = () => { const n = document.getElementById("iv-nom"); return n ? n.value.trim() : ""; };
+  const exigerNom = () => { if (nom()) return true; $("iv-err").textContent = "Indiquez votre nom avant de compter."; $("iv-nom").focus(); return false; };
+  const compter = (id, donnees) => { envoyer("compter", { id, par: nom(), ...donnees }); return new Promise((ok) => setTimeout(ok, 120)); };
+  zone.addEventListener("input", (e) => {
+    if (e.target.id === "iv-nom") { $("iv-err").textContent = ""; try { sessionStorage.setItem("arka-compteur", e.target.value.trim()); } catch (err) {} }
+  });
+  zone.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && e.target.matches("[data-qte]")) { e.preventDefault(); zone.querySelector(`[data-save="${e.target.dataset.qte}"]`).click(); }
+  });
+  zone.addEventListener("click", async (e) => {
+    const b = e.target.closest("button");
+    if (!b) return;
+    if (b.id === "iv-ouvrir") { b.disabled = true; envoyer("ouvrir-comptage"); toast("Inventaire physique lancé"); return; }
+    if (b.id === "iv-valider") {
+      b.disabled = true;
+      envoyer("valider-comptage", { par: nom() || "Administrateur" });
+      toast("Inventaire validé : les stocks sont corrigés");
+      return;
+    }
+    if (!exigerNom()) return;
+    if (b.dataset.scan) { b.disabled = true; compter(b.dataset.scan, { rfid: true }).finally(() => { b.disabled = false; }); return; }
+    if (b.dataset.save) {
+      const champ = zone.querySelector(`[data-qte="${b.dataset.save}"]`);
+      const q = Number(champ.value);
+      const err = zone.querySelector(`[data-err="${b.dataset.save}"]`);
+      if (champ.value.trim() === "" || !Number.isInteger(q) || q < 0) { err.textContent = "Nombre entier positif"; champ.focus(); return; }
+      err.textContent = "";
+      b.disabled = true; compter(b.dataset.save, { qty: q }).finally(() => { b.disabled = false; });
+      return;
+    }
+    if (b.id === "iv-tout") {
+      b.disabled = true;
+      const restants = V.S.comptage ? V.S.comptage.lignes.filter((l) => l.compte === null).map((l) => l.id) : [];
+      for (const id of restants) { try { await compter(id, { rfid: true }); } catch (err) { break; } }
+      b.disabled = false;
+      toast("Tous les articles restants ont été scannés");
+    }
+  });
+  majInventaire();
+}
+const LIB_CAT = { repas: "Repas", reserve: "Médicaments : réserve de l'armoire", medbox: "Médicaments : MedBox", graines: "Graines" };
+function majInventaire() {
+  const $ = (id) => document.getElementById(id);
+  if (!V) { $("iv-banner").innerHTML = `<div class="banner">Connexion au serveur…</div>`; return; }
+  avecVue(() => {
+    $("iv-heure").innerHTML = `${horlogeBord()} ${ib(INFO.horloge)}`;
+    $("iv-banner").innerHTML = (Date.now() - V.ts > 5000) ? `<div class="banner">Connexion au serveur perdue : reconnexion en cours…</div>` : "";
+    const C = S.comptage;
+    const d = new Date(S.t * 60000);
+    const finMois = Math.floor(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 1) / 60000) - 1;
+    const struct = C ? C.id : "aucun" + adminConnecte();
+    if (struct !== cleInvStruct) {
+      cleInvStruct = struct;
+      if (!C) {
+        $("iv-contenu").innerHTML = `<section class="card"><h2>Aucun inventaire physique en cours</h2>
+          <p>Le prochain s'ouvrira automatiquement le <b>${dateCourte(finMois)} à minuit</b>, à la fin du mois. Vous recevrez alors une alerte.</p>
+          ${adminConnecte() ? `<button class="btn" id="iv-ouvrir">Lancer un inventaire physique maintenant</button>` : `<p class="muted">L'administrateur peut aussi en lancer un à tout moment depuis sa console.</p>`}</section>`;
+      } else {
+        const groupes = Object.keys(LIB_CAT).map((cat) => {
+          const L = C.lignes.filter((l) => l.cat === cat);
+          return `<section class="card" style="margin-bottom:18px"><h2>${esc(LIB_CAT[cat])}</h2><div class="scroll"><table class="inv">
+            <thead><tr><th>Article</th><th>Quantité comptée</th><th>Résultat</th></tr></thead>
+            <tbody>${L.map((l) => `<tr>
+              <td><b>${esc(l.nom)}</b><div class="muted" style="font-size:13px">${esc(l.unite)}</div></td>
+              <td><div class="row" style="gap:6px;flex-wrap:nowrap"><label class="hidden" for="q-${esc(l.id)}">Quantité de ${esc(l.nom)}</label><input type="number" min="0" step="1" inputmode="numeric" id="q-${esc(l.id)}" data-qte="${esc(l.id)}" style="width:100px">
+                <button class="btn sm" data-save="${esc(l.id)}">Enregistrer</button><button class="btn sec sm" data-scan="${esc(l.id)}">Scanner (RFID)</button></div><span class="err" data-err="${esc(l.id)}"></span></td>
+              <td data-st="${esc(l.id)}"></td></tr>`).join("")}</tbody></table></div></section>`;
+        }).join("");
+        $("iv-contenu").innerHTML = `
+          <section class="card" style="margin-bottom:18px">
+            <h2>${esc(C.titre)}</h2>
+            <p class="muted" style="margin-top:-6px">Ouvert le ${esc(heure(C.ouvert))}. Comptez chaque article à la main ou avec le lecteur RFID de l'armoire, puis l'administrateur valide.</p>
+            <div class="row" style="align-items:flex-end;margin-bottom:12px">
+              <div class="field" style="max-width:320px;flex:1"><label for="iv-nom">Votre nom</label><input type="text" id="iv-nom" maxlength="40" autocomplete="name" placeholder="Qui fait le comptage ?"><span id="iv-err" class="err" aria-live="polite"></span></div>
+              <button class="btn sec" id="iv-tout">Scanner tous les articles restants</button>
+            </div>
+            <div class="row" style="gap:10px"><div class="bar" style="flex:1;height:12px;background:var(--line)"><span id="iv-barre" style="width:0%"></span></div><b id="iv-prog"></b></div>
+            <div id="iv-valid" style="margin-top:14px"></div>
+          </section>${groupes}`;
+        $("iv-nom").value = nomCompteur();
+      }
+    }
+    if (C) {
+      const faits = C.lignes.filter((l) => l.compte !== null).length;
+      $("iv-barre").style.width = Math.round((faits / C.lignes.length) * 100) + "%";
+      $("iv-prog").textContent = `${faits} / ${C.lignes.length} articles comptés`;
+      for (const l of C.lignes) {
+        const cel = document.querySelector(`[data-st="${CSS.escape(l.id)}"]`);
+        if (!cel) continue;
+        const e = l.compte === null ? null : l.compte - l.attendu;
+        const html = l.compte === null ? `<span class="tag">À compter</span>`
+          : `${e === 0 ? `<span class="tag ok">Conforme</span>` : `<span class="tag warn">Écart ${e > 0 ? "+" : ""}${e}</span>`} <span class="muted" style="font-size:13px">${l.compte} comptés${l.rfid ? " (RFID)" : ""} · système ${l.attendu} · ${esc(l.par)} à ${hhmm(l.t)}</span>`;
+        if (cel.innerHTML !== html) cel.innerHTML = html;
+        const champ = document.querySelector(`[data-qte="${CSS.escape(l.id)}"]`);
+        if (champ && l.compte !== null && document.activeElement !== champ && champ.value !== String(l.compte)) champ.value = l.compte;
+      }
+      const complet = faits === C.lignes.length;
+      const valid = adminConnecte()
+        ? `<button class="btn" id="iv-valider" ${complet ? "" : "disabled"}>Valider l'inventaire et corriger les stocks</button> ${complet ? "" : `<span class="muted">Il reste ${C.lignes.length - faits} article(s) à compter.</span>`}`
+        : `<p class="muted" style="margin:0">${complet ? "<b>Tout est compté.</b> " : ""}La validation est faite par l'administrateur (une fois connecté à la console d'administration, il valide depuis cette page).</p>`;
+      if ($("iv-valid").dataset.cle !== valid) { $("iv-valid").dataset.cle = valid; $("iv-valid").innerHTML = valid; }
+    }
+    const cleH = JSON.stringify(S.comptages.map((b) => b.id));
+    if (cleH !== cleInvHist) {
+      cleInvHist = cleH;
+      $("iv-hist").innerHTML = S.comptages.length ? S.comptages.map((b) => `<div class="cascade"><div class="root"><span class="tag ${b.ecarts.length ? "warn" : "ok"}">${b.ecarts.length ? b.ecarts.length + " écart(s)" : "Aucun écart"}</span><span>${esc(b.titre)}</span><span class="when">validé par ${esc(b.validePar)} le ${esc(heure(b.valideLe))}</span></div>
+        <div class="muted" style="font-size:13px;margin-top:4px">${b.articles} articles comptés par ${esc(b.compteurs.join(", "))}${b.rfid ? `, dont ${b.rfid} au lecteur RFID` : ""}</div>
+        ${b.ecarts.length ? `<div class="scroll" style="margin-top:8px"><table><thead><tr><th>Article</th><th>Système</th><th>Compté</th><th>Écart</th></tr></thead><tbody>${b.ecarts.map((x) => `<tr><td>${esc(x.nom)} <span class="muted">(${esc(LIB_CAT[x.cat])})</span></td><td>${x.attendu}</td><td>${x.compte}</td><td class="${x.ecart < 0 ? "c-danger" : ""}">${x.ecart > 0 ? "+" : ""}${x.ecart}</td></tr>`).join("")}</tbody></table></div>` : ""}</div>`).join("")
+        : `<p class="empty">Aucun inventaire physique validé pour l'instant.</p>`;
+    }
+  });
+}
+function rendreInventaire() { if (!invMonte) { monterInventaire(); return; } majInventaire(); }
+
+function rendre() { if (MODE === "admin") rendreAdmin(); else if (MODE === "equip") rendreEquip(); else if (MODE === "alertes") rendreAlertes(); else if (MODE === "inv") rendreInventaire(); else rendreDash(); }
 
 /* ---------- Démarrage ---------- */
-document.body.className = MODE === "equip" ? "admin equip" : MODE;
-document.title = MODE === "admin" ? "ARKA – Console d'administration" : MODE === "equip" ? "ARKA – Espace équipage" : "ARKA – Tableau de bord du vaisseau";
+document.body.className = MODE === "equip" || MODE === "alertes" || MODE === "inv" ? "admin equip" : MODE;
+document.title = MODE === "admin" ? "ARKA – Console d'administration" : MODE === "equip" ? "ARKA – Espace équipage" : MODE === "alertes" ? "ARKA – Alertes des piliers" : MODE === "inv" ? "ARKA – Espace inventaire" : "ARKA – Tableau de bord du vaisseau";
 try { const s = lsGet(K_SNAP); if (s) V = JSON.parse(s); } catch (e) {}
 rendre();
 boucle();
