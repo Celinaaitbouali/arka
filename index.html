@@ -1,0 +1,917 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ARKA – Armoire de Ressources Connectée et Autonome</title>
+  <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIiB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCI+CiAgPGVsbGlwc2UgY3g9IjYwIiBjeT0iNjQiIHJ4PSI1NCIgcnk9IjE5IiB0cmFuc2Zvcm09InJvdGF0ZSgtMTggNjAgNjQpIiBmaWxsPSJub25lIiBzdHJva2U9IiNFODgzM0EiIHN0cm9rZS13aWR0aD0iMyIvPgogIDxwYXRoIGQ9Ik0zMCA5NiBMNjAgMjAgTDkwIDk2IiBmaWxsPSJub25lIiBzdHJva2U9IiMxNDIxM0QiIHN0cm9rZS13aWR0aD0iOSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CiAgPGxpbmUgeDE9IjQ0IiB5MT0iNzIiIHgyPSI3NiIgeTI9IjcyIiBzdHJva2U9IiMxNDIxM0QiIHN0cm9rZS13aWR0aD0iNyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPHBhdGggZD0iTTYwIDYzIEM1MiA1NiA1MyA0NiA2MCA0MSBDNjcgNDYgNjggNTYgNjAgNjMgWiIgZmlsbD0iIzJBOUQ4RiIvPgogIDxjaXJjbGUgY3g9IjEwNyIgY3k9IjQzIiByPSI0LjUiIGZpbGw9IiNFODgzM0EiLz4KPC9zdmc+Cg==" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+:root {
+  --navy: #14213D;
+  --navy-deep: #0E1628;
+  --orange: #E8833A;
+  --orange-dark: #B35A17;
+  --green: #2A9D8F;
+  --green-dark: #1D6F65;
+  --red: #C0392B;
+  --ivory: #F5F3EE;
+  --stone: #E9E6DF;
+  --ink-soft: #4A5468;
+  --line: #D6D2C8;
+  --radius-lg: 20px;
+  --radius: 10px;
+  --font-display: "Syne", "Trebuchet MS", sans-serif;
+  --font-body: "DM Sans", system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--navy);
+  background: var(--stone);
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  min-height: 100vh;
+}
+
+:focus-visible { outline: 3px solid var(--orange); outline-offset: 2px; }
+
+/* ---------- Barre latérale ---------- */
+.sidebar {
+  background: var(--navy);
+  color: var(--ivory);
+  padding: 28px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+.brand { display: flex; align-items: center; gap: 12px; color: var(--ivory); text-decoration: none; }
+.brand-logo { width: 52px; height: 52px; }
+.brand-name { font-family: var(--font-display); font-weight: 800; font-size: 30px; letter-spacing: 0.14em; }
+
+.nav { display: flex; flex-direction: column; gap: 4px; }
+.nav a {
+  color: #C9CEDA;
+  text-decoration: none;
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.nav a:hover { background: rgba(245, 243, 238, 0.08); color: var(--ivory); }
+.nav a.active { background: var(--ivory); color: var(--navy); font-weight: 500; }
+.count {
+  background: var(--orange);
+  color: var(--navy-deep);
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 0 8px;
+  min-width: 24px;
+  text-align: center;
+}
+.count:empty { display: none; }
+
+.role { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color: #C9CEDA; }
+.role select {
+  font: inherit;
+  color: var(--navy);
+  background: var(--ivory);
+  border: 0;
+  border-radius: var(--radius);
+  padding: 10px;
+}
+.slogan { margin-top: auto; font-size: 14px; color: #C9CEDA; }
+
+/* ---------- Contenu ---------- */
+main { padding: 40px 48px 64px; max-width: 1200px; width: 100%; }
+main:focus { outline: none; }
+
+h1 { font-family: var(--font-display); font-weight: 700; font-size: 40px; line-height: 1.1; margin: 0 0 8px; }
+h2 { font-family: var(--font-display); font-weight: 700; font-size: 22px; margin: 0 0 16px; }
+.intro { color: var(--ink-soft); margin: 0 0 32px; max-width: 65ch; }
+
+.panel {
+  background: var(--ivory);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  margin-bottom: 24px;
+}
+.grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.grid-2 > .panel { margin-bottom: 0; }
+.row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.muted { color: var(--ink-soft); font-size: 14px; }
+
+/* Bandeau d'autonomie : l'élément fort du tableau de bord */
+.autonomy {
+  background: var(--navy);
+  color: var(--ivory);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  margin-bottom: 24px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 32px;
+}
+.autonomy .days { font-family: var(--font-display); font-weight: 800; font-size: 64px; line-height: 1; }
+.autonomy .days small { font-size: 20px; font-weight: 600; margin-left: 6px; }
+.autonomy .label { color: #C9CEDA; margin-top: 8px; }
+.orbit { height: 6px; background: rgba(245, 243, 238, 0.15); border-radius: 999px; margin-top: 16px; overflow: hidden; }
+.orbit span { display: block; height: 100%; background: var(--orange); border-radius: 999px; }
+.orbit span.ok { background: #3FC1B0; }
+
+/* Tableaux */
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 12px 10px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+th { font-size: 14px; font-weight: 500; color: var(--ink-soft); }
+tr:last-child td { border-bottom: 0; }
+.table-wrap { overflow-x: auto; }
+
+/* États */
+.tag {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--stone);
+  color: var(--navy);
+  margin: 2px 4px 2px 0;
+}
+.tag.ok { background: #D4EFEA; color: var(--green-dark); }
+.tag.warn { background: #FBE3D0; color: var(--orange-dark); }
+.tag.danger { background: #F6D5D1; color: #8E2A1F; }
+
+/* Boutons et formulaires */
+.btn {
+  font: inherit;
+  font-weight: 500;
+  border: 0;
+  border-radius: var(--radius);
+  padding: 10px 18px;
+  min-height: 44px;
+  cursor: pointer;
+  background: var(--navy);
+  color: var(--ivory);
+}
+.btn:hover { background: var(--navy-deep); }
+.btn.secondary { background: transparent; color: var(--navy); border: 1.5px solid var(--navy); }
+.btn.secondary:hover { background: var(--stone); }
+.btn.small { padding: 6px 12px; min-height: 36px; font-size: 14px; }
+
+label { font-weight: 500; }
+input[type="text"], select, textarea {
+  font: inherit;
+  padding: 10px 12px;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius);
+  background: #fff;
+  color: var(--navy);
+  width: 100%;
+}
+textarea { min-height: 80px; resize: vertical; }
+.field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 18px; }
+fieldset { border: 1.5px solid var(--line); border-radius: var(--radius); padding: 14px 16px; margin: 0 0 18px; }
+legend { font-weight: 500; padding: 0 6px; }
+.checks { display: flex; flex-wrap: wrap; gap: 8px 20px; }
+.checks label { font-weight: 400; display: flex; gap: 8px; align-items: center; }
+.error { color: var(--red); font-size: 14px; margin-top: 4px; }
+
+/* CropGuard */
+.zones { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
+.zone { border-radius: var(--radius); background: #fff; border: 1.5px solid var(--line); overflow: hidden; }
+.zone .photo { height: 110px; display: flex; align-items: center; justify-content: center; background: #E3F1EC; }
+.zone.sick .photo { background: #F7E4D6; }
+.zone .info { padding: 12px; }
+.zone .info strong { display: block; }
+
+/* Barres de consommation */
+.bars { display: flex; flex-direction: column; gap: 12px; }
+.bar-row { display: grid; grid-template-columns: 140px 1fr 70px; gap: 12px; align-items: center; font-size: 14px; }
+.bar { height: 12px; background: var(--stone); border-radius: 999px; overflow: hidden; }
+.bar span { display: block; height: 100%; background: var(--navy); }
+
+/* Alertes */
+.alert-list { list-style: none; margin: 0; padding: 0; }
+.alert-list li { display: flex; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--line); align-items: flex-start; }
+.alert-list li:last-child { border-bottom: 0; }
+.alert-list .when { font-size: 13px; color: var(--ink-soft); white-space: nowrap; }
+.empty { color: var(--ink-soft); padding: 12px 0; }
+
+.result { margin-top: 16px; padding: 14px 16px; border-radius: var(--radius); background: var(--stone); }
+.result.blocked { background: #F6D5D1; color: #8E2A1F; }
+.result.ok { background: #D4EFEA; color: var(--green-dark); }
+
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--navy);
+  color: var(--ivory);
+  padding: 14px 20px;
+  border-radius: var(--radius);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.2s, transform 0.2s;
+  pointer-events: none;
+  max-width: 360px;
+}
+.toast.show { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: reduce) { .toast { transition: none; } }
+
+/* ---------- Mobile ---------- */
+@media (max-width: 900px) {
+  body { grid-template-columns: 1fr; }
+  .sidebar { position: static; height: auto; gap: 16px; }
+  .nav { flex-direction: row; flex-wrap: wrap; }
+  .slogan { display: none; }
+  main { padding: 24px 18px 48px; }
+  .grid-2, .autonomy { grid-template-columns: 1fr; }
+  h1 { font-size: 30px; }
+  .bar-row { grid-template-columns: 100px 1fr 60px; }
+}
+
+</style>
+</head>
+<body>
+  <aside class="sidebar">
+    <a class="brand" href="#dashboard" aria-label="ARKA, accueil">
+      <svg class="brand-logo" viewBox="0 0 120 120" aria-hidden="true">
+        <ellipse cx="60" cy="64" rx="54" ry="19" transform="rotate(-18 60 64)" fill="none" stroke="#E8833A" stroke-width="4"/>
+        <path d="M30 96 L60 20 L90 96" fill="none" stroke="#F5F3EE" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+        <line x1="44" y1="72" x2="76" y2="72" stroke="#F5F3EE" stroke-width="8" stroke-linecap="round"/>
+        <path d="M60 63 C52 56 53 46 60 41 C67 46 68 56 60 63 Z" fill="#3FC1B0"/>
+        <circle cx="107" cy="43" r="5" fill="#E8833A"/>
+      </svg>
+      <span class="brand-name">ARKA</span>
+    </a>
+
+    <nav class="nav" aria-label="Navigation principale">
+      <a href="#dashboard" data-route="dashboard">Tableau de bord</a>
+      <a href="#graines" data-route="graines">Graines et CropGuard</a>
+      <a href="#medicaments" data-route="medicaments">Médicaments</a>
+      <a href="#alimentation" data-route="alimentation">Alimentation</a>
+      <a href="#equipage" data-route="equipage">Équipage</a>
+      <a href="#alertes" data-route="alertes">Alertes <span id="alert-count" class="count"></span></a>
+    </nav>
+
+    <div class="role">
+      <label for="role-select">Connecté en tant que</label>
+      <select id="role-select">
+        <option value="admin">Pilier central (admin)</option>
+        <option value="medecine">Pilier médecine</option>
+        <option value="cuisine">Pilier repas</option>
+        <option value="agriculture">Pilier agriculture</option>
+      </select>
+    </div>
+
+    <p class="slogan">Préserver les ressources, préserver la vie.</p>
+  </aside>
+
+  <main id="app" tabindex="-1"></main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>
+// Données de démonstration d'ARKA.
+// Dans la version finale, ces données viendront de l'API (base PostgreSQL).
+
+const ALLERGENES = ["arachide", "gluten", "lactose", "fruits à coque", "œuf", "poisson", "soja", "pénicilline", "aspirine"];
+const REGIMES = ["végétarien", "vegan", "halal"];
+const MALADIES = ["diabète", "maladie cœliaque", "hypertension"];
+const PILIERS = ["Agriculture", "Médecine", "Repas", "Robotique", "Pilier central"];
+
+const DEFAULT_DATA = {
+  graines: [
+    { id: "g1", espece: "Tomate", quantite: 42, seuil: 20 },
+    { id: "g2", espece: "Laitue", quantite: 18, seuil: 20 },
+    { id: "g3", espece: "Blé", quantite: 120, seuil: 50 },
+    { id: "g4", espece: "Pomme de terre", quantite: 35, seuil: 25 },
+    { id: "g5", espece: "Soja", quantite: 60, seuil: 30 }
+  ],
+
+  zones: [
+    { id: "z1", zone: "Serre A1", espece: "Tomate", etat: "saine", confiance: 97 },
+    { id: "z2", zone: "Serre A2", espece: "Laitue", etat: "saine", confiance: 94 },
+    { id: "z3", zone: "Serre B1", espece: "Blé", etat: "saine", confiance: 99 },
+    { id: "z4", zone: "Serre B2", espece: "Pomme de terre", etat: "malade", confiance: 88 },
+    { id: "z5", zone: "Serre C1", espece: "Soja", etat: "saine", confiance: 95 }
+  ],
+
+  // conso = unités consommées par jour sur les 14 derniers jours
+  medicaments: [
+    { id: "m1", nom: "Paracétamol 500 mg", allergene: null, reserve: 400, medbox: 30, seuilMedbox: 20,
+      conso: [6, 5, 7, 4, 6, 8, 5, 6, 7, 5, 6, 4, 7, 6] },
+    { id: "m2", nom: "Amoxicilline 1 g", allergene: "pénicilline", reserve: 90, medbox: 10, seuilMedbox: 8,
+      conso: [1, 0, 2, 1, 1, 0, 2, 1, 1, 2, 1, 0, 1, 2] },
+    { id: "m3", nom: "Aspirine 500 mg", allergene: "aspirine", reserve: 150, medbox: 15, seuilMedbox: 10,
+      conso: [2, 1, 2, 3, 1, 2, 2, 1, 3, 2, 1, 2, 2, 1] },
+    { id: "m4", nom: "Antihistaminique", allergene: null, reserve: 60, medbox: 8, seuilMedbox: 6,
+      conso: [1, 2, 1, 1, 2, 1, 3, 2, 1, 2, 2, 1, 2, 3] },
+    { id: "m5", nom: "Insuline (flacon)", allergene: null, reserve: 24, medbox: 4, seuilMedbox: 3,
+      conso: [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5] }
+  ],
+
+  // tags = régimes compatibles ; sucre = déconseillé en cas de diabète
+  aliments: [
+    { id: "a1", nom: "Ration pâtes bolognaise", categorie: "Plat", quantite: 80, allergenes: ["gluten"], tags: [], sucre: false },
+    { id: "a2", nom: "Curry de lentilles", categorie: "Plat", quantite: 65, allergenes: [], tags: ["végétarien", "vegan", "halal"], sucre: false },
+    { id: "a3", nom: "Poulet riz halal", categorie: "Plat", quantite: 50, allergenes: [], tags: ["halal"], sucre: false },
+    { id: "a4", nom: "Poisson et purée", categorie: "Plat", quantite: 30, allergenes: ["poisson", "lactose"], tags: [], sucre: false },
+    { id: "a5", nom: "Tofu sauté aux légumes", categorie: "Plat", quantite: 40, allergenes: ["soja"], tags: ["végétarien", "vegan", "halal"], sucre: false },
+    { id: "a6", nom: "Barre aux cacahuètes", categorie: "Collation", quantite: 120, allergenes: ["arachide"], tags: ["végétarien", "halal"], sucre: true },
+    { id: "a7", nom: "Compote de pommes", categorie: "Collation", quantite: 90, allergenes: [], tags: ["végétarien", "vegan", "halal"], sucre: true },
+    { id: "a8", nom: "Crackers sans gluten", categorie: "Collation", quantite: 70, allergenes: [], tags: ["végétarien", "vegan", "halal"], sucre: false },
+    { id: "a9", nom: "Yaourt nature", categorie: "Dessert", quantite: 60, allergenes: ["lactose"], tags: ["végétarien", "halal"], sucre: false },
+    { id: "a10", nom: "Mousse au chocolat", categorie: "Dessert", quantite: 45, allergenes: ["lactose", "œuf"], tags: ["végétarien"], sucre: true },
+    { id: "a11", nom: "Salade de fruits", categorie: "Dessert", quantite: 55, allergenes: [], tags: ["végétarien", "vegan", "halal"], sucre: true },
+    { id: "a12", nom: "Mélange noix et graines", categorie: "Collation", quantite: 40, allergenes: ["fruits à coque"], tags: ["végétarien", "vegan", "halal"], sucre: false }
+  ],
+
+  equipage: [
+    { id: "e1", nom: "Lina Moreau", pilier: "Médecine", allergies: ["pénicilline"], regimes: [], maladies: [], notes: "" },
+    { id: "e2", nom: "Yanis Benali", pilier: "Agriculture", allergies: ["arachide"], regimes: ["halal"], maladies: [], notes: "" },
+    { id: "e3", nom: "Sofia Almeida", pilier: "Repas", allergies: ["gluten"], regimes: ["végétarien"], maladies: ["maladie cœliaque"], notes: "" },
+    { id: "e4", nom: "Marc Delaunay", pilier: "Robotique", allergies: [], regimes: [], maladies: ["diabète"], notes: "Suivi glycémie quotidien" }
+  ],
+
+  alertes: [
+    { id: "al1", date: "2026-09-24T08:12:00", niveau: "danger", pilier: "Agriculture",
+      message: "CropGuard : feuilles malades détectées en serre B2 (pomme de terre)." },
+    { id: "al2", date: "2026-09-24T07:40:00", niveau: "warn", pilier: "Agriculture",
+      message: "Stock de graines de laitue sous le seuil (18 / 20)." }
+  ]
+};
+
+</script>
+<script>
+// ARKA – logique de l'application (prototype front-end)
+// Les données sont gardées dans le navigateur (localStorage).
+// Dans la version finale, chaque action appellera l'API backend.
+
+const STORAGE_KEY = "arka-data-v1";
+const app = document.getElementById("app");
+const roleSelect = document.getElementById("role-select");
+
+let data = loadData();
+let role = "admin";
+let ui = { membreAlim: "", delivrance: null, formErrors: {} };
+
+/* ---------- Stockage ---------- */
+function loadData() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) return JSON.parse(saved);
+  } catch (e) { /* stockage indisponible : on repart des données de démo */ }
+  return JSON.parse(JSON.stringify(DEFAULT_DATA));
+}
+function saveData() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) { /* ignoré */ }
+}
+
+/* ---------- Outils ---------- */
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) =>
+  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const uid = (p) => p + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+const avg = (arr) => arr.reduce((a, b) => a + b, 0) / arr.length;
+const canSeeHealth = () => role === "admin" || role === "medecine";
+
+function formatDate(iso) {
+  const d = new Date(iso);
+  return d.toLocaleDateString("fr-FR", { day: "2-digit", month: "short" }) + " " +
+    d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+}
+
+function toast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toast.timer);
+  toast.timer = setTimeout(() => t.classList.remove("show"), 3200);
+}
+
+function addAlert(niveau, pilier, message) {
+  data.alertes.unshift({ id: uid("al"), date: new Date().toISOString(), niveau, pilier, message });
+}
+
+/* ---------- Calculs métier ---------- */
+
+// Jours d'autonomie d'un médicament = stock total / consommation moyenne par jour
+function joursRestantsMed(m) {
+  const moyenne = avg(m.conso);
+  return moyenne > 0 ? Math.floor((m.reserve + m.medbox) / moyenne) : Infinity;
+}
+
+// Règles strictes : un produit est exclu s'il contient un allergène déclaré,
+// ne respecte pas un régime, ou est déconseillé pour une maladie.
+// Ces règles passent AVANT toute suggestion de l'IA.
+function motifsIncompatibilite(aliment, membre) {
+  const motifs = [];
+  const allergies = new Set(membre.allergies);
+  if (membre.maladies.includes("maladie cœliaque")) allergies.add("gluten");
+  aliment.allergenes.filter((a) => allergies.has(a)).forEach((a) => motifs.push("contient : " + a));
+  membre.regimes.forEach((r) => { if (!aliment.tags.includes(r)) motifs.push("non " + r); });
+  if (membre.maladies.includes("diabète") && aliment.sucre) motifs.push("riche en sucre (diabète)");
+  return motifs;
+}
+
+// Suggestion (simulation de l'IA de recommandation) : parmi les produits
+// compatibles, on propose pour chaque catégorie celui dont le stock est le plus
+// abondant, pour préserver les produits rares.
+function suggestionRepas(membre) {
+  const compatibles = data.aliments.filter((a) => a.quantite > 0 && motifsIncompatibilite(a, membre).length === 0);
+  const parCategorie = {};
+  compatibles.forEach((a) => {
+    if (!parCategorie[a.categorie] || a.quantite > parCategorie[a.categorie].quantite) parCategorie[a.categorie] = a;
+  });
+  return Object.values(parCategorie);
+}
+
+/* ---------- Pages ---------- */
+
+function pageDashboard() {
+  const medMin = data.medicaments.reduce((min, m) => Math.min(min, joursRestantsMed(m)), Infinity);
+  const totalRepasJour = data.equipage.length * 3;
+  const joursRepas = Math.floor(data.aliments.reduce((s, a) => s + a.quantite, 0) / Math.max(totalRepasJour, 1));
+  const zonesSaines = data.zones.filter((z) => z.etat === "saine").length;
+  const partSaine = Math.round((zonesSaines / data.zones.length) * 100);
+  const gauge = (jours) => Math.min(100, Math.round((jours / 90) * 100));
+
+  const recent = data.alertes.slice(0, 4);
+
+  return `
+    <h1>Tableau de bord</h1>
+    <p class="intro">L'état des ressources du vaisseau en un coup d'œil : combien de temps l'équipage peut tenir avec les stocks actuels.</p>
+
+    <section class="autonomy" aria-label="Autonomie du vaisseau">
+      <div>
+        <div class="days">${medMin === Infinity ? "–" : medMin}<small>jours</small></div>
+        <div class="label">Médicament le plus critique</div>
+        <div class="orbit"><span class="${medMin > 30 ? "ok" : ""}" style="width:${gauge(medMin)}%"></span></div>
+      </div>
+      <div>
+        <div class="days">${joursRepas}<small>jours</small></div>
+        <div class="label">Repas pour ${data.equipage.length} membres d'équipage</div>
+        <div class="orbit"><span class="${joursRepas > 30 ? "ok" : ""}" style="width:${gauge(joursRepas)}%"></span></div>
+      </div>
+      <div>
+        <div class="days">${partSaine}<small>%</small></div>
+        <div class="label">Cultures en bonne santé</div>
+        <div class="orbit"><span class="${partSaine >= 80 ? "ok" : ""}" style="width:${partSaine}%"></span></div>
+      </div>
+    </section>
+
+    <div class="grid-2">
+      <section class="panel">
+        <h2>Dernières alertes</h2>
+        ${alertList(recent)}
+        <p><a href="#alertes">Voir toutes les alertes</a></p>
+      </section>
+      <section class="panel">
+        <h2>Stocks sous le seuil</h2>
+        ${stocksBas()}
+      </section>
+    </div>`;
+}
+
+function stocksBas() {
+  const items = [
+    ...data.graines.filter((g) => g.quantite < g.seuil).map((g) => `Graines de ${g.espece.toLowerCase()} : ${g.quantite} / ${g.seuil}`),
+    ...data.medicaments.filter((m) => m.medbox < m.seuilMedbox).map((m) => `MedBox, ${m.nom} : ${m.medbox} / ${m.seuilMedbox}`),
+    ...data.aliments.filter((a) => a.quantite < 20).map((a) => `${a.nom} : ${a.quantite} restants`)
+  ];
+  if (!items.length) return `<p class="empty">Tous les stocks sont au-dessus de leur seuil.</p>`;
+  return `<ul class="alert-list">${items.map((i) => `<li><span class="tag warn">Bas</span> ${esc(i)}</li>`).join("")}</ul>`;
+}
+
+function alertList(list) {
+  if (!list.length) return `<p class="empty">Aucune alerte pour le moment.</p>`;
+  const labels = { danger: "Urgent", warn: "À surveiller", ok: "Info" };
+  return `<ul class="alert-list">${list.map((a) => `
+    <li>
+      <span class="tag ${a.niveau}">${labels[a.niveau] || "Info"}</span>
+      <div><div>${esc(a.message)}</div><div class="when">${formatDate(a.date)} · ${esc(a.pilier)}</div></div>
+    </li>`).join("")}</ul>`;
+}
+
+function pageGraines() {
+  const leaf = (sick) => `<svg width="56" height="56" viewBox="0 0 60 60" aria-hidden="true">
+      <path d="M30 54 C12 40 12 18 30 6 C48 18 48 40 30 54 Z" fill="${sick ? "#C9A06B" : "#2A9D8F"}"/>
+      <line x1="30" y1="54" x2="30" y2="16" stroke="#F5F3EE" stroke-width="2"/>
+      ${sick ? `<circle cx="22" cy="28" r="4" fill="#7A4B1F"/><circle cx="37" cy="36" r="3" fill="#7A4B1F"/><circle cx="33" cy="22" r="2.5" fill="#7A4B1F"/>` : ""}
+    </svg>`;
+
+  return `
+    <h1>Graines et CropGuard</h1>
+    <p class="intro">Le stock de semences de l'armoire et la surveillance des cultures par caméra. Quand CropGuard détecte une plante malade, ARKA prévient la ferme et réserve des graines pour replanter.</p>
+
+    <section class="panel">
+      <div class="row" style="justify-content:space-between;margin-bottom:16px">
+        <h2 style="margin:0">Surveillance des serres</h2>
+        <button class="btn" data-action="analyse">Lancer une analyse des photos</button>
+      </div>
+      <div class="zones">
+        ${data.zones.map((z) => `
+          <article class="zone ${z.etat === "malade" ? "sick" : ""}">
+            <div class="photo">${leaf(z.etat === "malade")}</div>
+            <div class="info">
+              <strong>${esc(z.zone)}</strong>
+              <span class="muted">${esc(z.espece)}</span><br>
+              <span class="tag ${z.etat === "malade" ? "danger" : "ok"}">${z.etat === "malade" ? "Maladie détectée" : "Saine"}</span>
+              <div class="muted">Confiance ${z.confiance} %</div>
+              ${z.etat === "malade" ? `<button class="btn small secondary" data-action="traiter" data-id="${z.id}" style="margin-top:8px">Marquer comme traitée</button>` : ""}
+            </div>
+          </article>`).join("")}
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Stock de graines</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Espèce</th><th>Sachets</th><th>Seuil</th><th>État</th><th></th></tr></thead>
+        <tbody>
+          ${data.graines.map((g) => `
+            <tr>
+              <td>${esc(g.espece)}</td><td>${g.quantite}</td><td>${g.seuil}</td>
+              <td><span class="tag ${g.quantite < g.seuil ? "warn" : "ok"}">${g.quantite < g.seuil ? "Sous le seuil" : "Suffisant"}</span></td>
+              <td><button class="btn small secondary" data-action="retirer-graines" data-id="${g.id}">Retirer 5 sachets</button></td>
+            </tr>`).join("")}
+        </tbody>
+      </table></div>
+    </section>`;
+}
+
+function pageMedicaments() {
+  const maxConso = Math.max(...data.medicaments.map((m) => avg(m.conso)));
+  const classement = [...data.medicaments].sort((a, b) => avg(b.conso) - avg(a.conso));
+  const d = ui.delivrance;
+
+  return `
+    <h1>Médicaments</h1>
+    <p class="intro">L'armoire garde la réserve principale et réapprovisionne la MedBox, le stock utilisé au quotidien. La prévision calcule combien de jours chaque médicament va durer.</p>
+
+    <section class="panel">
+      <div class="row" style="justify-content:space-between;margin-bottom:8px">
+        <h2 style="margin:0">Réserve et MedBox</h2>
+        <button class="btn secondary" data-action="simuler-jour">Simuler une journée</button>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Médicament</th><th>Réserve</th><th>MedBox</th><th>Conso / jour</th><th>Autonomie</th><th></th></tr></thead>
+        <tbody>
+          ${data.medicaments.map((m) => {
+            const j = joursRestantsMed(m);
+            const niveau = j < 30 ? "danger" : j < 60 ? "warn" : "ok";
+            return `<tr>
+              <td>${esc(m.nom)}</td>
+              <td>${m.reserve}</td>
+              <td>${m.medbox} ${m.medbox < m.seuilMedbox ? `<span class="tag warn">Bas</span>` : ""}</td>
+              <td>${avg(m.conso).toFixed(1)}</td>
+              <td><span class="tag ${niveau}">${j === Infinity ? "–" : j + " jours"}</span></td>
+              <td><button class="btn small secondary" data-action="reappro" data-id="${m.id}">Remplir la MedBox</button></td>
+            </tr>`;
+          }).join("")}
+        </tbody>
+      </table></div>
+    </section>
+
+    <div class="grid-2">
+      <section class="panel">
+        <h2>Les plus utilisés (14 jours)</h2>
+        <div class="bars">
+          ${classement.map((m) => `
+            <div class="bar-row">
+              <span>${esc(m.nom.split(" ")[0])}</span>
+              <div class="bar"><span style="width:${(avg(m.conso) / maxConso) * 100}%"></span></div>
+              <span>${avg(m.conso).toFixed(1)}/j</span>
+            </div>`).join("")}
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Délivrer à un membre</h2>
+        <div class="field">
+          <label for="deliv-membre">Membre d'équipage</label>
+          <select id="deliv-membre">
+            <option value="">Choisir…</option>
+            ${data.equipage.map((e) => `<option value="${e.id}" ${d && d.membre === e.id ? "selected" : ""}>${esc(e.nom)}</option>`).join("")}
+          </select>
+        </div>
+        <div class="field">
+          <label for="deliv-med">Médicament</label>
+          <select id="deliv-med">
+            <option value="">Choisir…</option>
+            ${data.medicaments.map((m) => `<option value="${m.id}" ${d && d.med === m.id ? "selected" : ""}>${esc(m.nom)}</option>`).join("")}
+          </select>
+        </div>
+        <button class="btn" data-action="delivrer">Vérifier et délivrer</button>
+        ${d && d.message ? `<div class="result ${d.ok ? "ok" : "blocked"}">${esc(d.message)}</div>` : ""}
+      </section>
+    </div>`;
+}
+
+function pageAlimentation() {
+  const membre = data.equipage.find((e) => e.id === ui.membreAlim);
+  let bloc = `<p class="empty">Choisissez un membre d'équipage pour voir les produits qui lui conviennent.</p>`;
+
+  if (membre) {
+    const suggestions = suggestionRepas(membre);
+    bloc = `
+      <h2>Suggestion pour ${esc(membre.nom)}</h2>
+      ${suggestions.length
+        ? `<div class="row">${suggestions.map((a) => `<span class="tag ok">${esc(a.categorie)} : ${esc(a.nom)}</span>`).join("")}</div>`
+        : `<p class="empty">Aucun produit compatible en stock. Prévenez le pilier repas.</p>`}
+      <p class="muted">Les produits incompatibles sont d'abord exclus par des règles strictes, puis la suggestion choisit parmi les produits restants.</p>`;
+  }
+
+  return `
+    <h1>Alimentation</h1>
+    <p class="intro">Tous les produits de l'armoire et leur compatibilité avec chaque membre d'équipage, selon ses allergies, son régime et son état de santé.</p>
+
+    <section class="panel">
+      <div class="field" style="max-width:360px">
+        <label for="alim-membre">Pour quel membre ?</label>
+        <select id="alim-membre">
+          <option value="">Tout l'inventaire</option>
+          ${data.equipage.map((e) => `<option value="${e.id}" ${ui.membreAlim === e.id ? "selected" : ""}>${esc(e.nom)}</option>`).join("")}
+        </select>
+      </div>
+      ${bloc}
+    </section>
+
+    <section class="panel">
+      <h2>Inventaire</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Produit</th><th>Catégorie</th><th>Quantité</th><th>Allergènes</th><th>${membre ? "Pour " + esc(membre.nom.split(" ")[0]) : "Régimes"}</th></tr></thead>
+        <tbody>
+          ${data.aliments.map((a) => {
+            let colonne = a.tags.map((t) => `<span class="tag">${esc(t)}</span>`).join("") || `<span class="muted">–</span>`;
+            if (membre) {
+              const motifs = motifsIncompatibilite(a, membre);
+              colonne = motifs.length
+                ? `<span class="tag danger">Incompatible</span>${canSeeHealth() ? `<div class="muted">${esc(motifs.join(", "))}</div>` : ""}`
+                : `<span class="tag ok">Compatible</span>`;
+            }
+            return `<tr>
+              <td>${esc(a.nom)}</td><td>${esc(a.categorie)}</td><td>${a.quantite}</td>
+              <td>${a.allergenes.map((x) => `<span class="tag warn">${esc(x)}</span>`).join("") || `<span class="muted">Aucun</span>`}</td>
+              <td>${colonne}</td>
+            </tr>`;
+          }).join("")}
+        </tbody>
+      </table></div>
+      ${membre && !canSeeHealth() ? `<p class="muted">Le motif médical n'est visible que par le pilier médecine.</p>` : ""}
+    </section>`;
+}
+
+function pageEquipage() {
+  const err = ui.formErrors;
+  const checks = (name, list) => list.map((v) => `
+    <label><input type="checkbox" name="${name}" value="${esc(v)}"> ${esc(v)}</label>`).join("");
+
+  return `
+    <h1>Équipage</h1>
+    <p class="intro">La fiche d'identification remplie à l'arrivée dans le vaisseau. La section santé sert à protéger chaque membre lors de la distribution des repas et des médicaments.</p>
+
+    <div class="grid-2">
+      <section class="panel">
+        <h2>Membres enregistrés</h2>
+        <ul class="alert-list">
+          ${data.equipage.map((e) => `
+            <li>
+              <div>
+                <strong>${esc(e.nom)}</strong> <span class="muted">· ${esc(e.pilier)}</span>
+                <div>
+                  ${canSeeHealth()
+                    ? ([...e.allergies.map((a) => `<span class="tag danger">${esc(a)}</span>`),
+                        ...e.regimes.map((r) => `<span class="tag">${esc(r)}</span>`),
+                        ...e.maladies.map((m) => `<span class="tag warn">${esc(m)}</span>`)].join("") || `<span class="muted">Aucune restriction</span>`)
+                    : `<span class="muted">Profil santé confidentiel</span>`}
+                </div>
+              </div>
+            </li>`).join("")}
+        </ul>
+      </section>
+
+      <section class="panel">
+        <h2>Nouvelle fiche d'identification</h2>
+        <form id="form-membre" novalidate>
+          <div class="field">
+            <label for="f-nom">Nom et prénom</label>
+            <input type="text" id="f-nom" name="nom" autocomplete="off">
+            ${err.nom ? `<span class="error">${err.nom}</span>` : ""}
+          </div>
+          <div class="field">
+            <label for="f-pilier">Pilier</label>
+            <select id="f-pilier" name="pilier">
+              <option value="">Choisir…</option>
+              ${PILIERS.map((p) => `<option>${esc(p)}</option>`).join("")}
+            </select>
+            ${err.pilier ? `<span class="error">${err.pilier}</span>` : ""}
+          </div>
+          <fieldset><legend>Allergies</legend><div class="checks">${checks("allergies", ALLERGENES)}</div></fieldset>
+          <fieldset><legend>Régime alimentaire</legend><div class="checks">${checks("regimes", REGIMES)}</div></fieldset>
+          <fieldset><legend>Maladies à prendre en compte</legend><div class="checks">${checks("maladies", MALADIES)}</div></fieldset>
+          <div class="field">
+            <label for="f-notes">Remarques pour l'équipe médicale</label>
+            <textarea id="f-notes" name="notes"></textarea>
+          </div>
+          <button type="submit" class="btn">Enregistrer la fiche</button>
+        </form>
+      </section>
+    </div>`;
+}
+
+function pageAlertes() {
+  return `
+    <h1>Alertes</h1>
+    <p class="intro">Tout ce que les piliers doivent savoir : maladies détectées dans les serres, stocks bas, retraits bloqués.</p>
+    <section class="panel">
+      <div class="row" style="justify-content:space-between;margin-bottom:8px">
+        <h2 style="margin:0">${data.alertes.length} alerte${data.alertes.length > 1 ? "s" : ""}</h2>
+        ${data.alertes.length ? `<button class="btn secondary" data-action="vider-alertes">Tout marquer comme lu</button>` : ""}
+      </div>
+      ${alertList(data.alertes)}
+    </section>
+    <p><button class="btn secondary" data-action="reset">Réinitialiser les données de démonstration</button></p>`;
+}
+
+/* ---------- Routage ---------- */
+const routes = {
+  dashboard: pageDashboard,
+  graines: pageGraines,
+  medicaments: pageMedicaments,
+  alimentation: pageAlimentation,
+  equipage: pageEquipage,
+  alertes: pageAlertes
+};
+
+function currentRoute() {
+  const r = location.hash.replace("#", "");
+  return routes[r] ? r : "dashboard";
+}
+
+function render() {
+  const r = currentRoute();
+  app.innerHTML = routes[r]();
+  document.querySelectorAll(".nav a").forEach((a) => {
+    const on = a.dataset.route === r;
+    a.classList.toggle("active", on);
+    if (on) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
+  });
+  document.getElementById("alert-count").textContent = data.alertes.length || "";
+}
+
+/* ---------- Actions ---------- */
+const actions = {
+  // Simulation de l'IA vision : dans la vraie version, les photos sont envoyées
+  // à un modèle de classification d'images (ex. entraîné sur PlantVillage).
+  analyse() {
+    let nouvelles = 0;
+    data.zones.forEach((z) => {
+      if (z.etat === "saine" && Math.random() < 0.3) {
+        z.etat = "malade";
+        z.confiance = 80 + Math.floor(Math.random() * 18);
+        nouvelles++;
+        addAlert("danger", "Agriculture", `CropGuard : feuilles malades détectées en ${z.zone} (${z.espece.toLowerCase()}).`);
+        const g = data.graines.find((s) => s.espece === z.espece);
+        if (g) {
+          const reserve = Math.min(5, g.quantite);
+          g.quantite -= reserve;
+          addAlert("warn", "Agriculture", `${reserve} sachets de graines de ${g.espece.toLowerCase()} réservés pour replanter la ${z.zone}.`);
+          if (g.quantite < g.seuil) addAlert("warn", "Agriculture", `Stock de graines de ${g.espece.toLowerCase()} sous le seuil (${g.quantite} / ${g.seuil}).`);
+        }
+      } else {
+        z.confiance = Math.min(99, Math.max(80, z.confiance + Math.round(Math.random() * 4 - 2)));
+      }
+    });
+    toast(nouvelles ? `${nouvelles} zone(s) malade(s) détectée(s). La ferme est prévenue.` : "Analyse terminée : aucune nouvelle maladie.");
+  },
+
+  traiter(id) {
+    const z = data.zones.find((x) => x.id === id);
+    if (z) { z.etat = "saine"; z.confiance = 95; toast(`${z.zone} marquée comme traitée.`); }
+  },
+
+  "retirer-graines"(id) {
+    const g = data.graines.find((x) => x.id === id);
+    if (!g) return;
+    if (g.quantite < 5) { toast(`Pas assez de graines de ${g.espece.toLowerCase()} (${g.quantite} restants).`); return; }
+    g.quantite -= 5;
+    if (g.quantite < g.seuil) addAlert("warn", "Agriculture", `Stock de graines de ${g.espece.toLowerCase()} sous le seuil (${g.quantite} / ${g.seuil}).`);
+    toast(`5 sachets de ${g.espece.toLowerCase()} retirés.`);
+  },
+
+  reappro(id) {
+    const m = data.medicaments.find((x) => x.id === id);
+    if (!m) return;
+    const cible = m.seuilMedbox * 2;
+    const besoin = Math.max(0, cible - m.medbox);
+    const envoye = Math.min(besoin, m.reserve);
+    if (!envoye) { toast(besoin ? "Réserve vide : impossible de remplir la MedBox." : "La MedBox est déjà pleine."); return; }
+    m.reserve -= envoye;
+    m.medbox += envoye;
+    toast(`${envoye} unités de ${m.nom} envoyées vers la MedBox.`);
+  },
+
+  // Simulation d'une journée de consommation dans la MedBox
+  "simuler-jour"() {
+    data.medicaments.forEach((m) => {
+      const moyenne = avg(m.conso);
+      const jour = Math.max(0, Math.round((moyenne + (Math.random() * 2 - 1)) * 2) / 2);
+      const pris = Math.min(jour, m.medbox);
+      m.medbox -= pris;
+      m.conso.push(pris);
+      m.conso.shift();
+      if (m.medbox < m.seuilMedbox) addAlert("warn", "Médecine", `MedBox : ${m.nom} sous le seuil (${m.medbox} / ${m.seuilMedbox}).`);
+      if (joursRestantsMed(m) < 30) addAlert("danger", "Médecine", `${m.nom} : moins de 30 jours d'autonomie. Prévoir la production ou le rationnement.`);
+    });
+    toast("Une journée de consommation a été simulée.");
+  },
+
+  delivrer() {
+    const membreId = document.getElementById("deliv-membre").value;
+    const medId = document.getElementById("deliv-med").value;
+    if (!membreId || !medId) {
+      ui.delivrance = { membre: membreId, med: medId, ok: false, message: "Choisissez un membre et un médicament." };
+      return;
+    }
+    const membre = data.equipage.find((e) => e.id === membreId);
+    const med = data.medicaments.find((m) => m.id === medId);
+    if (med.allergene && membre.allergies.includes(med.allergene)) {
+      const detail = canSeeHealth() ? ` : allergie déclarée (${med.allergene})` : "";
+      ui.delivrance = { membre: membreId, med: medId, ok: false, message: `Délivrance bloquée${detail}. Contactez le pilier médecine pour une alternative.` };
+      addAlert("danger", "Médecine", `Délivrance bloquée : ${med.nom} pour ${membre.nom} (contre-indication).`);
+      return;
+    }
+    if (med.medbox < 1) {
+      ui.delivrance = { membre: membreId, med: medId, ok: false, message: "MedBox vide pour ce médicament. Remplissez-la depuis la réserve." };
+      return;
+    }
+    med.medbox -= 1;
+    ui.delivrance = { membre: membreId, med: medId, ok: true, message: `${med.nom} délivré à ${membre.nom}.` };
+  },
+
+  "vider-alertes"() { data.alertes = []; toast("Toutes les alertes sont marquées comme lues."); },
+
+  reset() {
+    data = JSON.parse(JSON.stringify(DEFAULT_DATA));
+    ui = { membreAlim: "", delivrance: null, formErrors: {} };
+    toast("Données de démonstration réinitialisées.");
+  }
+};
+
+/* ---------- Événements ---------- */
+app.addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-action]");
+  if (!btn || !actions[btn.dataset.action]) return;
+  actions[btn.dataset.action](btn.dataset.id);
+  saveData();
+  render();
+});
+
+app.addEventListener("change", (e) => {
+  if (e.target.id === "alim-membre") { ui.membreAlim = e.target.value; render(); }
+});
+
+app.addEventListener("submit", (e) => {
+  if (e.target.id !== "form-membre") return;
+  e.preventDefault();
+  const f = new FormData(e.target);
+  const nom = (f.get("nom") || "").trim();
+  const pilier = f.get("pilier");
+  ui.formErrors = {};
+  if (!nom) ui.formErrors.nom = "Indiquez le nom et le prénom.";
+  if (!pilier) ui.formErrors.pilier = "Choisissez un pilier.";
+  if (Object.keys(ui.formErrors).length) { render(); return; }
+
+  data.equipage.push({
+    id: uid("e"), nom, pilier,
+    allergies: f.getAll("allergies"),
+    regimes: f.getAll("regimes"),
+    maladies: f.getAll("maladies"),
+    notes: (f.get("notes") || "").trim()
+  });
+  saveData();
+  render();
+  toast(`Fiche de ${nom} enregistrée.`);
+});
+
+roleSelect.addEventListener("change", () => { role = roleSelect.value; render(); });
+window.addEventListener("hashchange", () => { render(); app.focus(); });
+
+render();
+
+</script>
+</body>
+</html>
